@@ -2,6 +2,7 @@ import React from "react";
 import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/Hero";
 import { ChallengeCard } from "@/components/ChallengeCard";
+import { ChatBot } from "@/components/ChatBot";
 
 const Index = () => {
   const challenges = [
@@ -88,6 +89,9 @@ const Index = () => {
           </p>
         </div>
       </footer>
+      
+      {/* ChatBot */}
+      <ChatBot />
     </div>
   );
 };
