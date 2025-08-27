@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Shield, Lock, Code, Wifi, Brain, Database } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface ChallengeCardProps {
   title: string;
@@ -49,6 +50,17 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
 }) => {
   const IconComponent = getIcon(category);
   const progress = (completed / challenges) * 100;
+  const navigate = useNavigate();
+
+  const handleStartChallenge = () => {
+    // Navigate to SQL game for the first challenge (SQL Injection Basics)
+    if (title === "SQL Injection Basics") {
+      navigate("/sql-game");
+    } else {
+      // For other challenges, show coming soon message
+      alert("This challenge is coming soon! Try the SQL Injection game for now.");
+    }
+  };
 
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/50 cyber-bg">
@@ -93,6 +105,7 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
         <Button 
           variant="cyber" 
           className="w-full group-hover:shadow-cyber transition-all duration-300"
+          onClick={handleStartChallenge}
         >
           {completed === 0 ? "Start Challenge" : "Continue"}
         </Button>
