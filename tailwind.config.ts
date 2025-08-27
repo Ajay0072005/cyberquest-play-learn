@@ -18,6 +18,10 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				cyber: ['Orbitron', 'monospace'],
+				terminal: ['Fira Code', 'monospace'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -51,6 +55,15 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
+				},
+				cyber: {
+					green: 'hsl(var(--cyber-green))',
+					'green-glow': 'hsl(var(--cyber-green-glow))',
+					blue: 'hsl(var(--electric-blue))',
+					purple: 'hsl(var(--neon-purple))',
+					void: 'hsl(var(--dark-void))',
+					surface: 'hsl(var(--dark-surface))',
+					terminal: 'hsl(var(--terminal-green))',
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',

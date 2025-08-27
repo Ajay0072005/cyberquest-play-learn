@@ -1,42 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Fira+Code:wght@300;400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* CyberQuest Design System - Cyberpunk/Hacker Aesthetic */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core Dark Theme */
+    --background: 200 7% 8%;
+    --foreground: 120 100% 85%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Card System */
+    --card: 200 7% 12%;
+    --card-foreground: 120 100% 85%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Interactive Elements */
+    --popover: 200 7% 15%;
+    --popover-foreground: 120 100% 85%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Cyber Green Primary */
+    --primary: 120 100% 50%;
+    --primary-foreground: 200 7% 8%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Electric Blue Secondary */
+    --secondary: 195 100% 50%;
+    --secondary-foreground: 200 7% 8%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted Elements */
+    --muted: 200 7% 18%;
+    --muted-foreground: 120 15% 65%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Neon Accent */
+    --accent: 300 100% 60%;
+    --accent-foreground: 200 7% 8%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Danger/Alert */
+    --destructive: 0 100% 60%;
+    --destructive-foreground: 200 7% 8%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Borders & Inputs */
+    --border: 120 20% 25%;
+    --input: 200 7% 15%;
+    --ring: 120 100% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Custom Cyber Colors */
+    --cyber-green: 120 100% 50%;
+    --cyber-green-glow: 120 100% 70%;
+    --electric-blue: 195 100% 50%;
+    --neon-purple: 300 100% 60%;
+    --dark-void: 200 7% 8%;
+    --dark-surface: 200 7% 12%;
+    --terminal-green: 120 100% 40%;
+
+    /* Gradients */
+    --gradient-cyber: linear-gradient(135deg, hsl(var(--cyber-green)), hsl(var(--electric-blue)));
+    --gradient-void: linear-gradient(180deg, hsl(var(--dark-void)), hsl(var(--dark-surface)));
+    --gradient-glow: radial-gradient(circle, hsl(var(--cyber-green) / 0.2), transparent);
+
+    /* Shadows & Effects */
+    --shadow-neon: 0 0 20px hsl(var(--cyber-green) / 0.5);
+    --shadow-cyber: 0 10px 30px hsl(var(--cyber-green) / 0.3);
+    --glow-intense: 0 0 40px hsl(var(--cyber-green) / 0.8);
+
+    /* Animations */
+    --transition-cyber: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-glow: box-shadow 0.3s ease-in-out;
+
+    /* Typography */
+    --font-cyber: 'Orbitron', monospace;
+    --font-terminal: 'Fira Code', monospace;
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +136,70 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Orbitron', monospace;
+  }
+}
+
+@layer components {
+  /* Cyber Text Effects */
+  .cyber-glow {
+    text-shadow: 0 0 10px hsl(var(--cyber-green) / 0.8);
+  }
+  
+  .terminal-text {
+    font-family: var(--font-terminal);
+    color: hsl(var(--terminal-green));
+  }
+  
+  .glitch-effect {
+    animation: glitch 2s infinite;
+  }
+  
+  /* Neon Border Effect */
+  .neon-border {
+    border: 1px solid hsl(var(--cyber-green));
+    box-shadow: 
+      0 0 5px hsl(var(--cyber-green) / 0.5),
+      inset 0 0 5px hsl(var(--cyber-green) / 0.1);
+  }
+  
+  /* Cyber Background */
+  .cyber-bg {
+    background: var(--gradient-void);
+    position: relative;
+  }
+  
+  .cyber-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-glow);
+    opacity: 0.1;
+    pointer-events: none;
+  }
+}
+
+@layer utilities {
+  /* Animation Keyframes */
+  @keyframes glitch {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-2px); }
+    40% { transform: translateX(2px); }
+    60% { transform: translateX(-2px); }
+    80% { transform: translateX(2px); }
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px hsl(var(--cyber-green) / 0.5); }
+    50% { box-shadow: 0 0 40px hsl(var(--cyber-green) / 0.8); }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
   }
 }
