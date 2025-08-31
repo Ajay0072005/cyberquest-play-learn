@@ -4,67 +4,67 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Clean Blue Theme Design System */
+/* TryHackMe-Inspired Dark Theme */
 
 @layer base {
   :root {
-    /* Core Theme */
-    --background: 210 40% 98%;
-    --foreground: 222 84% 5%;
+    /* Core Dark Theme */
+    --background: 215 25% 15%;
+    --foreground: 0 0% 95%;
 
     /* Card System */
-    --card: 0 0% 100%;
-    --card-foreground: 222 84% 5%;
+    --card: 215 25% 18%;
+    --card-foreground: 0 0% 95%;
 
     /* Interactive Elements */
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 84% 5%;
+    --popover: 215 25% 18%;
+    --popover-foreground: 0 0% 95%;
 
-    /* Blue Primary */
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
+    /* Bright Green Primary (TryHackMe style) */
+    --primary: 120 100% 50%;
+    --primary-foreground: 215 25% 15%;
 
-    /* Light Blue Secondary */
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    /* Dark Secondary */
+    --secondary: 215 25% 20%;
+    --secondary-foreground: 0 0% 95%;
 
     /* Muted Elements */
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 215 25% 20%;
+    --muted-foreground: 0 0% 70%;
 
-    /* Blue Accent */
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
+    /* Green Accent */
+    --accent: 215 25% 20%;
+    --accent-foreground: 0 0% 95%;
 
     /* Danger/Alert */
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 95%;
 
     /* Borders & Inputs */
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
+    --border: 215 25% 25%;
+    --input: 215 25% 18%;
+    --ring: 120 100% 50%;
 
     --radius: 0.5rem;
 
-    /* Custom Blue Colors */
-    --cyber-green: 221 83% 53%;
-    --cyber-green-glow: 221 83% 53%;
-    --electric-blue: 221 83% 53%;
-    --neon-purple: 221 83% 53%;
-    --dark-void: 210 40% 98%;
-    --dark-surface: 0 0% 100%;
-    --terminal-green: 221 83% 53%;
+    /* TryHackMe Colors */
+    --cyber-green: 120 100% 50%;
+    --cyber-green-glow: 120 100% 60%;
+    --electric-blue: 195 100% 50%;
+    --neon-purple: 300 100% 60%;
+    --dark-void: 215 25% 15%;
+    --dark-surface: 215 25% 18%;
+    --terminal-green: 120 100% 45%;
 
-    /* Simple Gradients */
-    --gradient-cyber: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 63%));
-    --gradient-void: linear-gradient(180deg, hsl(210 40% 98%), hsl(0 0% 100%));
-    --gradient-glow: radial-gradient(circle, hsl(221 83% 53% / 0.1), transparent);
+    /* Dark Gradients */
+    --gradient-cyber: linear-gradient(135deg, hsl(120 100% 50%), hsl(195 100% 50%));
+    --gradient-void: linear-gradient(180deg, hsl(215 25% 15%), hsl(215 25% 18%));
+    --gradient-glow: radial-gradient(circle, hsl(120 100% 50% / 0.15), transparent);
 
-    /* Clean Shadows */
-    --shadow-neon: 0 1px 3px hsl(221 83% 53% / 0.12);
-    --shadow-cyber: 0 4px 6px hsl(221 83% 53% / 0.1);
-    --glow-intense: 0 0 0 1px hsl(221 83% 53% / 0.05);
+    /* Glowing Shadows */
+    --shadow-neon: 0 0 20px hsl(120 100% 50% / 0.3);
+    --shadow-cyber: 0 10px 30px hsl(120 100% 50% / 0.2);
+    --glow-intense: 0 0 40px hsl(120 100% 50% / 0.4);
 
     /* Animations */
     --transition-cyber: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -74,21 +74,14 @@
     --font-cyber: 'Orbitron', monospace;
     --font-terminal: 'Fira Code', monospace;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 215 25% 15%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 120 100% 50%;
+    --sidebar-primary-foreground: 215 25% 15%;
+    --sidebar-accent: 215 25% 18%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 215 25% 25%;
+    --sidebar-ring: 120 100% 50%;
   }
 
   .dark {
@@ -142,24 +135,45 @@
 }
 
 @layer components {
-  /* Clean Text Effects */
+  /* Cyber Text Effects */
   .cyber-glow {
     color: hsl(var(--primary));
+    text-shadow: 0 0 10px hsl(var(--cyber-green) / 0.6);
   }
   
   .terminal-text {
     font-family: var(--font-terminal);
-    color: hsl(var(--primary));
+    color: hsl(var(--terminal-green));
   }
   
-  /* Simple Border */
+  .glitch-effect {
+    animation: glitch 2s infinite;
+  }
+  
+  /* Neon Border Effect */
   .neon-border {
-    border: 1px solid hsl(var(--border));
+    border: 1px solid hsl(var(--cyber-green));
+    box-shadow: 
+      0 0 5px hsl(var(--cyber-green) / 0.5),
+      inset 0 0 5px hsl(var(--cyber-green) / 0.1);
   }
   
-  /* Clean Background */
+  /* Cyber Background */
   .cyber-bg {
-    background: hsl(var(--background));
+    background: var(--gradient-void);
+    position: relative;
+  }
+  
+  .cyber-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-glow);
+    opacity: 0.1;
+    pointer-events: none;
   }
 }
 
@@ -174,8 +188,8 @@
   }
   
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 1px 3px hsl(221 83% 53% / 0.12); }
-    50% { box-shadow: 0 4px 6px hsl(221 83% 53% / 0.1); }
+    0%, 100% { box-shadow: 0 0 20px hsl(120 100% 50% / 0.3); }
+    50% { box-shadow: 0 0 40px hsl(120 100% 50% / 0.6); }
   }
   
   @keyframes float {
