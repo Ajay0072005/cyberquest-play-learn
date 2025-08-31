@@ -4,67 +4,67 @@
 @tailwind components;
 @tailwind utilities;
 
-/* CyberQuest Design System - Cyberpunk/Hacker Aesthetic */
+/* Clean Blue Theme Design System */
 
 @layer base {
   :root {
-    /* Core Dark Theme */
-    --background: 200 7% 8%;
-    --foreground: 120 100% 85%;
+    /* Core Theme */
+    --background: 210 40% 98%;
+    --foreground: 222 84% 5%;
 
     /* Card System */
-    --card: 200 7% 12%;
-    --card-foreground: 120 100% 85%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 84% 5%;
 
     /* Interactive Elements */
-    --popover: 200 7% 15%;
-    --popover-foreground: 120 100% 85%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 84% 5%;
 
-    /* Cyber Green Primary */
-    --primary: 120 100% 50%;
-    --primary-foreground: 200 7% 8%;
+    /* Blue Primary */
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
 
-    /* Electric Blue Secondary */
-    --secondary: 195 100% 50%;
-    --secondary-foreground: 200 7% 8%;
+    /* Light Blue Secondary */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
 
     /* Muted Elements */
-    --muted: 200 7% 18%;
-    --muted-foreground: 120 15% 65%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    /* Neon Accent */
-    --accent: 300 100% 60%;
-    --accent-foreground: 200 7% 8%;
+    /* Blue Accent */
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
 
     /* Danger/Alert */
-    --destructive: 0 100% 60%;
-    --destructive-foreground: 200 7% 8%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
 
     /* Borders & Inputs */
-    --border: 120 20% 25%;
-    --input: 200 7% 15%;
-    --ring: 120 100% 50%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Custom Cyber Colors */
-    --cyber-green: 120 100% 50%;
-    --cyber-green-glow: 120 100% 70%;
-    --electric-blue: 195 100% 50%;
-    --neon-purple: 300 100% 60%;
-    --dark-void: 200 7% 8%;
-    --dark-surface: 200 7% 12%;
-    --terminal-green: 120 100% 40%;
+    /* Custom Blue Colors */
+    --cyber-green: 221 83% 53%;
+    --cyber-green-glow: 221 83% 53%;
+    --electric-blue: 221 83% 53%;
+    --neon-purple: 221 83% 53%;
+    --dark-void: 210 40% 98%;
+    --dark-surface: 0 0% 100%;
+    --terminal-green: 221 83% 53%;
 
-    /* Gradients */
-    --gradient-cyber: linear-gradient(135deg, hsl(var(--cyber-green)), hsl(var(--electric-blue)));
-    --gradient-void: linear-gradient(180deg, hsl(var(--dark-void)), hsl(var(--dark-surface)));
-    --gradient-glow: radial-gradient(circle, hsl(var(--cyber-green) / 0.2), transparent);
+    /* Simple Gradients */
+    --gradient-cyber: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 63%));
+    --gradient-void: linear-gradient(180deg, hsl(210 40% 98%), hsl(0 0% 100%));
+    --gradient-glow: radial-gradient(circle, hsl(221 83% 53% / 0.1), transparent);
 
-    /* Shadows & Effects */
-    --shadow-neon: 0 0 20px hsl(var(--cyber-green) / 0.5);
-    --shadow-cyber: 0 10px 30px hsl(var(--cyber-green) / 0.3);
-    --glow-intense: 0 0 40px hsl(var(--cyber-green) / 0.8);
+    /* Clean Shadows */
+    --shadow-neon: 0 1px 3px hsl(221 83% 53% / 0.12);
+    --shadow-cyber: 0 4px 6px hsl(221 83% 53% / 0.1);
+    --glow-intense: 0 0 0 1px hsl(221 83% 53% / 0.05);
 
     /* Animations */
     --transition-cyber: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -142,44 +142,24 @@
 }
 
 @layer components {
-  /* Cyber Text Effects */
+  /* Clean Text Effects */
   .cyber-glow {
-    text-shadow: 0 0 10px hsl(var(--cyber-green) / 0.8);
+    color: hsl(var(--primary));
   }
   
   .terminal-text {
     font-family: var(--font-terminal);
-    color: hsl(var(--terminal-green));
+    color: hsl(var(--primary));
   }
   
-  .glitch-effect {
-    animation: glitch 2s infinite;
-  }
-  
-  /* Neon Border Effect */
+  /* Simple Border */
   .neon-border {
-    border: 1px solid hsl(var(--cyber-green));
-    box-shadow: 
-      0 0 5px hsl(var(--cyber-green) / 0.5),
-      inset 0 0 5px hsl(var(--cyber-green) / 0.1);
+    border: 1px solid hsl(var(--border));
   }
   
-  /* Cyber Background */
+  /* Clean Background */
   .cyber-bg {
-    background: var(--gradient-void);
-    position: relative;
-  }
-  
-  .cyber-bg::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--gradient-glow);
-    opacity: 0.1;
-    pointer-events: none;
+    background: hsl(var(--background));
   }
 }
 
@@ -194,8 +174,8 @@
   }
   
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px hsl(var(--cyber-green) / 0.5); }
-    50% { box-shadow: 0 0 40px hsl(var(--cyber-green) / 0.8); }
+    0%, 100% { box-shadow: 0 1px 3px hsl(221 83% 53% / 0.12); }
+    50% { box-shadow: 0 4px 6px hsl(221 83% 53% / 0.1); }
   }
   
   @keyframes float {
