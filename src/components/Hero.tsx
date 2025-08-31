@@ -44,18 +44,10 @@ export const Hero: React.FC = () => {
           </div>
           
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-            <div className="text-center p-6 bg-card/50 rounded-lg backdrop-blur-sm border border-border/50">
-              <div className="text-3xl font-cyber text-primary cyber-glow mb-2">500+</div>
-              <div className="text-muted-foreground">Interactive Challenges</div>
-            </div>
-            <div className="text-center p-6 bg-card/50 rounded-lg backdrop-blur-sm border border-border/50">
+          <div className="flex justify-center mt-16">
+            <div className="text-center p-6 bg-card/50 rounded-lg backdrop-blur-sm border border-border/50 max-w-xs">
               <div className="text-3xl font-cyber text-secondary mb-2">10K+</div>
               <div className="text-muted-foreground">Active Learners</div>
-            </div>
-            <div className="text-center p-6 bg-card/50 rounded-lg backdrop-blur-sm border border-border/50">
-              <div className="text-3xl font-cyber text-accent mb-2">99%</div>
-              <div className="text-muted-foreground">Success Rate</div>
             </div>
           </div>
         </div>
