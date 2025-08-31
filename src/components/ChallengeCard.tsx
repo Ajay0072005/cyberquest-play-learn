@@ -53,12 +53,14 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
   const navigate = useNavigate();
 
   const handleStartChallenge = () => {
-    // Navigate to SQL game for the first challenge (SQL Injection Basics)
+    // Navigate to appropriate game based on challenge
     if (title === "SQL Injection Basics") {
       navigate("/sql-game");
+    } else if (title === "Encryption Fundamentals") {
+      navigate("/crypto-puzzles");
     } else {
       // For other challenges, show coming soon message
-      alert("This challenge is coming soon! Try the SQL Injection game for now.");
+      alert("This challenge is coming soon! Try the SQL Injection or Crypto Puzzles for now.");
     }
   };
 

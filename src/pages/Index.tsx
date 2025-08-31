@@ -3,6 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/Hero";
 import { ChallengeCard } from "@/components/ChallengeCard";
 import { ChatBot } from "@/components/ChatBot";
+import { PointsDisplay } from "@/components/PointsDisplay";
 
 const Index = () => {
   const challenges = [
@@ -23,12 +24,12 @@ const Index = () => {
       completed: 0,
     },
     {
-      title: "Advanced Cryptography",
-      description: "Dive deep into modern cryptographic systems and their weaknesses",
-      difficulty: "Advanced" as const,
+      title: "Encryption Fundamentals", 
+      description: "Learn cryptography basics through hands-on decoding challenges",
+      difficulty: "Beginner" as const,
       category: "Cryptography",
-      challenges: 15,
-      completed: 7,
+      challenges: 3,
+      completed: 0,
     },
     {
       title: "Social Engineering",
@@ -64,6 +65,10 @@ const Index = () => {
       {/* Challenges Section */}
       <section id="challenges" className="py-20 bg-gradient-to-b from-background to-muted/20">
         <div className="container mx-auto px-4">
+          <div className="flex justify-center mb-8">
+            <PointsDisplay />
+          </div>
+          
           <div className="text-center mb-16">
             <h2 className="text-4xl font-cyber font-bold mb-4 cyber-glow">
               Choose Your Path
