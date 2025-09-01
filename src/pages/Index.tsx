@@ -15,46 +15,6 @@ const Index = () => {
       challenges: 8,
       completed: 3,
     },
-    {
-      title: "Network Penetration",
-      description: "Master network scanning, enumeration, and exploitation techniques",
-      difficulty: "Intermediate" as const,
-      category: "Network Security",
-      challenges: 12,
-      completed: 0,
-    },
-    {
-      title: "Encryption Fundamentals", 
-      description: "Learn cryptography basics through hands-on decoding challenges",
-      difficulty: "Beginner" as const,
-      category: "Cryptography",
-      challenges: 3,
-      completed: 0,
-    },
-    {
-      title: "Social Engineering",
-      description: "Understand human psychological manipulation in cybersecurity contexts",
-      difficulty: "Intermediate" as const,
-      category: "Social Engineering",
-      challenges: 10,
-      completed: 5,
-    },
-    {
-      title: "Database Security",
-      description: "Secure database systems and protect against data breaches",
-      difficulty: "Beginner" as const,
-      category: "Database Security",
-      challenges: 6,
-      completed: 6,
-    },
-    {
-      title: "Mobile Security",
-      description: "Discover vulnerabilities in iOS and Android applications",
-      difficulty: "Advanced" as const,
-      category: "General",
-      challenges: 20,
-      completed: 2,
-    },
   ];
 
   return (
