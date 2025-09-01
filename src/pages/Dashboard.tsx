@@ -28,11 +28,16 @@ const Dashboard: React.FC = () => {
     { type: 'challenge', name: 'Caesar Cipher', points: 100, time: '2 days ago' },
   ];
 
+  // Calculate cryptography progress based on completed crypto puzzles
+  const cryptoCompleted = completedChallenges.filter(id => 
+    id.includes('crypto') || id.includes('cipher') || id.includes('caesar') || id.includes('vigenere') || id.includes('substitution')
+  ).length;
+  
   const challengeCategories = [
-    { name: 'Web Security', completed: 5, total: 12, color: 'text-primary' },
-    { name: 'Cryptography', completed: 3, total: 8, color: 'text-secondary' },
-    { name: 'Network Security', completed: 2, total: 10, color: 'text-accent' },
-    { name: 'Forensics', completed: 1, total: 6, color: 'text-destructive' },
+    { name: 'Web Security', completed: 0, total: 12, color: 'text-primary' },
+    { name: 'Cryptography', completed: cryptoCompleted, total: 8, color: 'text-secondary' },
+    { name: 'Network Security', completed: 0, total: 10, color: 'text-accent' },
+    { name: 'Forensics', completed: 0, total: 6, color: 'text-destructive' },
   ];
 
   return (
