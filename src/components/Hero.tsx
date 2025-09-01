@@ -4,6 +4,13 @@ import { Shield, Play, Code } from "lucide-react";
 import heroImage from "@/assets/cyber-hero-bg.jpg";
 
 export const Hero: React.FC = () => {
+  const scrollToChallenges = () => {
+    const challengesSection = document.getElementById('challenges');
+    if (challengesSection) {
+      challengesSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -33,11 +40,11 @@ export const Hero: React.FC = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button variant="hero" size="xl" className="group">
+            <Button variant="hero" size="xl" className="group" onClick={scrollToChallenges}>
               <Play className="h-5 w-5 group-hover:scale-110 transition-transform" />
               Start Learning
             </Button>
-            <Button variant="outline" size="xl" className="border-primary/50 text-primary hover:bg-primary/10">
+            <Button variant="outline" size="xl" className="border-primary/50 text-primary hover:bg-primary/10" onClick={scrollToChallenges}>
               <Code className="h-5 w-5" />
               Browse Challenges
             </Button>
