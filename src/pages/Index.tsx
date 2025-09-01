@@ -50,7 +50,7 @@ const Index = () => {
       <footer className="py-12 bg-card border-t border-border/50">
         <div className="container mx-auto px-4 text-center">
           <p className="text-muted-foreground">
-            © 2024 CyberQuest. Empowering the next generation of cybersecurity professionals.
+            © 2025 CyberQuest. Empowering the next generation of cybersecurity professionals.
           </p>
         </div>
       </footer>
