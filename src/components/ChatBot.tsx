@@ -180,7 +180,7 @@ export const ChatBot: React.FC = () => {
                   <div
                     className={`max-w-[280px] px-3 py-2 rounded-lg text-sm ${
                       message.sender === "user"
-                        ? "bg-primary text-primary-foreground ml-auto shadow-lg border border-primary/20"
+                        ? "bg-primary text-black ml-auto shadow-lg border border-primary/20"
                         : "bg-muted text-foreground"
                     }`}
                   >
