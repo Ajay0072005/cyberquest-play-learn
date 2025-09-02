@@ -18,19 +18,29 @@ const botResponses = {
     "Greetings! I'm here to guide you through your cybersecurity learning journey."
   ],
   challenges: [
-    "We have 6 main challenge categories: Web Security, Network Security, Cryptography, Social Engineering, Database Security, and Mobile Security. Which interests you most?",
-    "Our challenges range from Beginner to Advanced levels. I recommend starting with SQL Injection Basics if you're new to web security!",
-    "Each challenge path includes hands-on labs, real-world simulations, and progress tracking. Want me to recommend a path based on your experience?"
+    "We have exciting interactive challenges! Try our SQL Injection Game to learn about database security, or test your skills with Crypto Puzzles including Caesar ciphers, Vigenère ciphers, and substitution ciphers.",
+    "Our challenges include hands-on SQL injection simulations and cryptography puzzles. Which area interests you most - database security or cryptography?",
+    "Start with our interactive games: SQL Injection Game for web security fundamentals, or Crypto Puzzles for encryption and decryption challenges!"
+  ],
+  sql: [
+    "The SQL Injection Game teaches you how to identify and exploit SQL injection vulnerabilities! You'll practice on a simulated user database and learn both offensive and defensive techniques.",
+    "Our SQL injection challenge simulates a real login system with vulnerable code. Perfect for understanding how attackers exploit databases and how to prevent it!",
+    "Ready to hack a database? The SQL Injection Game lets you try different injection techniques on a safe, simulated environment. Great for beginners!"
+  ],
+  crypto: [
+    "Crypto Puzzles include Caesar cipher, Vigenère cipher, and substitution cipher challenges! Each puzzle teaches different encryption techniques used throughout history.",
+    "Test your decryption skills with our cryptography puzzles! Start with Caesar cipher (letter shifting), then try Vigenère (keyword-based) and substitution ciphers.",
+    "Our crypto challenges cover classical ciphers that form the foundation of modern cryptography. Decode secret messages and earn points!"
   ],
   help: [
     "I can help you navigate CyberQuest, recommend learning paths, explain concepts, or answer questions about cybersecurity. What would you like to know?",
     "Need guidance? I can suggest challenges based on your skill level, explain cybersecurity concepts, or help you track your progress.",
-    "I'm here to make your learning journey smoother! Ask me about specific topics, challenge difficulty, or career advice in cybersecurity."
+    "I'm here to make your learning journey smoother! Ask me about SQL injection, cryptography, or any other cybersecurity topics."
   ],
   default: [
-    "That's an interesting question about cybersecurity! While I don't have a specific answer, I recommend exploring our challenge modules for hands-on learning.",
-    "I'm still learning too! For detailed technical questions, try our community forums or dive into the relevant challenge path.",
-    "Great question! The best way to learn cybersecurity is through practice. Check out our interactive challenges for practical experience."
+    "That's an interesting question about cybersecurity! Try our SQL Injection Game or Crypto Puzzles for hands-on learning experience.",
+    "I'm still learning too! For practical experience, check out our interactive SQL injection and cryptography challenges.",
+    "Great question! The best way to learn cybersecurity is through practice. Try our SQL game or crypto puzzles!"
   ]
 };
 
@@ -44,6 +54,16 @@ const getBotResponse = (userMessage: string): string => {
   
   if (message.includes("hello") || message.includes("hi") || message.includes("hey")) {
     return getRandomResponse("greeting");
+  }
+  
+  if (message.includes("sql") || message.includes("injection") || message.includes("database")) {
+    return getRandomResponse("sql");
+  }
+  
+  if (message.includes("crypto") || message.includes("cipher") || message.includes("caesar") || 
+      message.includes("vigenere") || message.includes("substitution") || message.includes("encrypt") || 
+      message.includes("decrypt") || message.includes("puzzle")) {
+    return getRandomResponse("crypto");
   }
   
   if (message.includes("challenge") || message.includes("learn") || message.includes("start")) {
