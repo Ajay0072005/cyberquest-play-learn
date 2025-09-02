@@ -33,8 +33,14 @@ const Dashboard: React.FC = () => {
     id.includes('crypto') || id.includes('cipher') || id.includes('caesar') || id.includes('vigenere') || id.includes('substitution')
   ).length;
   
+  // Calculate SQL progress based on completed SQL challenges
+  const sqlCompleted = completedChallenges.filter(id => 
+    id.includes('sql') || id.includes('injection') || id.includes('database')
+  ).length;
+  
   const challengeCategories = [
     { name: 'Web Security', completed: 0, total: 12, color: 'text-primary' },
+    { name: 'SQL Security', completed: sqlCompleted, total: 5, color: 'text-accent' },
     { name: 'Cryptography', completed: cryptoCompleted, total: 8, color: 'text-secondary' },
     { name: 'Network Security', completed: 0, total: 10, color: 'text-accent' },
     { name: 'Forensics', completed: 0, total: 6, color: 'text-destructive' },
