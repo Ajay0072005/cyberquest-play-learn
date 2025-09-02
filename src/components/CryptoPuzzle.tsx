@@ -123,7 +123,7 @@ export const CryptoPuzzle: React.FC<CryptoPuzzleProps> = ({ onBack }) => {
             <CardContent className="space-y-4">
               <div>
                 <h4 className="font-semibold mb-2">Challenge:</h4>
-                <p className="text-muted-foreground">{puzzle.description}</p>
+                <p className="text-foreground">{puzzle.description}</p>
               </div>
 
               <div>
