@@ -181,11 +181,11 @@ export const ChatBot: React.FC = () => {
                     className={`max-w-[280px] px-3 py-2 rounded-lg text-sm ${
                       message.sender === "user"
                         ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground ml-auto"
-                        : "bg-muted text-muted-foreground"
+                        : "bg-muted text-foreground"
                     }`}
                   >
                     <p className="terminal-text">{message.text}</p>
-                    <span className="text-xs opacity-60 mt-1 block">
+                    <span className="text-xs opacity-70 mt-1 block">
                       {message.timestamp.toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit"
@@ -207,13 +207,13 @@ export const ChatBot: React.FC = () => {
                   <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                     <Bot className="h-4 w-4 text-primary" />
                   </div>
-                  <div className="bg-muted text-muted-foreground px-3 py-2 rounded-lg">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-                    </div>
-                  </div>
+                   <div className="bg-muted text-foreground px-3 py-2 rounded-lg">
+                     <div className="flex gap-1">
+                       <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                       <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                       <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                     </div>
+                   </div>
                 </div>
               )}
               
