@@ -50,12 +50,16 @@ export const Navigation: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          <Button variant="ghost">
-            Sign In
-          </Button>
-          <Button variant="cyber">
-            Get Started
-          </Button>
+          <Link to="/login">
+            <Button variant="ghost">
+              Sign In
+            </Button>
+          </Link>
+          <Link to="/register">
+            <Button variant="cyber">
+              Get Started
+            </Button>
+          </Link>
         </div>
       </div>
     </nav>
