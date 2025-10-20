@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X, MessageSquare, Send, Bot, User } from "lucide-react";
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
   id: string;
@@ -11,78 +13,12 @@ interface Message {
   timestamp: Date;
 }
 
-const botResponses = {
-  greeting: [
-    "Welcome to CyberQuest! I'm your AI security assistant. How can I help you today?",
-    "Hello, cyber warrior! Ready to dive into some cybersecurity challenges?",
-    "Greetings! I'm here to guide you through your cybersecurity learning journey."
-  ],
-  challenges: [
-    "We have exciting interactive challenges! Try our SQL Injection Game to learn about database security, or test your skills with Crypto Puzzles including Caesar ciphers, Vigenère ciphers, and substitution ciphers.",
-    "Our challenges include hands-on SQL injection simulations and cryptography puzzles. Which area interests you most - database security or cryptography?",
-    "Start with our interactive games: SQL Injection Game for web security fundamentals, or Crypto Puzzles for encryption and decryption challenges!"
-  ],
-  sql: [
-    "The SQL Injection Game teaches you how to identify and exploit SQL injection vulnerabilities! You'll practice on a simulated user database and learn both offensive and defensive techniques.",
-    "Our SQL injection challenge simulates a real login system with vulnerable code. Perfect for understanding how attackers exploit databases and how to prevent it!",
-    "Ready to hack a database? The SQL Injection Game lets you try different injection techniques on a safe, simulated environment. Great for beginners!"
-  ],
-  crypto: [
-    "Crypto Puzzles include Caesar cipher, Vigenère cipher, and substitution cipher challenges! Each puzzle teaches different encryption techniques used throughout history.",
-    "Test your decryption skills with our cryptography puzzles! Start with Caesar cipher (letter shifting), then try Vigenère (keyword-based) and substitution ciphers.",
-    "Our crypto challenges cover classical ciphers that form the foundation of modern cryptography. Decode secret messages and earn points!"
-  ],
-  help: [
-    "I can help you navigate CyberQuest, recommend learning paths, explain concepts, or answer questions about cybersecurity. What would you like to know?",
-    "Need guidance? I can suggest challenges based on your skill level, explain cybersecurity concepts, or help you track your progress.",
-    "I'm here to make your learning journey smoother! Ask me about SQL injection, cryptography, or any other cybersecurity topics."
-  ],
-  default: [
-    "That's an interesting question about cybersecurity! Try our SQL Injection Game or Crypto Puzzles for hands-on learning experience.",
-    "I'm still learning too! For practical experience, check out our interactive SQL injection and cryptography challenges.",
-    "Great question! The best way to learn cybersecurity is through practice. Try our SQL game or crypto puzzles!"
-  ]
-};
-
-const getRandomResponse = (category: keyof typeof botResponses): string => {
-  const responses = botResponses[category];
-  return responses[Math.floor(Math.random() * responses.length)];
-};
-
-const getBotResponse = (userMessage: string): string => {
-  const message = userMessage.toLowerCase();
-  
-  if (message.includes("hello") || message.includes("hi") || message.includes("hey")) {
-    return getRandomResponse("greeting");
-  }
-  
-  if (message.includes("sql") || message.includes("injection") || message.includes("database")) {
-    return getRandomResponse("sql");
-  }
-  
-  if (message.includes("crypto") || message.includes("cipher") || message.includes("caesar") || 
-      message.includes("vigenere") || message.includes("substitution") || message.includes("encrypt") || 
-      message.includes("decrypt") || message.includes("puzzle")) {
-    return getRandomResponse("crypto");
-  }
-  
-  if (message.includes("challenge") || message.includes("learn") || message.includes("start")) {
-    return getRandomResponse("challenges");
-  }
-  
-  if (message.includes("help") || message.includes("guide") || message.includes("how")) {
-    return getRandomResponse("help");
-  }
-  
-  return getRandomResponse("default");
-};
-
 export const ChatBot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Hello! I'm CyberBot, your cybersecurity learning assistant. How can I help you today?",
+      text: "Hello! I'm CyberBot, your AI-powered cybersecurity assistant. I have access to 12,663 cybersecurity questions and can help you learn. Ask me anything!",
       sender: "bot",
       timestamp: new Date()
     }
@@ -90,6 +26,7 @@ export const ChatBot: React.FC = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -110,21 +47,60 @@ export const ChatBot: React.FC = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentMessage = inputMessage;
     setInputMessage("");
     setIsTyping(true);
 
-    // Simulate bot thinking time
-    setTimeout(() => {
-      const botMessage: Message = {
+    try {
+      const { data, error } = await supabase.functions.invoke('chat-rag', {
+        body: { message: currentMessage }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data?.error) {
+        toast({
+          title: "Error",
+          description: data.error,
+          variant: "destructive"
+        });
+        
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: data.error,
+          sender: "bot",
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      } else {
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: data.reply,
+          sender: "bot",
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, botMessage]);
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to get response. Please try again.",
+        variant: "destructive"
+      });
+      
+      const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: getBotResponse(inputMessage),
+        text: "Sorry, I encountered an error. Please try again.",
         sender: "bot",
         timestamp: new Date()
       };
-
-      setMessages(prev => [...prev, botMessage]);
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1000 + Math.random() * 1000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
