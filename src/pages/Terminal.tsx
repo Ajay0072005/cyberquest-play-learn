@@ -189,6 +189,14 @@ const Terminal = () => {
       case 'cd':
         if (!args[0]) {
           setCurrentPath('/home/hacker');
+        } else if (args[0] === '..') {
+          // Go up one directory
+          const pathParts = currentPath.split('/').filter(p => p);
+          if (pathParts.length > 0) {
+            pathParts.pop();
+            const newPath = '/' + pathParts.join('/');
+            setCurrentPath(newPath || '/');
+          }
         } else {
           const newPath = args[0].startsWith('/') ? args[0] : `${currentPath}/${args[0]}`;
           if (fileSystem[newPath]) {
