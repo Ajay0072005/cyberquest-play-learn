@@ -60,7 +60,9 @@ const Terminal = () => {
             },
             'error.log': {
               type: 'file',
-              content: 'Error: Unauthorized access attempt detected.\nError: Failed login for user: admin\nNote: Security key stored in /root/.secret',
+              content: 'Error: Unauthorized access attempt detected.\nError: Failed login for user: admin\nNote: Security key stored in /root/.secret\n\nFlag: FLAG{log_analysis_master}\nPoints: 60',
+              flag: 'FLAG{log_analysis_master}',
+              points: 60,
             },
           },
         },
@@ -392,6 +394,9 @@ const Terminal = () => {
               <ul className="space-y-2 text-sm">
                 <li className={foundFlags.has('FLAG{hidden_files_r_cool}') ? 'line-through opacity-50' : ''}>
                   ✓ Find the hidden file in the home directory
+                </li>
+                <li className={foundFlags.has('FLAG{log_analysis_master}') ? 'line-through opacity-50' : ''}>
+                  ✓ Analyze system log files for clues
                 </li>
                 <li className={foundFlags.has('FLAG{system_files_exposed}') ? 'line-through opacity-50' : ''}>
                   ✓ Examine system configuration files
