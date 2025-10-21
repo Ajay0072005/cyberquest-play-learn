@@ -47,6 +47,16 @@ export const Navigation: React.FC = () => {
           >
             Crypto Puzzles
           </Link>
+          <Link 
+            to="/terminal" 
+            className={`transition-colors ${
+              location.pathname === '/terminal' 
+                ? 'text-primary cyber-glow' 
+                : 'text-muted-foreground hover:text-primary'
+            }`}
+          >
+            Terminal
+          </Link>
         </div>
         
         <div className="flex items-center gap-4">

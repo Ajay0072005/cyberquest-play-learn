@@ -13,6 +13,7 @@ interface ChallengeCardProps {
   icon?: string;
   challenges: number;
   completed: number;
+  link?: string;
 }
 
 const getIcon = (category: string) => {
@@ -20,6 +21,7 @@ const getIcon = (category: string) => {
     "Web Security": Code,
     "Network Security": Wifi,
     "Cryptography": Lock,
+    "System Security": Shield,
     "Social Engineering": Brain,
     "Database Security": Database,
     "General": Shield,
@@ -47,20 +49,18 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
   category,
   challenges,
   completed,
+  link,
 }) => {
   const IconComponent = getIcon(category);
   const progress = (completed / challenges) * 100;
   const navigate = useNavigate();
 
   const handleStartChallenge = () => {
-    // Navigate to appropriate game based on challenge
-    if (title === "SQL Injection Basics") {
-      navigate("/sql-game");
-    } else if (title === "Encryption Fundamentals") {
-      navigate("/crypto-puzzles");
+    if (link) {
+      navigate(link);
     } else {
-      // For other challenges, show coming soon message
-      alert("This challenge is coming soon! Try the SQL Injection or Crypto Puzzles for now.");
+      // For challenges without a link, show coming soon message
+      alert("This challenge is coming soon!");
     }
   };
 

@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import SQLGame from "./pages/SQLGame";
 import CryptoPuzzles from "./pages/CryptoPuzzles";
+import Terminal from "./pages/Terminal";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/sql-game" element={<SQLGame />} />
             <Route path="/crypto-puzzles" element={<CryptoPuzzles />} />
+            <Route path="/terminal" element={<Terminal />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

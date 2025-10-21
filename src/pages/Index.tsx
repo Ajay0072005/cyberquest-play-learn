@@ -14,6 +14,25 @@ const Index = () => {
       category: "Web Security",
       challenges: 8,
       completed: 3,
+      link: "/sql-game",
+    },
+    {
+      title: "Crypto Puzzles",
+      description: "Master cryptography by solving Caesar, Vigenère, and substitution cipher challenges",
+      difficulty: "Intermediate" as const,
+      category: "Cryptography",
+      challenges: 12,
+      completed: 0,
+      link: "/crypto-puzzles",
+    },
+    {
+      title: "Terminal Challenge",
+      description: "Navigate a Linux terminal, execute commands, and uncover hidden security flags",
+      difficulty: "Beginner" as const,
+      category: "System Security",
+      challenges: 5,
+      completed: 0,
+      link: "/terminal",
     },
   ];
 
