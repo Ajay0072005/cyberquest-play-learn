@@ -1,15 +1,20 @@
 import React from "react";
 import { CryptoPuzzle } from "@/components/CryptoPuzzle";
 import { useNavigate } from "react-router-dom";
+import { DashboardLayout } from "@/components/DashboardLayout";
 
 const CryptoPuzzles = () => {
   const navigate = useNavigate();
 
   const handleBack = () => {
-    navigate("/");
+    navigate("/dashboard");
   };
 
-  return <CryptoPuzzle onBack={handleBack} />;
+  return (
+    <DashboardLayout>
+      <CryptoPuzzle onBack={handleBack} />
+    </DashboardLayout>
+  );
 };
 
 export default CryptoPuzzles;

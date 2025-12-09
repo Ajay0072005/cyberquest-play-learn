@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Navigation } from '@/components/Navigation';
+import { DashboardLayout } from '@/components/DashboardLayout';
 import { PointsDisplay } from '@/components/PointsDisplay';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -19,14 +19,19 @@ import {
   Calendar,
   Database,
   Upload,
-  Loader2
+  Loader2,
+  Flame,
+  Star,
+  Award
 } from 'lucide-react';
 import { useGame } from '@/context/GameContext';
+import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 const Dashboard: React.FC = () => {
   const { points, level, completedChallenges } = useGame();
+  const { user } = useAuth();
   const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
 
@@ -36,9 +41,7 @@ const Dashboard: React.FC = () => {
     try {
       const { data, error } = await supabase.functions.invoke('import-knowledge');
       
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
       
       if (data?.error) {
         toast({
@@ -49,7 +52,7 @@ const Dashboard: React.FC = () => {
       } else {
         toast({
           title: "Import Successful",
-          description: `Successfully imported ${data.imported} cybersecurity questions into the knowledge base!`,
+          description: `Successfully imported ${data.imported} cybersecurity questions!`,
         });
       }
     } catch (error) {
@@ -70,270 +73,307 @@ const Dashboard: React.FC = () => {
     { type: 'challenge', name: 'Caesar Cipher', points: 100, time: '2 days ago' },
   ];
 
-  // Calculate cryptography progress based on completed crypto puzzles
   const cryptoCompleted = completedChallenges.filter(id => 
     id.includes('crypto') || id.includes('cipher') || id.includes('caesar') || id.includes('vigenere') || id.includes('substitution')
   ).length;
   
-  // Calculate SQL progress based on completed SQL challenges
   const sqlCompleted = completedChallenges.filter(id => 
     id.includes('sql') || id.includes('injection') || id.includes('database')
   ).length;
   
   const challengeCategories = [
-    { name: 'Web Security', completed: 0, total: 12, color: 'text-primary' },
-    { name: 'SQL Security', completed: sqlCompleted, total: 5, color: 'text-accent' },
-    { name: 'Cryptography', completed: cryptoCompleted, total: 8, color: 'text-secondary' },
-    { name: 'Network Security', completed: 0, total: 10, color: 'text-accent' },
-    { name: 'Forensics', completed: 0, total: 6, color: 'text-destructive' },
+    { name: 'Web Security', completed: 0, total: 12, color: 'from-primary to-primary/50' },
+    { name: 'SQL Security', completed: sqlCompleted, total: 5, color: 'from-blue-500 to-blue-400' },
+    { name: 'Cryptography', completed: cryptoCompleted, total: 8, color: 'from-purple-500 to-purple-400' },
+    { name: 'Network Security', completed: 0, total: 10, color: 'from-orange-500 to-orange-400' },
+    { name: 'Forensics', completed: 0, total: 6, color: 'from-red-500 to-red-400' },
   ];
 
+  const KeyIcon = ({ className }: { className?: string }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+    </svg>
+  );
+
+  const achievements = [
+    { name: 'First Steps', description: 'Complete your first challenge', unlocked: completedChallenges.length > 0, icon: Trophy },
+    { name: 'Speed Runner', description: 'Complete 5 challenges in one day', unlocked: false, icon: Zap },
+    { name: 'Security Expert', description: 'Master all web security challenges', unlocked: false, icon: Shield },
+    { name: 'Crypto Master', description: 'Complete all cryptography puzzles', unlocked: cryptoCompleted >= 8, icon: KeyIcon },
+    { name: 'SQL Ninja', description: 'Master SQL injection techniques', unlocked: sqlCompleted >= 5, icon: Database },
+    { name: 'Elite Hacker', description: 'Reach level 10', unlocked: level >= 10, icon: Star },
+  ];
+
+  const username = user?.email?.split('@')[0] || 'Hacker';
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
-      <main className="container mx-auto px-4 pt-24 pb-8">
-        <div className="flex items-center gap-4 mb-8">
-          <Avatar className="h-16 w-16">
+    <DashboardLayout>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-4">
+          <Avatar className="h-14 w-14 md:h-16 md:w-16 border-2 border-primary/50">
             <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback className="bg-primary/20 text-primary text-xl">
-              CQ
+            <AvatarFallback className="bg-primary/20 text-primary text-xl font-cyber">
+              {username.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-3xl font-cyber font-bold cyber-glow">Welcome back, Hacker!</h1>
-            <p className="text-muted-foreground">Ready to level up your cybersecurity skills?</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-1">
-            <PointsDisplay />
-          </div>
-          
-          <Card className="cyber-bg border-primary/30">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Target className="h-5 w-5 text-primary" />
-                Challenges Completed
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-cyber font-bold text-primary cyber-glow mb-2">
-                {completedChallenges.length}
-              </div>
-              <p className="text-sm text-muted-foreground">Keep pushing your limits!</p>
-            </CardContent>
-          </Card>
-
-          <Card className="cyber-bg border-primary/30">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <TrendingUp className="h-5 w-5 text-secondary" />
-                This Week
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-cyber font-bold text-secondary mb-2">
-                +{points > 500 ? Math.floor(points * 0.3) : points} XP
-              </div>
-              <p className="text-sm text-muted-foreground">Great progress!</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="cyber-bg border-primary/30 mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Database className="h-5 w-5" />
-              AI Chatbot Knowledge Base
-            </CardTitle>
-            <CardDescription>
-              Import the cybersecurity question dataset into the AI chatbot
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Load 12,663 cybersecurity questions from the cysecbench.csv dataset into the AI chatbot's knowledge base using RAG (Retrieval Augmented Generation).
+            <h1 className="text-2xl md:text-3xl font-cyber font-bold cyber-glow">
+              Welcome, {username}!
+            </h1>
+            <p className="text-muted-foreground text-sm md:text-base">
+              Ready to level up your cybersecurity skills?
             </p>
-            
-            <Button 
-              onClick={handleImportData} 
-              disabled={isImporting}
-              className="w-full sm:w-auto"
-            >
-              {isImporting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Importing... (This may take a few minutes)
-                </>
-              ) : (
-                <>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Import Knowledge Base
-                </>
-              )}
-            </Button>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <Badge variant="outline" className="px-3 py-1.5 border-primary/50 text-primary">
+            <Flame className="h-4 w-4 mr-1" />
+            Level {level}
+          </Badge>
+          <Badge variant="outline" className="px-3 py-1.5 border-secondary/50">
+            <Star className="h-4 w-4 mr-1" />
+            {points} XP
+          </Badge>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-colors">
+          <CardContent className="p-4 md:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Points</p>
+                <p className="text-2xl md:text-3xl font-cyber font-bold text-primary cyber-glow">{points}</p>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
+                <Trophy className="h-6 w-6 text-primary" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="challenges">Challenges</TabsTrigger>
-            <TabsTrigger value="achievements">Achievements</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="cyber-bg border-primary/30">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-primary" />
-                    Challenge Categories
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {challengeCategories.map((category) => (
-                    <div key={category.name} className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">{category.name}</span>
-                        <span className="text-sm text-muted-foreground">
-                          {category.completed}/{category.total}
-                        </span>
-                      </div>
-                      <Progress 
-                        value={(category.completed / category.total) * 100} 
-                        className="h-2"
-                      />
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              <Card className="cyber-bg border-primary/30">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-secondary" />
-                    Recent Activity
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {recentActivity.map((activity, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        {activity.type === 'challenge' ? (
-                          <Target className="h-4 w-4 text-primary" />
-                        ) : (
-                          <Trophy className="h-4 w-4 text-accent" />
-                        )}
-                        <div>
-                          <p className="text-sm font-medium">{activity.name}</p>
-                          <p className="text-xs text-muted-foreground">{activity.time}</p>
-                        </div>
-                      </div>
-                      <Badge variant="outline" className="text-primary">
-                        +{activity.points} XP
-                      </Badge>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-colors">
+          <CardContent className="p-4 md:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Challenges</p>
+                <p className="text-2xl md:text-3xl font-cyber font-bold text-blue-400">{completedChallenges.length}</p>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                <Target className="h-6 w-6 text-blue-400" />
+              </div>
             </div>
-          </TabsContent>
+          </CardContent>
+        </Card>
 
-          <TabsContent value="challenges">
+        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-colors">
+          <CardContent className="p-4 md:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Current Streak</p>
+                <p className="text-2xl md:text-3xl font-cyber font-bold text-orange-400">3 days</p>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-orange-500/20 flex items-center justify-center">
+                <Flame className="h-6 w-6 text-orange-400" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-colors">
+          <CardContent className="p-4 md:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Achievements</p>
+                <p className="text-2xl md:text-3xl font-cyber font-bold text-purple-400">
+                  {achievements.filter(a => a.unlocked).length}/{achievements.length}
+                </p>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-purple-500/20 flex items-center justify-center">
+                <Award className="h-6 w-6 text-purple-400" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Tabs */}
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
+          <TabsTrigger value="overview" className="py-2">Overview</TabsTrigger>
+          <TabsTrigger value="challenges" className="py-2">Challenges</TabsTrigger>
+          <TabsTrigger value="achievements" className="py-2">Achievements</TabsTrigger>
+          <TabsTrigger value="tools" className="py-2">Tools</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Challenge Categories */}
             <Card className="cyber-bg border-primary/30">
               <CardHeader>
-                <CardTitle>Challenge Progress</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {challengeCategories.map((category) => (
-                    <Card key={category.name} className="cyber-bg border-border/50">
-                      <CardContent className="p-4">
-                        <h3 className="font-semibold mb-2">{category.name}</h3>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-muted-foreground">Progress</span>
-                          <span className="text-sm">{category.completed}/{category.total}</span>
-                        </div>
-                        <Progress value={(category.completed / category.total) * 100} className="h-2" />
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="achievements">
-            <Card className="cyber-bg border-primary/30">
-              <CardHeader>
-                <CardTitle>Achievements</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div className="flex items-center gap-3 p-4 bg-primary/10 rounded-lg border border-primary/30">
-                    <Trophy className="h-8 w-8 text-primary" />
-                    <div>
-                      <h3 className="font-semibold">First Steps</h3>
-                      <p className="text-sm text-muted-foreground">Complete your first challenge</p>
-                    </div>
-                    <CheckCircle className="h-5 w-5 text-primary ml-auto" />
-                  </div>
-                  
-                  <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg border border-border/50 opacity-60">
-                    <Zap className="h-8 w-8 text-muted-foreground" />
-                    <div>
-                      <h3 className="font-semibold">Speed Runner</h3>
-                      <p className="text-sm text-muted-foreground">Complete 5 challenges in one day</p>
-                    </div>
-                    <Lock className="h-5 w-5 text-muted-foreground ml-auto" />
-                  </div>
-                  
-                  <div className="flex items-center gap-3 p-4 bg-muted/20 rounded-lg border border-border/50 opacity-60">
-                    <Shield className="h-8 w-8 text-muted-foreground" />
-                    <div>
-                      <h3 className="font-semibold">Security Expert</h3>
-                      <p className="text-sm text-muted-foreground">Master all web security challenges</p>
-                    </div>
-                    <Lock className="h-5 w-5 text-muted-foreground ml-auto" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="activity">
-            <Card className="cyber-bg border-primary/30">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Activity Timeline
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Shield className="h-5 w-5 text-primary" />
+                  Challenge Progress
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentActivity.map((activity, index) => (
-                    <div key={index} className="flex items-start gap-4 p-4 bg-muted/10 rounded-lg">
-                      <div className="flex-shrink-0 w-2 h-2 bg-primary rounded-full mt-2"></div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-medium">{activity.name}</h3>
-                          <Badge variant="outline">+{activity.points} XP</Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground mt-1">{activity.time}</p>
-                      </div>
+              <CardContent className="space-y-4">
+                {challengeCategories.map((category) => (
+                  <div key={category.name} className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">{category.name}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {category.completed}/{category.total}
+                      </span>
                     </div>
-                  ))}
-                </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full bg-gradient-to-r ${category.color} transition-all duration-500`}
+                        style={{ width: `${(category.completed / category.total) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
-      </main>
-    </div>
+
+            {/* Recent Activity */}
+            <Card className="cyber-bg border-primary/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Clock className="h-5 w-5 text-secondary" />
+                  Recent Activity
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {recentActivity.map((activity, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/30 transition-colors">
+                    <div className="flex items-center gap-3">
+                      {activity.type === 'challenge' ? (
+                        <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                          <Target className="h-4 w-4 text-primary" />
+                        </div>
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                          <Trophy className="h-4 w-4 text-yellow-400" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-sm font-medium">{activity.name}</p>
+                        <p className="text-xs text-muted-foreground">{activity.time}</p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="text-primary border-primary/30">
+                      +{activity.points} XP
+                    </Badge>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="challenges">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {challengeCategories.map((category) => (
+              <Card key={category.name} className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover:scale-[1.02]">
+                <CardContent className="p-6">
+                  <div className={`h-12 w-12 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center mb-4`}>
+                    <Shield className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-2">{category.name}</h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm text-muted-foreground">Progress</span>
+                    <span className="text-sm font-medium">{category.completed}/{category.total}</span>
+                  </div>
+                  <Progress value={(category.completed / category.total) * 100} className="h-2" />
+                  <p className="text-xs text-muted-foreground mt-3">
+                    {Math.round((category.completed / category.total) * 100)}% complete
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="achievements">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {achievements.map((achievement) => (
+              <Card 
+                key={achievement.name} 
+                className={`cyber-bg transition-all ${
+                  achievement.unlocked 
+                    ? 'border-primary/50 hover:border-primary' 
+                    : 'border-border/50 opacity-60'
+                }`}
+              >
+                <CardContent className="p-6 flex items-start gap-4">
+                  <div className={`h-12 w-12 rounded-lg flex items-center justify-center ${
+                    achievement.unlocked ? 'bg-primary/20' : 'bg-muted'
+                  }`}>
+                    <achievement.icon className={`h-6 w-6 ${
+                      achievement.unlocked ? 'text-primary' : 'text-muted-foreground'
+                    }`} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">{achievement.name}</h3>
+                      {achievement.unlocked ? (
+                        <CheckCircle className="h-5 w-5 text-primary" />
+                      ) : (
+                        <Lock className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {achievement.description}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="tools">
+          <Card className="cyber-bg border-primary/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Database className="h-5 w-5" />
+                AI Chatbot Knowledge Base
+              </CardTitle>
+              <CardDescription>
+                Import the cybersecurity question dataset into the AI chatbot
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Load 12,663 cybersecurity questions from the cysecbench.csv dataset into the AI chatbot's knowledge base using RAG (Retrieval Augmented Generation).
+              </p>
+              
+              <Button 
+                onClick={handleImportData} 
+                disabled={isImporting}
+                variant="cyber"
+                className="w-full sm:w-auto"
+              >
+                {isImporting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Importing... (This may take a few minutes)
+                  </>
+                ) : (
+                  <>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Import Knowledge Base
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </DashboardLayout>
   );
 };
 
