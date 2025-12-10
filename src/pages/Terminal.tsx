@@ -416,7 +416,6 @@ const Terminal = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
     </DashboardLayout>
   );
 };
