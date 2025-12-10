@@ -14,6 +14,7 @@ import CryptoPuzzles from "./pages/CryptoPuzzles";
 import Terminal from "./pages/Terminal";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ProfileSettings from "./pages/ProfileSettings";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,11 @@ const App = () => (
               <Route path="/terminal" element={
                 <ProtectedRoute>
                   <Terminal />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings" element={
+                <ProtectedRoute>
+                  <ProfileSettings />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
