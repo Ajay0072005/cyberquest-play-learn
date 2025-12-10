@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 
 interface GameContextType {
   points: number;
@@ -19,6 +21,7 @@ export const useGame = () => {
 };
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
   const [points, setPoints] = useState(() => {
     const saved = localStorage.getItem('cyberquest-points');
     return saved ? parseInt(saved) : 0;
@@ -30,6 +33,50 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const level = Math.floor(points / 1000) + 1;
+
+  // Sync points from database when user logs in
+  useEffect(() => {
+    const syncPointsFromDB = async () => {
+      if (!user) return;
+
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('points')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (data && data.points > 0) {
+          // Use the higher value between local and DB
+          const localPoints = parseInt(localStorage.getItem('cyberquest-points') || '0');
+          const maxPoints = Math.max(data.points, localPoints);
+          setPoints(maxPoints);
+        }
+      } catch (error) {
+        console.error('Error syncing points:', error);
+      }
+    };
+
+    syncPointsFromDB();
+  }, [user]);
+
+  // Sync points to database when they change
+  useEffect(() => {
+    const syncPointsToDB = async () => {
+      if (!user || points === 0) return;
+
+      try {
+        await supabase
+          .from('profiles')
+          .update({ points })
+          .eq('user_id', user.id);
+      } catch (error) {
+        console.error('Error saving points to database:', error);
+      }
+    };
+
+    syncPointsToDB();
+  }, [points, user]);
 
   const addPoints = (newPoints: number) => {
     setPoints(prev => prev + newPoints);
