@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/context/AuthContext';
+import { User } from '@supabase/supabase-js';
 
 interface GameContextType {
   points: number;
@@ -21,7 +21,7 @@ export const useGame = () => {
 };
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
+  const [user, setUser] = useState<User | null>(null);
   const [points, setPoints] = useState(() => {
     const saved = localStorage.getItem('cyberquest-points');
     return saved ? parseInt(saved) : 0;
@@ -33,6 +33,21 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const level = Math.floor(points / 1000) + 1;
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Sync points from database when user logs in
   useEffect(() => {
