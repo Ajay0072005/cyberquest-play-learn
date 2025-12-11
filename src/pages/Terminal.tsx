@@ -25,7 +25,7 @@ const Terminal = () => {
   const [foundFlags, setFoundFlags] = useState<Set<string>>(new Set());
   const terminalEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { addPoints } = useGame();
+  const { addPoints, incrementTerminalFlags } = useGame();
   const { toast } = useToast();
 
   const fileSystem: Record<string, any> = {
@@ -220,6 +220,7 @@ const Terminal = () => {
             if (file.flag && !foundFlags.has(file.flag)) {
               setFoundFlags(prev => new Set([...prev, file.flag]));
               addPoints(file.points);
+              incrementTerminalFlags();
               toast({
                 title: "🎉 Flag Captured!",
                 description: `You found ${file.flag} and earned ${file.points} points!`,

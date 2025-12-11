@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Terminal, CheckCircle, XCircle, Lightbulb, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useGame } from "@/context/GameContext";
 
 interface GameLevel {
   id: number;
@@ -91,6 +92,7 @@ export const SQLInjectionGame: React.FC<{ onBack: () => void }> = ({ onBack }) =
   const [currentHint, setCurrentHint] = useState(0);
   const terminalRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { incrementSqlLevels } = useGame();
 
   const level = gameLevels[currentLevel];
 
@@ -123,6 +125,7 @@ export const SQLInjectionGame: React.FC<{ onBack: () => void }> = ({ onBack }) =
         result = `✅ ${level.expectedResult}`;
         if (!completedLevels.includes(level.id)) {
           setCompletedLevels(prev => [...prev, level.id]);
+          incrementSqlLevels();
           toast({
             title: "Challenge Completed!",
             description: `Level ${level.id}: ${level.title}`,
