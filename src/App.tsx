@@ -17,6 +17,7 @@ import Register from "./pages/Register";
 import ProfileSettings from "./pages/ProfileSettings";
 import Leaderboard from "./pages/Leaderboard";
 import Chat from "./pages/Chat";
+import Achievements from "./pages/Achievements";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,11 @@ const App = () => (
               <Route path="/chat" element={
                 <ProtectedRoute>
                   <Chat />
+                </ProtectedRoute>
+              } />
+              <Route path="/achievements" element={
+                <ProtectedRoute>
+                  <Achievements />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
