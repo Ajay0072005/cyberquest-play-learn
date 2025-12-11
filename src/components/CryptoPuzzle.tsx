@@ -47,7 +47,7 @@ export const CryptoPuzzle: React.FC<CryptoPuzzleProps> = ({ onBack }) => {
   const [showHint, setShowHint] = useState(false);
   const [solved, setSolved] = useState<string[]>([]);
   const { toast } = useToast();
-  const { addPoints, completeChallenge } = useGame();
+  const { addPoints, completeChallenge, incrementCryptoPuzzles } = useGame();
 
   const puzzle = puzzles[currentPuzzle];
 
@@ -60,6 +60,7 @@ export const CryptoPuzzle: React.FC<CryptoPuzzleProps> = ({ onBack }) => {
         setSolved(prev => [...prev, puzzle.id]);
         addPoints(puzzle.points);
         completeChallenge(puzzle.id);
+        incrementCryptoPuzzles();
         toast({
           title: "Puzzle Solved! 🎉",
           description: `+${puzzle.points} XP earned!`,

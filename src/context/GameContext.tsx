@@ -1,6 +1,17 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
+import { useToast } from '@/hooks/use-toast';
+
+interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  points: number;
+  requirement_type: string;
+  requirement_value: number;
+}
 
 interface GameContextType {
   points: number;
@@ -8,6 +19,14 @@ interface GameContextType {
   addPoints: (points: number) => void;
   completedChallenges: string[];
   completeChallenge: (challengeId: string) => void;
+  cryptoPuzzlesSolved: number;
+  sqlLevelsCompleted: number;
+  terminalFlagsFound: number;
+  chatMessagesSent: number;
+  incrementCryptoPuzzles: () => void;
+  incrementSqlLevels: () => void;
+  incrementTerminalFlags: () => void;
+  incrementChatMessages: () => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -22,6 +41,10 @@ export const useGame = () => {
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [userAchievementIds, setUserAchievementIds] = useState<Set<string>>(new Set());
+  const { toast } = useToast();
+
   const [points, setPoints] = useState(() => {
     const saved = localStorage.getItem('cyberquest-points');
     return saved ? parseInt(saved) : 0;
@@ -30,6 +53,26 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [completedChallenges, setCompletedChallenges] = useState<string[]>(() => {
     const saved = localStorage.getItem('cyberquest-completed');
     return saved ? JSON.parse(saved) : [];
+  });
+
+  const [cryptoPuzzlesSolved, setCryptoPuzzlesSolved] = useState(() => {
+    const saved = localStorage.getItem('cyberquest-crypto');
+    return saved ? parseInt(saved) : 0;
+  });
+
+  const [sqlLevelsCompleted, setSqlLevelsCompleted] = useState(() => {
+    const saved = localStorage.getItem('cyberquest-sql');
+    return saved ? parseInt(saved) : 0;
+  });
+
+  const [terminalFlagsFound, setTerminalFlagsFound] = useState(() => {
+    const saved = localStorage.getItem('cyberquest-terminal');
+    return saved ? parseInt(saved) : 0;
+  });
+
+  const [chatMessagesSent, setChatMessagesSent] = useState(() => {
+    const saved = localStorage.getItem('cyberquest-chat');
+    return saved ? parseInt(saved) : 0;
   });
 
   const level = Math.floor(points / 1000) + 1;
@@ -49,6 +92,51 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
+  // Fetch achievements and user achievements
+  useEffect(() => {
+    const fetchAchievements = async () => {
+      const { data } = await supabase.from('achievements').select('*');
+      if (data) setAchievements(data);
+
+      if (user) {
+        const { data: userAchievements } = await supabase
+          .from('user_achievements')
+          .select('achievement_id')
+          .eq('user_id', user.id);
+        if (userAchievements) {
+          setUserAchievementIds(new Set(userAchievements.map(ua => ua.achievement_id)));
+        }
+      }
+    };
+    fetchAchievements();
+  }, [user]);
+
+  // Check and award achievements
+  const checkAchievements = useCallback(async (type: string, value: number) => {
+    if (!user) return;
+
+    const eligible = achievements.filter(
+      a => a.requirement_type === type && 
+           a.requirement_value <= value && 
+           !userAchievementIds.has(a.id)
+    );
+
+    for (const achievement of eligible) {
+      const { error } = await supabase.from('user_achievements').insert({
+        user_id: user.id,
+        achievement_id: achievement.id,
+      });
+
+      if (!error) {
+        setUserAchievementIds(prev => new Set([...prev, achievement.id]));
+        toast({
+          title: '🏆 Achievement Unlocked!',
+          description: `${achievement.name} - ${achievement.description}`,
+        });
+      }
+    }
+  }, [achievements, userAchievementIds, user, toast]);
+
   // Sync points from database when user logs in
   useEffect(() => {
     const syncPointsFromDB = async () => {
@@ -62,7 +150,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .maybeSingle();
 
         if (data && data.points > 0) {
-          // Use the higher value between local and DB
           const localPoints = parseInt(localStorage.getItem('cyberquest-points') || '0');
           const maxPoints = Math.max(data.points, localPoints);
           setPoints(maxPoints);
@@ -93,6 +180,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     syncPointsToDB();
   }, [points, user]);
 
+  // Check points-based achievements when points change
+  useEffect(() => {
+    if (points > 0) {
+      checkAchievements('points_earned', points);
+    }
+  }, [points, checkAchievements]);
+
   const addPoints = (newPoints: number) => {
     setPoints(prev => prev + newPoints);
   };
@@ -100,9 +194,48 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const completeChallenge = (challengeId: string) => {
     if (!completedChallenges.includes(challengeId)) {
       setCompletedChallenges(prev => [...prev, challengeId]);
-      addPoints(100); // Base points for completing a challenge
+      addPoints(100);
+      checkAchievements('challenges_completed', completedChallenges.length + 1);
     }
   };
+
+  const incrementCryptoPuzzles = useCallback(() => {
+    setCryptoPuzzlesSolved(prev => {
+      const newVal = prev + 1;
+      localStorage.setItem('cyberquest-crypto', newVal.toString());
+      checkAchievements('crypto_puzzles', newVal);
+      return newVal;
+    });
+  }, [checkAchievements]);
+
+  const incrementSqlLevels = useCallback(() => {
+    setSqlLevelsCompleted(prev => {
+      const newVal = prev + 1;
+      localStorage.setItem('cyberquest-sql', newVal.toString());
+      checkAchievements('sql_levels', newVal);
+      return newVal;
+    });
+  }, [checkAchievements]);
+
+  const incrementTerminalFlags = useCallback(() => {
+    setTerminalFlagsFound(prev => {
+      const newVal = prev + 1;
+      localStorage.setItem('cyberquest-terminal', newVal.toString());
+      if (newVal >= 5) {
+        checkAchievements('terminal_complete', 1);
+      }
+      return newVal;
+    });
+  }, [checkAchievements]);
+
+  const incrementChatMessages = useCallback(() => {
+    setChatMessagesSent(prev => {
+      const newVal = prev + 1;
+      localStorage.setItem('cyberquest-chat', newVal.toString());
+      checkAchievements('chat_messages', newVal);
+      return newVal;
+    });
+  }, [checkAchievements]);
 
   useEffect(() => {
     localStorage.setItem('cyberquest-points', points.toString());
@@ -118,7 +251,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       level,
       addPoints,
       completedChallenges,
-      completeChallenge
+      completeChallenge,
+      cryptoPuzzlesSolved,
+      sqlLevelsCompleted,
+      terminalFlagsFound,
+      chatMessagesSent,
+      incrementCryptoPuzzles,
+      incrementSqlLevels,
+      incrementTerminalFlags,
+      incrementChatMessages,
     }}>
       {children}
     </GameContext.Provider>

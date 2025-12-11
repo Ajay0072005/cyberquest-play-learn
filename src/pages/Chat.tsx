@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
+import { useGame } from '@/context/GameContext';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -19,6 +20,7 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
 const Chat = () => {
   const { toast } = useToast();
+  const { incrementChatMessages } = useGame();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -135,6 +137,7 @@ const Chat = () => {
     setMessages(newMessages);
     setInput('');
     setIsLoading(true);
+    incrementChatMessages();
 
     try {
       await streamChat(newMessages);
