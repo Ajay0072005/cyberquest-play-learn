@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
-import { useToast } from '@/hooks/use-toast';
+import { useAchievementNotification } from '@/components/AchievementNotificationContainer';
 
 interface Achievement {
   id: string;
@@ -43,7 +43,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [userAchievementIds, setUserAchievementIds] = useState<Set<string>>(new Set());
-  const { toast } = useToast();
+  const { showAchievement } = useAchievementNotification();
 
   const [points, setPoints] = useState(() => {
     const saved = localStorage.getItem('cyberquest-points');
@@ -129,13 +129,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (!error) {
         setUserAchievementIds(prev => new Set([...prev, achievement.id]));
-        toast({
-          title: '🏆 Achievement Unlocked!',
-          description: `${achievement.name} - ${achievement.description}`,
+        showAchievement({
+          id: achievement.id,
+          name: achievement.name,
+          description: achievement.description,
+          points: achievement.points,
         });
       }
     }
-  }, [achievements, userAchievementIds, user, toast]);
+  }, [achievements, userAchievementIds, user, showAchievement]);
 
   // Sync points from database when user logs in
   useEffect(() => {
