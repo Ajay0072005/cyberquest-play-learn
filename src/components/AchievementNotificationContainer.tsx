@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { AchievementNotification } from './AchievementNotification';
+import { useAchievementSound } from '@/hooks/useAchievementSound';
 
 interface Achievement {
   id: string;
@@ -25,6 +26,14 @@ export const useAchievementNotification = () => {
 export const AchievementNotificationProvider = ({ children }: { children: ReactNode }) => {
   const [queue, setQueue] = useState<Achievement[]>([]);
   const [current, setCurrent] = useState<Achievement | null>(null);
+  const { playAchievementSound } = useAchievementSound();
+
+  // Play sound when a new achievement is shown
+  useEffect(() => {
+    if (current) {
+      playAchievementSound();
+    }
+  }, [current, playAchievementSound]);
 
   const showAchievement = useCallback((achievement: Achievement) => {
     if (current) {
