@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { PointsDisplay } from '@/components/PointsDisplay';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,18 +22,72 @@ import {
   Loader2,
   Flame,
   Star,
-  Award
+  Award,
+  ChevronRight
 } from 'lucide-react';
 import { useGame } from '@/context/GameContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { AchievementBadge } from '@/components/AchievementBadge';
+import { useNavigate } from 'react-router-dom';
+
+interface RecentAchievement {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  points: number;
+  earned_at: string;
+}
 
 const Dashboard: React.FC = () => {
   const { points, level, completedChallenges } = useGame();
   const { user } = useAuth();
   const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
+
+  const [recentAchievements, setRecentAchievements] = useState<RecentAchievement[]>([]);
+  const navigate = useNavigate();
+
+  // Fetch recently earned achievements
+  useEffect(() => {
+    const fetchRecentAchievements = async () => {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('user_achievements')
+        .select(`
+          id,
+          earned_at,
+          achievement_id,
+          achievements (
+            id,
+            name,
+            description,
+            icon,
+            points
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('earned_at', { ascending: false })
+        .limit(5);
+
+      if (data && !error) {
+        const formatted = data.map((ua: any) => ({
+          id: ua.achievements.id,
+          name: ua.achievements.name,
+          description: ua.achievements.description,
+          icon: ua.achievements.icon,
+          points: ua.achievements.points,
+          earned_at: ua.earned_at,
+        }));
+        setRecentAchievements(formatted);
+      }
+    };
+
+    fetchRecentAchievements();
+  }, [user]);
 
   const handleImportData = async () => {
     setIsImporting(true);
@@ -235,6 +289,51 @@ const Dashboard: React.FC = () => {
                     </div>
                   </div>
                 ))}
+              </CardContent>
+            </Card>
+
+            {/* Recently Unlocked Achievements */}
+            <Card className="cyber-bg border-primary/30">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Trophy className="h-5 w-5 text-yellow-400" />
+                    Recently Unlocked
+                  </CardTitle>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => navigate('/achievements')}
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    View All
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {recentAchievements.length > 0 ? (
+                  <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                    {recentAchievements.map((achievement) => (
+                      <AchievementBadge
+                        key={achievement.id}
+                        name={achievement.name}
+                        description={achievement.description}
+                        icon={achievement.icon}
+                        points={achievement.points}
+                        earned={true}
+                        earnedAt={achievement.earned_at}
+                        size="lg"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Trophy className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">No achievements unlocked yet</p>
+                    <p className="text-xs mt-1">Complete challenges to earn badges!</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
