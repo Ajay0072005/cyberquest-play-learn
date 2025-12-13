@@ -11,7 +11,8 @@ import {
   ChevronRight,
   Shield,
   MessageSquare,
-  Award
+  Award,
+  BookOpen
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
@@ -20,6 +21,7 @@ import { useState } from 'react';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+  { icon: BookOpen, label: 'Sherlock Course', path: '/sherlock-course' },
   { icon: Database, label: 'SQL Game', path: '/sql-game' },
   { icon: Key, label: 'Crypto Puzzles', path: '/crypto-puzzles' },
   { icon: Terminal, label: 'Terminal', path: '/terminal' },
