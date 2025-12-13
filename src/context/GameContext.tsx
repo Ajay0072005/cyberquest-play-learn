@@ -206,6 +206,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const newVal = prev + 1;
       localStorage.setItem('cyberquest-crypto', newVal.toString());
       checkAchievements('crypto_puzzles', newVal);
+      // Check for Crypto Master milestone (all 3 puzzles completed)
+      if (newVal >= 3) {
+        checkAchievements('crypto_master', 1);
+      }
       return newVal;
     });
   }, [checkAchievements]);
@@ -215,6 +219,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const newVal = prev + 1;
       localStorage.setItem('cyberquest-sql', newVal.toString());
       checkAchievements('sql_levels', newVal);
+      // Check for SQL Master milestone (all 5 levels completed)
+      if (newVal >= 5) {
+        checkAchievements('sql_master', 1);
+      }
       return newVal;
     });
   }, [checkAchievements]);
@@ -225,6 +233,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('cyberquest-terminal', newVal.toString());
       if (newVal >= 5) {
         checkAchievements('terminal_complete', 1);
+        // Check for Terminal Commander milestone (all 5 objectives completed)
+        checkAchievements('terminal_master', 1);
       }
       return newVal;
     });
