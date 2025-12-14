@@ -44,7 +44,7 @@ export const DashboardSidebar: React.FC = () => {
     >
       {/* Logo */}
       <div className="p-4 border-b border-border flex items-center justify-between">
-        <Link to="/dashboard" className={cn("flex items-center gap-2", collapsed && "justify-center w-full")}>
+        <Link to="/" className={cn("flex items-center gap-2", collapsed && "justify-center w-full")}>
           <Shield className="h-8 w-8 text-primary cyber-glow flex-shrink-0" />
           {!collapsed && (
             <span className="text-xl font-cyber font-bold cyber-glow">CyberQuest</span>
