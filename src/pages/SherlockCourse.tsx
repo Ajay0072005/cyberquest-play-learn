@@ -8,6 +8,7 @@ import { CheckCircle, Lock, BookOpen, Brain, Search, Trophy } from 'lucide-react
 import { SherlockModule } from '@/components/sherlock/SherlockModule';
 import { SherlockPuzzle } from '@/components/sherlock/SherlockPuzzle';
 import { VictorianEscapeRoom } from '@/components/sherlock/VictorianEscapeRoom';
+import { SherlockCertificate } from '@/components/sherlock/SherlockCertificate';
 import { useGame } from '@/context/GameContext';
 
 interface Module {
@@ -162,10 +163,14 @@ const SherlockCourse = () => {
     const saved = localStorage.getItem('sherlock-puzzles');
     return saved ? JSON.parse(saved) : [];
   });
+  const [escapeRoomCompleted, setEscapeRoomCompleted] = useState<boolean>(() => {
+    return localStorage.getItem('sherlock-escape-completed') === 'true';
+  });
   const { addPoints, completeChallenge } = useGame();
 
   const progress = (completedModules.length / modules.length) * 100;
   const allCompleted = completedModules.length === modules.length && completedPuzzles.length === modules.length;
+  const courseFullyCompleted = allCompleted && escapeRoomCompleted;
 
   const handleModuleComplete = (moduleId: number) => {
     if (!completedModules.includes(moduleId)) {
@@ -193,10 +198,18 @@ const SherlockCourse = () => {
     return completedPuzzles.includes(moduleId - 1);
   };
 
+  const handleEscapeRoomComplete = () => {
+    if (!escapeRoomCompleted) {
+      setEscapeRoomCompleted(true);
+      localStorage.setItem('sherlock-escape-completed', 'true');
+    }
+    setShowEscapeRoom(false);
+  };
+
   if (showEscapeRoom) {
     return (
       <DashboardLayout>
-        <VictorianEscapeRoom onExit={() => setShowEscapeRoom(false)} />
+        <VictorianEscapeRoom onExit={handleEscapeRoomComplete} />
       </DashboardLayout>
     );
   }
@@ -352,6 +365,11 @@ const SherlockCourse = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Certificate Section */}
+          {courseFullyCompleted && (
+            <SherlockCertificate completionDate={new Date()} />
+          )}
         </div>
       </div>
     </DashboardLayout>
