@@ -42,7 +42,7 @@ interface RecentAchievement {
 }
 
 const Dashboard: React.FC = () => {
-  const { points, level, completedChallenges } = useGame();
+  const { points, level, completedChallenges, cryptoPuzzlesSolved, sqlLevelsCompleted, terminalFlagsFound, chatMessagesSent } = useGame();
   const { user } = useAuth();
   const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
@@ -121,26 +121,37 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const recentActivity = [
-    { type: 'challenge', name: 'SQL Injection Basics', points: 150, time: '2 hours ago' },
-    { type: 'achievement', name: 'First Blood', points: 50, time: '1 day ago' },
-    { type: 'challenge', name: 'Caesar Cipher', points: 100, time: '2 days ago' },
-  ];
+  // Get Sherlock course progress from localStorage
+  const sherlockProgress = JSON.parse(localStorage.getItem('sherlock-progress') || '{}');
+  const sherlockModulesCompleted = Object.values(sherlockProgress).filter(Boolean).length;
+  const sherlockEscapeRoomCompleted = localStorage.getItem('sherlock-escape-completed') === 'true';
 
-  const cryptoCompleted = completedChallenges.filter(id => 
-    id.includes('crypto') || id.includes('cipher') || id.includes('caesar') || id.includes('vigenere') || id.includes('substitution')
-  ).length;
-  
-  const sqlCompleted = completedChallenges.filter(id => 
-    id.includes('sql') || id.includes('injection') || id.includes('database')
-  ).length;
+  // Build dynamic recent activity based on actual user actions
+  const recentActivity = [];
+  if (sqlLevelsCompleted > 0) {
+    recentActivity.push({ type: 'challenge', name: `SQL Level ${sqlLevelsCompleted} Completed`, points: 50, time: 'Recently' });
+  }
+  if (cryptoPuzzlesSolved > 0) {
+    recentActivity.push({ type: 'challenge', name: `${cryptoPuzzlesSolved} Crypto Puzzle${cryptoPuzzlesSolved > 1 ? 's' : ''} Solved`, points: cryptoPuzzlesSolved * 75, time: 'Recently' });
+  }
+  if (terminalFlagsFound > 0) {
+    recentActivity.push({ type: 'challenge', name: `${terminalFlagsFound} Terminal Flag${terminalFlagsFound > 1 ? 's' : ''} Found`, points: terminalFlagsFound * 50, time: 'Recently' });
+  }
+  if (chatMessagesSent > 0) {
+    recentActivity.push({ type: 'activity', name: `${chatMessagesSent} AI Chat Message${chatMessagesSent > 1 ? 's' : ''} Sent`, points: chatMessagesSent * 5, time: 'Recently' });
+  }
+  if (sherlockModulesCompleted > 0) {
+    recentActivity.push({ type: 'challenge', name: `Sherlock Module ${sherlockModulesCompleted}/3 Completed`, points: sherlockModulesCompleted * 100, time: 'Recently' });
+  }
+  if (recentActivity.length === 0) {
+    recentActivity.push({ type: 'info', name: 'No activity yet', points: 0, time: 'Start exploring!' });
+  }
   
   const challengeCategories = [
-    { name: 'Web Security', completed: 0, total: 12, color: 'from-primary to-primary/50' },
-    { name: 'SQL Security', completed: sqlCompleted, total: 5, color: 'from-blue-500 to-blue-400' },
-    { name: 'Cryptography', completed: cryptoCompleted, total: 8, color: 'from-purple-500 to-purple-400' },
-    { name: 'Network Security', completed: 0, total: 10, color: 'from-orange-500 to-orange-400' },
-    { name: 'Forensics', completed: 0, total: 6, color: 'from-red-500 to-red-400' },
+    { name: 'SQL Injection', completed: sqlLevelsCompleted, total: 5, color: 'from-blue-500 to-blue-400' },
+    { name: 'Cryptography', completed: cryptoPuzzlesSolved, total: 3, color: 'from-purple-500 to-purple-400' },
+    { name: 'Terminal Security', completed: terminalFlagsFound, total: 5, color: 'from-orange-500 to-orange-400' },
+    { name: 'Sherlock Course', completed: sherlockModulesCompleted + (sherlockEscapeRoomCompleted ? 1 : 0), total: 4, color: 'from-amber-500 to-amber-400' },
   ];
 
   const KeyIcon = ({ className }: { className?: string }) => (
@@ -149,13 +160,15 @@ const Dashboard: React.FC = () => {
     </svg>
   );
 
+  const totalChallengesCompleted = sqlLevelsCompleted + cryptoPuzzlesSolved + terminalFlagsFound + sherlockModulesCompleted;
+
   const achievements = [
-    { name: 'First Steps', description: 'Complete your first challenge', unlocked: completedChallenges.length > 0, icon: Trophy },
-    { name: 'Speed Runner', description: 'Complete 5 challenges in one day', unlocked: false, icon: Zap },
-    { name: 'Security Expert', description: 'Master all web security challenges', unlocked: false, icon: Shield },
-    { name: 'Crypto Master', description: 'Complete all cryptography puzzles', unlocked: cryptoCompleted >= 8, icon: KeyIcon },
-    { name: 'SQL Ninja', description: 'Master SQL injection techniques', unlocked: sqlCompleted >= 5, icon: Database },
-    { name: 'Elite Hacker', description: 'Reach level 10', unlocked: level >= 10, icon: Star },
+    { name: 'First Steps', description: 'Complete your first challenge', unlocked: totalChallengesCompleted > 0, icon: Trophy },
+    { name: 'Crypto Master', description: 'Complete all cryptography puzzles', unlocked: cryptoPuzzlesSolved >= 3, icon: KeyIcon },
+    { name: 'SQL Ninja', description: 'Master all SQL injection levels', unlocked: sqlLevelsCompleted >= 5, icon: Database },
+    { name: 'Terminal Commander', description: 'Find all terminal flags', unlocked: terminalFlagsFound >= 5, icon: Shield },
+    { name: 'Detective', description: 'Complete Sherlock Holmes course', unlocked: sherlockModulesCompleted >= 3 && sherlockEscapeRoomCompleted, icon: Star },
+    { name: 'Elite Hacker', description: 'Reach level 10', unlocked: level >= 10, icon: Zap },
   ];
 
   const username = user?.email?.split('@')[0] || 'Hacker';
@@ -213,7 +226,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Challenges</p>
-                <p className="text-2xl md:text-3xl font-cyber font-bold text-blue-400">{completedChallenges.length}</p>
+                <p className="text-2xl md:text-3xl font-cyber font-bold text-blue-400">{totalChallengesCompleted}</p>
               </div>
               <div className="h-12 w-12 rounded-full bg-blue-500/20 flex items-center justify-center">
                 <Target className="h-6 w-6 text-blue-400" />
