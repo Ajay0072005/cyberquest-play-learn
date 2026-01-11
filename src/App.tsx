@@ -19,6 +19,7 @@ import Leaderboard from "./pages/Leaderboard";
 import Chat from "./pages/Chat";
 import Achievements from "./pages/Achievements";
 import SherlockCourse from "./pages/SherlockCourse";
+import PracticalLabs from "./pages/PracticalLabs";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +78,11 @@ const App = () => (
               <Route path="/sherlock-course" element={
                 <ProtectedRoute>
                   <SherlockCourse />
+                </ProtectedRoute>
+              } />
+              <Route path="/practical-labs" element={
+                <ProtectedRoute>
+                  <PracticalLabs />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
