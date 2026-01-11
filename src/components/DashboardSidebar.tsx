@@ -12,7 +12,8 @@ import {
   Shield,
   MessageSquare,
   Award,
-  BookOpen
+  BookOpen,
+  FlaskConical
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
@@ -22,6 +23,7 @@ import { useState } from 'react';
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
   { icon: BookOpen, label: 'Sherlock Course', path: '/sherlock-course' },
+  { icon: FlaskConical, label: 'Practical Labs', path: '/practical-labs' },
   { icon: Database, label: 'SQL Game', path: '/sql-game' },
   { icon: Key, label: 'Crypto Puzzles', path: '/crypto-puzzles' },
   { icon: Terminal, label: 'Terminal', path: '/terminal' },
