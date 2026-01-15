@@ -135,7 +135,15 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard: {
+        Row: {
+          avatar_url: string | null
+          id: string | null
+          points: number | null
+          username: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       match_knowledge: {

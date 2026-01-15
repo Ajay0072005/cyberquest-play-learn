@@ -9,7 +9,6 @@ import { Loader2, Trophy, Medal, Award } from 'lucide-react';
 
 interface LeaderboardEntry {
   id: string;
-  user_id: string;
   username: string | null;
   avatar_url: string | null;
   points: number;
@@ -20,24 +19,33 @@ const Leaderboard = () => {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [userRank, setUserRank] = useState<number | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
+        // Fetch from the secure leaderboard view (excludes user_id)
         const { data, error } = await supabase
-          .from('profiles')
-          .select('id, user_id, username, avatar_url, points')
-          .order('points', { ascending: false })
-          .limit(50);
+          .from('leaderboard')
+          .select('id, username, avatar_url, points');
 
         if (error) throw error;
 
         setEntries(data || []);
 
-        // Find current user's rank
-        if (user && data) {
-          const rank = data.findIndex(entry => entry.user_id === user.id);
-          setUserRank(rank !== -1 ? rank + 1 : null);
+        // Fetch current user's profile to find their rank
+        if (user) {
+          const { data: userProfile } = await supabase
+            .from('profiles')
+            .select('id, points')
+            .eq('user_id', user.id)
+            .single();
+
+          if (userProfile && data) {
+            setCurrentUserId(userProfile.id);
+            const rank = data.findIndex(entry => entry.id === userProfile.id);
+            setUserRank(rank !== -1 ? rank + 1 : null);
+          }
         }
       } catch (error) {
         console.error('Error fetching leaderboard:', error);
@@ -207,7 +215,7 @@ const Leaderboard = () => {
                   <div
                     key={entry.id}
                     className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${
-                      entry.user_id === user?.id
+                      entry.id === currentUserId
                         ? 'bg-primary/10 border border-primary/20'
                         : 'hover:bg-muted/50'
                     }`}
@@ -224,7 +232,7 @@ const Leaderboard = () => {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-foreground truncate">
                         {entry.username || 'Anonymous'}
-                        {entry.user_id === user?.id && (
+                        {entry.id === currentUserId && (
                           <Badge variant="secondary" className="ml-2 text-xs">You</Badge>
                         )}
                       </p>
