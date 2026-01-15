@@ -6,25 +6,110 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Input validation constants
+const MAX_MESSAGES = 50;
+const MAX_MESSAGE_LENGTH = 10000;
+const VALID_ROLES = ["user", "assistant", "system"];
+
+interface ChatMessage {
+  role: string;
+  content: string;
+}
+
+function validateMessages(messages: unknown): { valid: boolean; error?: string } {
+  // Check if messages is an array
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return { valid: false, error: "Invalid messages format: must be a non-empty array" };
+  }
+
+  // Check message count limit
+  if (messages.length > MAX_MESSAGES) {
+    return { valid: false, error: `Too many messages in conversation (max ${MAX_MESSAGES})` };
+  }
+
+  // Validate each message
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i];
+    
+    // Check message structure
+    if (!msg || typeof msg !== "object") {
+      return { valid: false, error: `Invalid message at index ${i}: must be an object` };
+    }
+
+    // Validate role
+    if (!msg.role || !VALID_ROLES.includes(msg.role)) {
+      return { valid: false, error: `Invalid message role at index ${i}: must be one of ${VALID_ROLES.join(", ")}` };
+    }
+
+    // Validate content type
+    if (typeof msg.content !== "string") {
+      return { valid: false, error: `Invalid message content at index ${i}: must be a string` };
+    }
+
+    // Validate content length
+    if (msg.content.length > MAX_MESSAGE_LENGTH) {
+      return { valid: false, error: `Message at index ${i} is too long (max ${MAX_MESSAGE_LENGTH} characters)` };
+    }
+  }
+
+  return { valid: true };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { messages } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    // Verify JWT authentication
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Missing or invalid authorization header" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // Create client with user's JWT to verify authentication
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    // Verify the user is authenticated
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized: Invalid or expired token" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { messages } = await req.json();
+    
+    // Validate messages input
+    const validation = validateMessages(messages);
+    if (!validation.valid) {
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Create service client for RAG operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get the last user message for RAG
-    const lastUserMessage = messages.filter((m: any) => m.role === "user").pop()?.content || "";
+    const lastUserMessage = (messages as ChatMessage[]).filter((m) => m.role === "user").pop()?.content || "";
 
     // Generate embedding for context retrieval
     let context = "";
@@ -53,7 +138,7 @@ serve(async (req) => {
 
         if (similarQuestions?.length) {
           context = similarQuestions
-            .map((q: any) => `Q: ${q.prompt}\nCategory: ${q.category}`)
+            .map((q: { prompt: string; category: string }) => `Q: ${q.prompt}\nCategory: ${q.category}`)
             .join("\n\n");
         }
       }

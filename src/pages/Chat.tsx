@@ -10,6 +10,7 @@ import { useGame } from '@/context/GameContext';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -34,11 +35,18 @@ const Chat = () => {
   }, [messages]);
 
   const streamChat = async (userMessages: Message[]) => {
+    // Get the user's session for JWT authentication
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session?.access_token) {
+      throw new Error('You must be logged in to use the chat');
+    }
+
     const resp = await fetch(CHAT_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        Authorization: `Bearer ${session.access_token}`,
       },
       body: JSON.stringify({ messages: userMessages }),
     });
