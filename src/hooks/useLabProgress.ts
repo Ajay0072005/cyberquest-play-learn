@@ -18,33 +18,33 @@ export const useLabProgress = () => {
   const [completedLabs, setCompletedLabs] = useState<LabProgress[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch completed labs on mount
+  // Fetch completed labs
+  const fetchProgress = useCallback(async () => {
+    if (!user) {
+      setCompletedLabs([]);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('lab_progress')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      setCompletedLabs(data || []);
+    } catch (error) {
+      console.error('Error fetching lab progress:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  // Fetch on mount and subscribe to changes
   useEffect(() => {
-    const fetchProgress = async () => {
-      if (!user) {
-        setCompletedLabs([]);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('lab_progress')
-          .select('*')
-          .eq('user_id', user.id);
-
-        if (error) throw error;
-        setCompletedLabs(data || []);
-      } catch (error) {
-        console.error('Error fetching lab progress:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProgress();
 
-    // Subscribe to realtime updates
     if (user) {
       const channel = supabase
         .channel('lab-progress-changes')
@@ -66,7 +66,7 @@ export const useLabProgress = () => {
         supabase.removeChannel(channel);
       };
     }
-  }, [user]);
+  }, [user, fetchProgress]);
 
   // Check if a specific lab is completed
   const isLabCompleted = useCallback(
@@ -100,7 +100,7 @@ export const useLabProgress = () => {
 
       // Check if already completed
       if (isLabCompleted(labId, labType)) {
-        return true; // Already completed, no need to save again
+        return true;
       }
 
       try {
@@ -112,14 +112,12 @@ export const useLabProgress = () => {
         });
 
         if (error) {
-          // Handle unique constraint violation (already completed)
           if (error.code === '23505') {
             return true;
           }
           throw error;
         }
 
-        // Update local state optimistically
         setCompletedLabs((prev) => [
           ...prev,
           {
@@ -151,6 +149,89 @@ export const useLabProgress = () => {
     [user, isLabCompleted, toast]
   );
 
+  // Reset a single lab's progress
+  const resetLabProgress = useCallback(
+    async (labId: string, labType: string): Promise<boolean> => {
+      if (!user) {
+        toast({
+          title: 'Error',
+          description: 'You must be logged in to reset progress',
+          variant: 'destructive',
+        });
+        return false;
+      }
+
+      try {
+        const { error } = await supabase
+          .from('lab_progress')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('lab_id', labId)
+          .eq('lab_type', labType);
+
+        if (error) throw error;
+
+        setCompletedLabs((prev) =>
+          prev.filter((lab) => !(lab.lab_id === labId && lab.lab_type === labType))
+        );
+
+        toast({
+          title: 'Progress Reset',
+          description: 'Lab progress has been reset. You can replay it now!',
+        });
+
+        return true;
+      } catch (error) {
+        console.error('Error resetting lab progress:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to reset progress',
+          variant: 'destructive',
+        });
+        return false;
+      }
+    },
+    [user, toast]
+  );
+
+  // Reset all lab progress
+  const resetAllProgress = useCallback(async (): Promise<boolean> => {
+    if (!user) {
+      toast({
+        title: 'Error',
+        description: 'You must be logged in to reset progress',
+        variant: 'destructive',
+      });
+      return false;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('lab_progress')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setCompletedLabs([]);
+
+      toast({
+        title: 'All Progress Reset',
+        description: 'All lab progress has been reset. Start fresh!',
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error resetting all progress:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to reset progress',
+        variant: 'destructive',
+      });
+      return false;
+    }
+  }, [user, toast]);
+
   // Get total points earned from labs
   const getTotalLabPoints = useCallback((): number => {
     return completedLabs.reduce((sum, lab) => sum + lab.points_earned, 0);
@@ -177,7 +258,10 @@ export const useLabProgress = () => {
     isLabCompleted,
     getProgressByType,
     completeLab,
+    resetLabProgress,
+    resetAllProgress,
     getTotalLabPoints,
     getStats,
+    refetch: fetchProgress,
   };
 };

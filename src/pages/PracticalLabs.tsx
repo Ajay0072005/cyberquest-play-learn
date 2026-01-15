@@ -4,6 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { 
   FlaskConical, 
   Swords, 
@@ -15,7 +26,9 @@ import {
   ChevronRight,
   CheckCircle2,
   Star,
-  Loader2
+  Loader2,
+  RotateCcw,
+  Trash2
 } from 'lucide-react';
 import { MiniLab, MiniLabData } from '@/components/labs/MiniLab';
 import { miniLabs } from '@/components/labs/miniLabsData';
@@ -32,6 +45,8 @@ const PracticalLabs = () => {
     completeLab, 
     getProgressByType, 
     getTotalLabPoints,
+    resetLabProgress,
+    resetAllProgress,
     loading 
   } = useLabProgress();
 
@@ -92,14 +107,45 @@ const PracticalLabs = () => {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-cyber font-bold cyber-glow mb-2">
-            Practical & Gamified Labs
-          </h1>
-          <p className="text-muted-foreground">
-            Master cybersecurity through hands-on practice with our Identify → Exploit → Fix workflow and story-driven missions.
-          </p>
+        {/* Header with Reset Button */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-cyber font-bold cyber-glow mb-2">
+              Practical & Gamified Labs
+            </h1>
+            <p className="text-muted-foreground">
+              Master cybersecurity through hands-on practice with our Identify → Exploit → Fix workflow and story-driven missions.
+            </p>
+          </div>
+          
+          {(completedLabsList.length > 0 || completedMissionsList.length > 0) && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="gap-2 text-destructive border-destructive/50 hover:bg-destructive/10">
+                  <Trash2 className="h-4 w-4" />
+                  Reset All Progress
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Reset All Lab Progress?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete all your lab and mission completion records. 
+                    You'll be able to replay everything from scratch, but your earned XP will remain.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={() => resetAllProgress()}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Reset All Progress
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
 
         {/* Stats Overview */}
@@ -246,7 +292,7 @@ const PracticalLabs = () => {
                     <CardContent>
                       <p className="text-sm text-muted-foreground mb-4">{lab.description}</p>
                       
-                      <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
@@ -257,10 +303,26 @@ const PracticalLabs = () => {
                             {lab.points} XP
                           </span>
                         </div>
-                        <Button size="sm" className="gap-1">
-                          {isCompleted ? 'Replay' : 'Start'}
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          {isCompleted && (
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              className="gap-1 text-muted-foreground hover:text-foreground"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                resetLabProgress(lab.id, 'minilab');
+                              }}
+                            >
+                              <RotateCcw className="h-4 w-4" />
+                              Reset
+                            </Button>
+                          )}
+                          <Button size="sm" className="gap-1">
+                            {isCompleted ? 'Replay' : 'Start'}
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -334,7 +396,7 @@ const PracticalLabs = () => {
                           </div>
                         </div>
                         
-                        <div className="flex flex-col gap-3">
+                          <div className="flex flex-col gap-3">
                           <div className="text-sm text-muted-foreground mb-1">Available Roles:</div>
                           <div className="flex gap-2">
                             <div className="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center" title="Analyst">
@@ -347,10 +409,25 @@ const PracticalLabs = () => {
                               <Shield className="h-5 w-5 text-green-400" />
                             </div>
                           </div>
-                          <Button className="gap-2 mt-2">
-                            {isCompleted ? 'Play Again' : 'Start Mission'}
-                            <ChevronRight className="h-4 w-4" />
-                          </Button>
+                          <div className="flex items-center gap-2 mt-2">
+                            {isCompleted && (
+                              <Button 
+                                variant="ghost"
+                                className="gap-1 text-muted-foreground hover:text-foreground"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  resetLabProgress(mission.id, 'mission');
+                                }}
+                              >
+                                <RotateCcw className="h-4 w-4" />
+                                Reset
+                              </Button>
+                            )}
+                            <Button className="gap-2">
+                              {isCompleted ? 'Play Again' : 'Start Mission'}
+                              <ChevronRight className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
