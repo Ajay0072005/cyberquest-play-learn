@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useGame } from '@/context/GameContext';
+import { useLabProgress } from '@/hooks/useLabProgress';
 
 export type Role = 'analyst' | 'attacker' | 'defender';
 
@@ -117,6 +118,7 @@ export const StoryMission: React.FC<StoryMissionProps> = ({ mission, onComplete,
   const [missionComplete, setMissionComplete] = useState(false);
   const { toast } = useToast();
   const { addPoints, completeChallenge } = useGame();
+  const { completeLab } = useLabProgress();
 
   const currentScene = mission.scenes[currentSceneId];
   const scenesVisited = decisions.length + 1;
@@ -174,10 +176,12 @@ export const StoryMission: React.FC<StoryMissionProps> = ({ mission, onComplete,
     }
   };
 
-  const handleCompleteMission = () => {
+  const handleCompleteMission = async () => {
     const score = calculateScore();
     const earnedPoints = Math.round((score.percentage / 100) * mission.points);
     
+    // Save to database
+    await completeLab(mission.id, 'mission', earnedPoints);
     addPoints(earnedPoints);
     completeChallenge(`mission-${mission.id}`);
     setMissionComplete(true);
