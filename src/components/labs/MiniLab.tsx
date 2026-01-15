@@ -2,15 +2,13 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { 
   Search, 
   Crosshair, 
   Shield, 
-  ChevronRight, 
-  ChevronLeft,
+  ChevronRight,
   CheckCircle2,
   AlertTriangle,
   Lightbulb,
@@ -19,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useGame } from '@/context/GameContext';
+import { useLabProgress } from '@/hooks/useLabProgress';
 
 export interface LabStep {
   title: string;
@@ -89,6 +88,7 @@ export const MiniLab: React.FC<MiniLabProps> = ({ lab, onComplete, onBack }) => 
   const [showExplanation, setShowExplanation] = useState(false);
   const { toast } = useToast();
   const { addPoints, completeChallenge } = useGame();
+  const { completeLab } = useLabProgress();
 
   const steps: StepKey[] = ['identify', 'exploit', 'fix'];
   const currentStepIndex = steps.indexOf(currentStep);
@@ -98,7 +98,7 @@ export const MiniLab: React.FC<MiniLabProps> = ({ lab, onComplete, onBack }) => 
 
   const progress = (completedSteps.length / 3) * 100;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const normalizedAnswer = userAnswer.trim().toLowerCase();
     const normalizedExpected = stepData.expectedAnswer.toLowerCase();
 
@@ -107,7 +107,8 @@ export const MiniLab: React.FC<MiniLabProps> = ({ lab, onComplete, onBack }) => 
       setShowExplanation(true);
       
       if (currentStep === 'fix') {
-        // Lab completed
+        // Lab completed - save to database
+        await completeLab(lab.id, 'minilab', lab.points);
         addPoints(lab.points);
         completeChallenge(`minilab-${lab.id}`);
         toast({

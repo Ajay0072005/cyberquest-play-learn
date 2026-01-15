@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
 import { 
   FlaskConical, 
   Swords, 
@@ -14,42 +13,38 @@ import {
   Clock,
   Trophy,
   ChevronRight,
-  Lock,
   CheckCircle2,
-  Star
+  Star,
+  Loader2
 } from 'lucide-react';
 import { MiniLab, MiniLabData } from '@/components/labs/MiniLab';
 import { miniLabs } from '@/components/labs/miniLabsData';
 import { StoryMission, StoryMissionData } from '@/components/missions/StoryMission';
 import { storyMissions } from '@/components/missions/storyMissionsData';
+import { useLabProgress } from '@/hooks/useLabProgress';
 
 const PracticalLabs = () => {
   const [selectedLab, setSelectedLab] = useState<MiniLabData | null>(null);
   const [selectedMission, setSelectedMission] = useState<StoryMissionData | null>(null);
-  const [completedLabs, setCompletedLabs] = useState<string[]>([]);
-  const [completedMissions, setCompletedMissions] = useState<string[]>([]);
+  
+  const { 
+    isLabCompleted, 
+    completeLab, 
+    getProgressByType, 
+    getTotalLabPoints,
+    loading 
+  } = useLabProgress();
 
-  useEffect(() => {
-    const savedLabs = localStorage.getItem('cyberquest-completed-labs');
-    const savedMissions = localStorage.getItem('cyberquest-completed-missions');
-    if (savedLabs) setCompletedLabs(JSON.parse(savedLabs));
-    if (savedMissions) setCompletedMissions(JSON.parse(savedMissions));
-  }, []);
-
-  const handleLabComplete = () => {
-    if (selectedLab && !completedLabs.includes(selectedLab.id)) {
-      const updated = [...completedLabs, selectedLab.id];
-      setCompletedLabs(updated);
-      localStorage.setItem('cyberquest-completed-labs', JSON.stringify(updated));
+  const handleLabComplete = async () => {
+    if (selectedLab) {
+      await completeLab(selectedLab.id, 'minilab', selectedLab.points);
     }
     setSelectedLab(null);
   };
 
-  const handleMissionComplete = () => {
-    if (selectedMission && !completedMissions.includes(selectedMission.id)) {
-      const updated = [...completedMissions, selectedMission.id];
-      setCompletedMissions(updated);
-      localStorage.setItem('cyberquest-completed-missions', JSON.stringify(updated));
+  const handleMissionComplete = async () => {
+    if (selectedMission) {
+      await completeLab(selectedMission.id, 'mission', selectedMission.points);
     }
     setSelectedMission(null);
   };
@@ -74,15 +69,25 @@ const PracticalLabs = () => {
     );
   }
 
+  // Get completed counts from database
+  const completedLabsList = getProgressByType('minilab');
+  const completedMissionsList = getProgressByType('mission');
+  
   const totalLabPoints = miniLabs.reduce((acc, lab) => acc + lab.points, 0);
-  const earnedLabPoints = miniLabs
-    .filter(lab => completedLabs.includes(lab.id))
-    .reduce((acc, lab) => acc + lab.points, 0);
+  const earnedLabPoints = completedLabsList.reduce((acc, lab) => acc + lab.points_earned, 0);
 
   const totalMissionPoints = storyMissions.reduce((acc, m) => acc + m.points, 0);
-  const earnedMissionPoints = storyMissions
-    .filter(m => completedMissions.includes(m.id))
-    .reduce((acc, m) => acc + m.points, 0);
+  const earnedMissionPoints = completedMissionsList.reduce((acc, m) => acc + m.points_earned, 0);
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -105,7 +110,7 @@ const PracticalLabs = () => {
                 <FlaskConical className="h-6 w-6 text-blue-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{completedLabs.length}/{miniLabs.length}</p>
+                <p className="text-2xl font-bold">{completedLabsList.length}/{miniLabs.length}</p>
                 <p className="text-xs text-muted-foreground">Mini Labs</p>
               </div>
             </CardContent>
@@ -117,7 +122,7 @@ const PracticalLabs = () => {
                 <Swords className="h-6 w-6 text-purple-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{completedMissions.length}/{storyMissions.length}</p>
+                <p className="text-2xl font-bold">{completedMissionsList.length}/{storyMissions.length}</p>
                 <p className="text-xs text-muted-foreground">Missions</p>
               </div>
             </CardContent>
@@ -129,7 +134,7 @@ const PracticalLabs = () => {
                 <Trophy className="h-6 w-6 text-green-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{earnedLabPoints + earnedMissionPoints}</p>
+                <p className="text-2xl font-bold">{getTotalLabPoints()}</p>
                 <p className="text-xs text-muted-foreground">XP Earned</p>
               </div>
             </CardContent>
@@ -202,7 +207,7 @@ const PracticalLabs = () => {
             {/* Labs Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {miniLabs.map((lab) => {
-                const isCompleted = completedLabs.includes(lab.id);
+                const isCompleted = isLabCompleted(lab.id, 'minilab');
                 
                 return (
                   <Card 
@@ -280,7 +285,7 @@ const PracticalLabs = () => {
             {/* Missions Grid */}
             <div className="grid grid-cols-1 gap-6">
               {storyMissions.map((mission) => {
-                const isCompleted = completedMissions.includes(mission.id);
+                const isCompleted = isLabCompleted(mission.id, 'mission');
                 
                 return (
                   <Card 
