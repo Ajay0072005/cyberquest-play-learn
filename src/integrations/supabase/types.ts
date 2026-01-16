@@ -169,6 +169,18 @@ export type Database = {
           points: number | null
           username: string | null
         }
+        Insert: {
+          avatar_url?: string | null
+          id?: string | null
+          points?: number | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          id?: string | null
+          points?: number | null
+          username?: string | null
+        }
         Relationships: []
       }
     }
