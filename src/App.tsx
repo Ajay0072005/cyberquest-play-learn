@@ -20,6 +20,7 @@ import Chat from "./pages/Chat";
 import Achievements from "./pages/Achievements";
 import SherlockCourse from "./pages/SherlockCourse";
 import PracticalLabs from "./pages/PracticalLabs";
+import CareerPath from "./pages/CareerPath";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/path/:slug" element={<CareerPath />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/dashboard" element={
