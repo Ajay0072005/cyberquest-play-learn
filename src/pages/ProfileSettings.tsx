@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,13 +8,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, User, Save } from 'lucide-react';
+import { Loader2, User, Save, Upload, Camera } from 'lucide-react';
 
 const ProfileSettings = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
 
@@ -51,6 +53,74 @@ const ProfileSettings = () => {
 
     fetchProfile();
   }, [user, toast]);
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Invalid file type',
+        description: 'Please upload an image file',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: 'File too large',
+        description: 'Please upload an image smaller than 2MB',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/avatar.${fileExt}`;
+
+      // Upload the file
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get the public URL
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      const newAvatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+      setAvatarUrl(newAvatarUrl);
+
+      // Update the profile with the new avatar URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: newAvatarUrl })
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: 'Success',
+        description: 'Avatar uploaded successfully',
+      });
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to upload avatar',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -119,17 +189,51 @@ const ProfileSettings = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Avatar Preview */}
-            <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20 border-2 border-primary/20">
-                <AvatarImage src={avatarUrl} alt={username || 'Avatar'} />
-                <AvatarFallback className="bg-primary/10 text-primary text-xl">
-                  {getInitials()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="text-sm text-muted-foreground">
+            {/* Avatar Upload */}
+            <div className="flex items-center gap-6">
+              <div className="relative group">
+                <Avatar className="h-24 w-24 border-2 border-primary/20">
+                  <AvatarImage src={avatarUrl} alt={username || 'Avatar'} />
+                  <AvatarFallback className="bg-primary/10 text-primary text-2xl">
+                    {getInitials()}
+                  </AvatarFallback>
+                </Avatar>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full cursor-pointer"
+                >
+                  {uploading ? (
+                    <Loader2 className="h-6 w-6 text-white animate-spin" />
+                  ) : (
+                    <Camera className="h-6 w-6 text-white" />
+                  )}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                />
+              </div>
+              <div className="space-y-2">
                 <p className="font-medium text-foreground">{username || 'No username set'}</p>
-                <p>{user?.email}</p>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="gap-2"
+                >
+                  {uploading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
+                  Upload Photo
+                </Button>
               </div>
             </div>
 
@@ -148,9 +252,9 @@ const ProfileSettings = () => {
               </p>
             </div>
 
-            {/* Avatar URL Field */}
+            {/* Avatar URL Field (optional manual input) */}
             <div className="space-y-2">
-              <Label htmlFor="avatar">Avatar URL</Label>
+              <Label htmlFor="avatar">Avatar URL (optional)</Label>
               <Input
                 id="avatar"
                 value={avatarUrl}
@@ -159,7 +263,7 @@ const ProfileSettings = () => {
                 className="max-w-md bg-background border-border"
               />
               <p className="text-xs text-muted-foreground">
-                Enter a URL to an image for your avatar
+                Or enter a URL to an external image
               </p>
             </div>
 

@@ -10,14 +10,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 export const Navigation: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const { profile } = useUserProfile();
 
   const handleSignOut = async () => {
     await signOut();
@@ -29,8 +31,15 @@ export const Navigation: React.FC = () => {
   };
 
   const getUserInitials = () => {
+    if (profile?.username) {
+      return profile.username.slice(0, 2).toUpperCase();
+    }
     if (!user?.email) return "U";
     return user.email.charAt(0).toUpperCase();
+  };
+
+  const getDisplayName = () => {
+    return profile?.username || user?.email || "User";
   };
   
   return (
@@ -92,6 +101,7 @@ export const Navigation: React.FC = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar className="h-10 w-10 border-2 border-primary">
+                    <AvatarImage src={profile?.avatar_url || undefined} alt={getDisplayName()} />
                     <AvatarFallback className="bg-primary/20 text-primary font-bold">
                       {getUserInitials()}
                     </AvatarFallback>
@@ -101,7 +111,7 @@ export const Navigation: React.FC = () => {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <div className="flex items-center justify-start gap-2 p-2">
                   <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium text-sm">{user.email}</p>
+                    <p className="font-medium text-sm">{getDisplayName()}</p>
                     <p className="text-xs text-muted-foreground">Welcome back!</p>
                   </div>
                 </div>
