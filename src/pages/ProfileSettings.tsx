@@ -98,11 +98,13 @@ const ProfileSettings = () => {
       const newAvatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
       setAvatarUrl(newAvatarUrl);
 
-      // Update the profile with the new avatar URL
+      // Update the profile with the new avatar URL using upsert
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ avatar_url: newAvatarUrl })
-        .eq('user_id', user.id);
+        .upsert({ 
+          user_id: user.id,
+          avatar_url: newAvatarUrl 
+        }, { onConflict: 'user_id' });
 
       if (updateError) throw updateError;
 
@@ -129,11 +131,11 @@ const ProfileSettings = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({
-          username: username.trim(),
-          avatar_url: avatarUrl.trim(),
-        })
-        .eq('user_id', user.id);
+        .upsert({
+          user_id: user.id,
+          username: username.trim() || null,
+          avatar_url: avatarUrl.trim() || null,
+        }, { onConflict: 'user_id' });
 
       if (error) throw error;
 
