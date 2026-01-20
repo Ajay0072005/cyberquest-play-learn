@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { PasswordStrengthIndicator, isPasswordStrong } from "@/components/PasswordStrengthIndicator";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -27,10 +28,19 @@ export default function Register() {
       return;
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       toast({
         title: "Error",
-        description: "Password must be at least 6 characters",
+        description: "Password must be at least 8 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isPasswordStrong(password)) {
+      toast({
+        title: "Weak Password",
+        description: "Please choose a stronger password that meets all requirements",
         variant: "destructive",
       });
       return;
@@ -103,6 +113,7 @@ export default function Register() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <PasswordStrengthIndicator password={password} />
             </div>
 
             <div className="space-y-2">

@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, User, Save, Upload, Camera, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { PasswordStrengthIndicator, isPasswordStrong } from '@/components/PasswordStrengthIndicator';
 
 const ProfileSettings = () => {
   const { user } = useAuth();
@@ -339,9 +340,7 @@ const ProfileSettings = () => {
                   {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Password must be at least 6 characters
-              </p>
+              <PasswordStrengthIndicator password={newPassword} />
             </div>
 
             <div className="space-y-2">
@@ -367,10 +366,18 @@ const ProfileSettings = () => {
 
             <Button
               onClick={async () => {
-                if (newPassword.length < 6) {
+                if (newPassword.length < 8) {
                   toast({
                     title: 'Password too short',
-                    description: 'Password must be at least 6 characters',
+                    description: 'Password must be at least 8 characters',
+                    variant: 'destructive',
+                  });
+                  return;
+                }
+                if (!isPasswordStrong(newPassword)) {
+                  toast({
+                    title: 'Weak Password',
+                    description: 'Please choose a stronger password that meets all requirements',
                     variant: 'destructive',
                   });
                   return;
