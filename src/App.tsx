@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GameProvider } from "@/context/GameContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { BottomNav } from "@/components/BottomNav";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -32,6 +33,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <BottomNav />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/path/:slug" element={<CareerPath />} />
@@ -58,6 +60,11 @@ const App = () => (
                 </ProtectedRoute>
               } />
               <Route path="/settings" element={
+                <ProtectedRoute>
+                  <ProfileSettings />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
                 <ProtectedRoute>
                   <ProfileSettings />
                 </ProtectedRoute>
