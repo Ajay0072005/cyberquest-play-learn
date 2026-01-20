@@ -13,10 +13,12 @@ import {
   MessageSquare,
   Award,
   BookOpen,
-  FlaskConical
+  FlaskConical,
+  ShieldAlert
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
+import { useAdminRole } from '@/hooks/useAdminRole';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 
@@ -35,7 +37,12 @@ const navItems = [
 export const DashboardSidebar: React.FC = () => {
   const location = useLocation();
   const { signOut, user } = useAuth();
+  const { isAdmin } = useAdminRole();
   const [collapsed, setCollapsed] = useState(false);
+
+  const adminItems = isAdmin ? [
+    { icon: ShieldAlert, label: 'Admin: Roles', path: '/admin/roles' },
+  ] : [];
 
   return (
     <aside 
@@ -64,7 +71,7 @@ export const DashboardSidebar: React.FC = () => {
 
       {/* Navigation */}
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
+        {[...navItems, ...adminItems].map((item) => {
           const isActive = location.pathname === item.path;
           return (
             <Link
