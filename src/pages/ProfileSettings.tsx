@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, User, Save, Upload, Camera } from 'lucide-react';
+import { Loader2, User, Save, Upload, Camera, KeyRound, Eye, EyeOff } from 'lucide-react';
 
 const ProfileSettings = () => {
   const { user } = useAuth();
@@ -19,6 +19,13 @@ const ProfileSettings = () => {
   const [uploading, setUploading] = useState(false);
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+  
+  // Password change state
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -300,6 +307,118 @@ const ProfileSettings = () => {
               <Label className="text-muted-foreground">User ID</Label>
               <p className="text-foreground font-mono text-sm">{user?.id}</p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Change Password Card */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <KeyRound className="h-5 w-5 text-primary" />
+              Change Password
+            </CardTitle>
+            <CardDescription>Update your account password</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-password">New Password</Label>
+              <div className="relative max-w-md">
+                <Input
+                  id="new-password"
+                  type={showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  className="bg-background border-border pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Password must be at least 6 characters
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirm-password">Confirm New Password</Label>
+              <div className="relative max-w-md">
+                <Input
+                  id="confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="bg-background border-border pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            <Button
+              onClick={async () => {
+                if (newPassword.length < 6) {
+                  toast({
+                    title: 'Password too short',
+                    description: 'Password must be at least 6 characters',
+                    variant: 'destructive',
+                  });
+                  return;
+                }
+                if (newPassword !== confirmPassword) {
+                  toast({
+                    title: 'Passwords do not match',
+                    description: 'Please make sure both passwords are the same',
+                    variant: 'destructive',
+                  });
+                  return;
+                }
+
+                setChangingPassword(true);
+                try {
+                  const { error } = await supabase.auth.updateUser({
+                    password: newPassword,
+                  });
+
+                  if (error) throw error;
+
+                  toast({
+                    title: 'Success',
+                    description: 'Your password has been updated',
+                  });
+                  setNewPassword('');
+                  setConfirmPassword('');
+                } catch (error: any) {
+                  console.error('Error changing password:', error);
+                  toast({
+                    title: 'Error',
+                    description: error.message || 'Failed to update password',
+                    variant: 'destructive',
+                  });
+                } finally {
+                  setChangingPassword(false);
+                }
+              }}
+              disabled={changingPassword || !newPassword || !confirmPassword}
+              className="gap-2"
+            >
+              {changingPassword ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <KeyRound className="h-4 w-4" />
+              )}
+              Update Password
+            </Button>
           </CardContent>
         </Card>
       </div>
