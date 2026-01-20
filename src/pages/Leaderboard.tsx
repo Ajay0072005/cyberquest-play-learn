@@ -9,6 +9,7 @@ import { Loader2, Trophy, Medal, Award } from 'lucide-react';
 
 interface LeaderboardEntry {
   id: string;
+  user_id: string;
   username: string | null;
   avatar_url: string | null;
   points: number;
@@ -24,26 +25,23 @@ const Leaderboard = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        // Fetch from the secure leaderboard view (excludes user_id)
+        // Fetch from the secure leaderboard table
         const { data, error } = await supabase
           .from('leaderboard')
-          .select('id, username, avatar_url, points');
+          .select('id, user_id, username, avatar_url, points')
+          .order('points', { ascending: false })
+          .limit(50);
 
         if (error) throw error;
 
         setEntries(data || []);
 
-        // Fetch current user's profile to find their rank
-        if (user) {
-          const { data: userProfile } = await supabase
-            .from('profiles')
-            .select('id, points')
-            .eq('user_id', user.id)
-            .single();
-
-          if (userProfile && data) {
-            setCurrentUserId(userProfile.id);
-            const rank = data.findIndex(entry => entry.id === userProfile.id);
+        // Find current user's rank in the leaderboard
+        if (user && data) {
+          const userEntry = data.find(entry => entry.user_id === user.id);
+          if (userEntry) {
+            setCurrentUserId(userEntry.id);
+            const rank = data.findIndex(entry => entry.user_id === user.id);
             setUserRank(rank !== -1 ? rank + 1 : null);
           }
         }
@@ -56,7 +54,7 @@ const Leaderboard = () => {
 
     fetchLeaderboard();
 
-    // Subscribe to realtime updates
+    // Subscribe to realtime updates on the leaderboard table
     const channel = supabase
       .channel('leaderboard-changes')
       .on(
@@ -64,7 +62,7 @@ const Leaderboard = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'profiles'
+          table: 'leaderboard'
         },
         () => {
           fetchLeaderboard();
