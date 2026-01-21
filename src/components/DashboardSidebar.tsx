@@ -1,9 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  Database, 
-  Key, 
-  Terminal, 
   Trophy, 
   Settings,
   LogOut,
@@ -28,9 +25,6 @@ const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
   { icon: BookOpen, label: 'Sherlock Course', path: '/sherlock-course' },
   { icon: FlaskConical, label: 'Practical Labs', path: '/practical-labs' },
-  { icon: Database, label: 'SQL Game', path: '/sql-game' },
-  { icon: Key, label: 'Crypto Puzzles', path: '/crypto-puzzles' },
-  { icon: Terminal, label: 'Terminal', path: '/terminal' },
   { icon: Award, label: 'Achievements', path: '/achievements' },
   { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
   { icon: MessageSquare, label: 'AI Chat', path: '/chat' },

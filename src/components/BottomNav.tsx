@@ -1,12 +1,11 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, Trophy, Terminal, Lock, Settings } from "lucide-react";
+import { Home, Trophy, FlaskConical, Settings } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
   { to: "/dashboard", label: "Home", icon: Home },
-  { to: "/sql-game", label: "SQL", icon: Terminal },
-  { to: "/crypto-puzzles", label: "Crypto", icon: Lock },
+  { to: "/practical-labs", label: "Labs", icon: FlaskConical },
   { to: "/leaderboard", label: "Ranks", icon: Trophy },
   { to: "/settings", label: "Profile", icon: Settings },
 ];
