@@ -38,7 +38,7 @@ const puzzles = [
 ];
 
 interface CryptoPuzzleProps {
-  onBack: () => void;
+  onBack?: () => void;
 }
 
 export const CryptoPuzzle: React.FC<CryptoPuzzleProps> = ({ onBack }) => {
@@ -92,13 +92,15 @@ export const CryptoPuzzle: React.FC<CryptoPuzzleProps> = ({ onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="bg-background p-4">
       <div className="container mx-auto max-w-4xl">
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Challenges
-          </Button>
+          {onBack && (
+            <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Challenges
+            </Button>
+          )}
           <div className="flex-1">
             <h1 className="text-2xl font-cyber font-bold cyber-glow">
               Cryptography Puzzles

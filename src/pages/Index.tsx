@@ -12,31 +12,22 @@ import { careerPaths } from "@/data/careerPathsData";
 const Index = () => {
   const challenges = [
     {
-      title: "SQL Injection Basics",
-      description: "Learn to identify and exploit SQL injection vulnerabilities in web applications",
+      title: "Practical Labs",
+      description: "Master cybersecurity through hands-on practice with our Identify → Exploit → Fix workflow",
       difficulty: "Beginner" as const,
-      category: "Web Security",
-      challenges: 8,
-      completed: 3,
-      link: "/sql-game",
-    },
-    {
-      title: "Crypto Puzzles",
-      description: "Master cryptography by solving Caesar, Vigenère, and substitution cipher challenges",
-      difficulty: "Intermediate" as const,
-      category: "Cryptography",
-      challenges: 12,
+      category: "Hands-on Training",
+      challenges: 10,
       completed: 0,
-      link: "/crypto-puzzles",
+      link: "/practical-labs",
     },
     {
-      title: "Terminal Challenge",
-      description: "Navigate a Linux terminal, execute commands, and uncover hidden security flags",
-      difficulty: "Beginner" as const,
-      category: "System Security",
+      title: "Sherlock Course",
+      description: "Learn cryptography and security through Victorian-era detective adventures",
+      difficulty: "Intermediate" as const,
+      category: "Interactive Learning",
       challenges: 5,
       completed: 0,
-      link: "/terminal",
+      link: "/sherlock-course",
     },
   ];
 

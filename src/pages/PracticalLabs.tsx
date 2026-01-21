@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,15 +29,22 @@ import {
   Star,
   Loader2,
   RotateCcw,
-  Trash2
+  Trash2,
+  Database,
+  Key,
+  Terminal
 } from 'lucide-react';
 import { MiniLab, MiniLabData } from '@/components/labs/MiniLab';
 import { miniLabs } from '@/components/labs/miniLabsData';
 import { StoryMission, StoryMissionData } from '@/components/missions/StoryMission';
 import { storyMissions } from '@/components/missions/storyMissionsData';
 import { useLabProgress } from '@/hooks/useLabProgress';
+import { SQLInjectionGame } from '@/components/SQLInjectionGame';
+import { CryptoPuzzle } from '@/components/CryptoPuzzle';
+import { TerminalChallenge } from '@/components/TerminalChallenge';
 
 const PracticalLabs = () => {
+  const navigate = useNavigate();
   const [selectedLab, setSelectedLab] = useState<MiniLabData | null>(null);
   const [selectedMission, setSelectedMission] = useState<StoryMissionData | null>(null);
   
@@ -201,7 +209,7 @@ const PracticalLabs = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="labs" className="space-y-6">
-          <TabsList className="bg-muted/30">
+          <TabsList className="bg-muted/30 flex-wrap h-auto gap-1">
             <TabsTrigger value="labs" className="gap-2">
               <FlaskConical className="h-4 w-4" />
               Mini Labs
@@ -209,6 +217,18 @@ const PracticalLabs = () => {
             <TabsTrigger value="missions" className="gap-2">
               <Swords className="h-4 w-4" />
               Story Missions
+            </TabsTrigger>
+            <TabsTrigger value="sql" className="gap-2">
+              <Database className="h-4 w-4" />
+              SQL Game
+            </TabsTrigger>
+            <TabsTrigger value="crypto" className="gap-2">
+              <Key className="h-4 w-4" />
+              Crypto Puzzles
+            </TabsTrigger>
+            <TabsTrigger value="terminal" className="gap-2">
+              <Terminal className="h-4 w-4" />
+              Terminal
             </TabsTrigger>
           </TabsList>
 
@@ -435,6 +455,21 @@ const PracticalLabs = () => {
                 );
               })}
             </div>
+          </TabsContent>
+
+          {/* SQL Game Tab */}
+          <TabsContent value="sql" className="space-y-6">
+            <SQLInjectionGame />
+          </TabsContent>
+
+          {/* Crypto Puzzles Tab */}
+          <TabsContent value="crypto" className="space-y-6">
+            <CryptoPuzzle />
+          </TabsContent>
+
+          {/* Terminal Tab */}
+          <TabsContent value="terminal" className="space-y-6">
+            <TerminalChallenge />
           </TabsContent>
         </Tabs>
       </div>

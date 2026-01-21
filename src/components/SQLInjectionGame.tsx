@@ -82,7 +82,7 @@ const gameLevels: GameLevel[] = [
   }
 ];
 
-export const SQLInjectionGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+export const SQLInjectionGame: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [userInput, setUserInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
@@ -167,14 +167,16 @@ export const SQLInjectionGame: React.FC<{ onBack: () => void }> = ({ onBack }) =
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="bg-background p-4">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Challenges
-          </Button>
+          {onBack && (
+            <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Challenges
+            </Button>
+          )}
           <div className="flex-1">
             <h1 className="text-2xl font-cyber font-bold cyber-glow">
               SQL Injection Training Lab
