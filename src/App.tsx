@@ -23,6 +23,7 @@ import SherlockCourse from "./pages/SherlockCourse";
 import PracticalLabs from "./pages/PracticalLabs";
 import CareerPath from "./pages/CareerPath";
 import AdminRoles from "./pages/AdminRoles";
+import ModeratorDashboard from "./pages/ModeratorDashboard";
 
 const queryClient = new QueryClient();
 
@@ -98,6 +99,11 @@ const App = () => (
               <Route path="/admin/roles" element={
                 <ProtectedRoute>
                   <AdminRoles />
+                </ProtectedRoute>
+              } />
+              <Route path="/moderator" element={
+                <ProtectedRoute>
+                  <ModeratorDashboard />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
