@@ -42,6 +42,7 @@ import { useLabProgress } from '@/hooks/useLabProgress';
 import { SQLInjectionGame } from '@/components/SQLInjectionGame';
 import { CryptoPuzzle } from '@/components/CryptoPuzzle';
 import { TerminalChallenge } from '@/components/TerminalChallenge';
+import { useGame } from '@/context/GameContext';
 
 const PracticalLabs = () => {
   const navigate = useNavigate();
@@ -57,6 +58,12 @@ const PracticalLabs = () => {
     resetAllProgress,
     loading 
   } = useLabProgress();
+
+  const {
+    sqlLevelsCompleted,
+    cryptoPuzzlesSolved,
+    terminalFlagsFound
+  } = useGame();
 
   const handleLabComplete = async () => {
     if (selectedLab) {
@@ -157,51 +164,87 @@ const PracticalLabs = () => {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           <Card className="cyber-bg border-blue-500/30">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-12 w-12 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                <FlaskConical className="h-6 w-6 text-blue-400" />
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-blue-500/20 flex items-center justify-center shrink-0">
+                <FlaskConical className="h-5 w-5 text-blue-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{completedLabsList.length}/{miniLabs.length}</p>
+                <p className="text-xl font-bold">{completedLabsList.length}/{miniLabs.length}</p>
                 <p className="text-xs text-muted-foreground">Mini Labs</p>
               </div>
             </CardContent>
           </Card>
           
           <Card className="cyber-bg border-purple-500/30">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-12 w-12 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                <Swords className="h-6 w-6 text-purple-400" />
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-purple-500/20 flex items-center justify-center shrink-0">
+                <Swords className="h-5 w-5 text-purple-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{completedMissionsList.length}/{storyMissions.length}</p>
+                <p className="text-xl font-bold">{completedMissionsList.length}/{storyMissions.length}</p>
                 <p className="text-xs text-muted-foreground">Missions</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="cyber-bg border-green-500/30">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-12 w-12 rounded-lg bg-green-500/20 flex items-center justify-center">
-                <Trophy className="h-6 w-6 text-green-400" />
+          <Card className="cyber-bg border-orange-500/30">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-orange-500/20 flex items-center justify-center shrink-0">
+                <Database className="h-5 w-5 text-orange-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{getTotalLabPoints()}</p>
+                <p className="text-xl font-bold">{sqlLevelsCompleted}/5</p>
+                <p className="text-xs text-muted-foreground">SQL Levels</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="cyber-bg border-cyan-500/30">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-cyan-500/20 flex items-center justify-center shrink-0">
+                <Key className="h-5 w-5 text-cyan-400" />
+              </div>
+              <div>
+                <p className="text-xl font-bold">{cryptoPuzzlesSolved}/3</p>
+                <p className="text-xs text-muted-foreground">Crypto Puzzles</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="cyber-bg border-emerald-500/30">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
+                <Terminal className="h-5 w-5 text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-xl font-bold">{terminalFlagsFound}/5</p>
+                <p className="text-xs text-muted-foreground">Terminal Flags</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="cyber-bg border-green-500/30">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-green-500/20 flex items-center justify-center shrink-0">
+                <Trophy className="h-5 w-5 text-green-400" />
+              </div>
+              <div>
+                <p className="text-xl font-bold">{getTotalLabPoints()}</p>
                 <p className="text-xs text-muted-foreground">XP Earned</p>
               </div>
             </CardContent>
           </Card>
 
           <Card className="cyber-bg border-yellow-500/30">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-12 w-12 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-                <Star className="h-6 w-6 text-yellow-400" />
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-yellow-500/20 flex items-center justify-center shrink-0">
+                <Star className="h-5 w-5 text-yellow-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{totalLabPoints + totalMissionPoints}</p>
-                <p className="text-xs text-muted-foreground">Total XP Available</p>
+                <p className="text-xl font-bold">{totalLabPoints + totalMissionPoints}</p>
+                <p className="text-xs text-muted-foreground">Total XP</p>
               </div>
             </CardContent>
           </Card>
