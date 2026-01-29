@@ -27,6 +27,14 @@ interface GameContextType {
   incrementSqlLevels: () => void;
   incrementTerminalFlags: () => void;
   incrementChatMessages: () => void;
+  // New specific completion functions
+  completeSqlLevel: (level: number) => Promise<void>;
+  completeCryptoPuzzle: (puzzleId: string) => Promise<void>;
+  completeTerminalFlag: (flagId: string) => Promise<void>;
+  // Check if specific items are completed
+  isSqlLevelCompleted: (level: number) => boolean;
+  isCryptoPuzzleCompleted: (puzzleId: string) => boolean;
+  isTerminalFlagCompleted: (flagId: string) => boolean;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -45,6 +53,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userAchievementIds, setUserAchievementIds] = useState<Set<string>>(new Set());
   const { showAchievement } = useAchievementNotification();
 
+  // Track specific completed items
+  const [completedSqlLevels, setCompletedSqlLevels] = useState<Set<number>>(new Set());
+  const [completedCryptoPuzzles, setCompletedCryptoPuzzles] = useState<Set<string>>(new Set());
+  const [completedTerminalFlags, setCompletedTerminalFlags] = useState<Set<string>>(new Set());
+
   const [points, setPoints] = useState(() => {
     const saved = localStorage.getItem('cyberquest-points');
     return saved ? parseInt(saved) : 0;
@@ -55,25 +68,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [cryptoPuzzlesSolved, setCryptoPuzzlesSolved] = useState(() => {
-    const saved = localStorage.getItem('cyberquest-crypto');
-    return saved ? parseInt(saved) : 0;
-  });
-
-  const [sqlLevelsCompleted, setSqlLevelsCompleted] = useState(() => {
-    const saved = localStorage.getItem('cyberquest-sql');
-    return saved ? parseInt(saved) : 0;
-  });
-
-  const [terminalFlagsFound, setTerminalFlagsFound] = useState(() => {
-    const saved = localStorage.getItem('cyberquest-terminal');
-    return saved ? parseInt(saved) : 0;
-  });
-
   const [chatMessagesSent, setChatMessagesSent] = useState(() => {
     const saved = localStorage.getItem('cyberquest-chat');
     return saved ? parseInt(saved) : 0;
   });
+
+  // Derived counts from sets
+  const sqlLevelsCompleted = completedSqlLevels.size;
+  const cryptoPuzzlesSolved = completedCryptoPuzzles.size;
+  const terminalFlagsFound = completedTerminalFlags.size;
 
   const level = Math.floor(points / 1000) + 1;
 
@@ -109,6 +112,61 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
     fetchAchievements();
+  }, [user]);
+
+  // Fetch game progress from database
+  useEffect(() => {
+    const fetchGameProgress = async () => {
+      if (!user) {
+        // Load from localStorage for non-logged users
+        const savedSql = localStorage.getItem('cyberquest-sql-levels');
+        const savedCrypto = localStorage.getItem('cyberquest-crypto-puzzles');
+        const savedTerminal = localStorage.getItem('cyberquest-terminal-flags');
+        
+        if (savedSql) setCompletedSqlLevels(new Set(JSON.parse(savedSql)));
+        if (savedCrypto) setCompletedCryptoPuzzles(new Set(JSON.parse(savedCrypto)));
+        if (savedTerminal) setCompletedTerminalFlags(new Set(JSON.parse(savedTerminal)));
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('lab_progress')
+          .select('lab_id, lab_type')
+          .eq('user_id', user.id)
+          .in('lab_type', ['sql_level', 'crypto_puzzle', 'terminal_flag']);
+
+        if (error) throw error;
+
+        const sqlLevels = new Set<number>();
+        const cryptoPuzzles = new Set<string>();
+        const terminalFlags = new Set<string>();
+
+        data?.forEach(item => {
+          if (item.lab_type === 'sql_level') {
+            const level = parseInt(item.lab_id.replace('sql-', ''));
+            if (!isNaN(level)) sqlLevels.add(level);
+          } else if (item.lab_type === 'crypto_puzzle') {
+            cryptoPuzzles.add(item.lab_id);
+          } else if (item.lab_type === 'terminal_flag') {
+            terminalFlags.add(item.lab_id);
+          }
+        });
+
+        setCompletedSqlLevels(sqlLevels);
+        setCompletedCryptoPuzzles(cryptoPuzzles);
+        setCompletedTerminalFlags(terminalFlags);
+
+        // Also save to localStorage as backup
+        localStorage.setItem('cyberquest-sql-levels', JSON.stringify([...sqlLevels]));
+        localStorage.setItem('cyberquest-crypto-puzzles', JSON.stringify([...cryptoPuzzles]));
+        localStorage.setItem('cyberquest-terminal-flags', JSON.stringify([...terminalFlags]));
+      } catch (error) {
+        console.error('Error fetching game progress:', error);
+      }
+    };
+
+    fetchGameProgress();
   }, [user]);
 
   // Check and award achievements
@@ -201,44 +259,116 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const incrementCryptoPuzzles = useCallback(() => {
-    setCryptoPuzzlesSolved(prev => {
-      const newVal = prev + 1;
-      localStorage.setItem('cyberquest-crypto', newVal.toString());
-      checkAchievements('crypto_puzzles', newVal);
-      // Check for Crypto Master milestone (all 3 puzzles completed)
-      if (newVal >= 3) {
-        checkAchievements('crypto_master', 1);
+  // Complete specific SQL level
+  const completeSqlLevel = useCallback(async (level: number) => {
+    if (completedSqlLevels.has(level)) return;
+
+    const newCompleted = new Set([...completedSqlLevels, level]);
+    setCompletedSqlLevels(newCompleted);
+    localStorage.setItem('cyberquest-sql-levels', JSON.stringify([...newCompleted]));
+
+    if (user) {
+      try {
+        await supabase.from('lab_progress').insert({
+          user_id: user.id,
+          lab_id: `sql-${level}`,
+          lab_type: 'sql_level',
+          points_earned: 100,
+        });
+      } catch (error: any) {
+        if (error?.code !== '23505') {
+          console.error('Error saving SQL level progress:', error);
+        }
       }
-      return newVal;
-    });
-  }, [checkAchievements]);
+    }
+
+    addPoints(100);
+    checkAchievements('sql_levels', newCompleted.size);
+    if (newCompleted.size >= 5) {
+      checkAchievements('sql_master', 1);
+    }
+  }, [completedSqlLevels, user, checkAchievements]);
+
+  // Complete specific crypto puzzle
+  const completeCryptoPuzzle = useCallback(async (puzzleId: string) => {
+    if (completedCryptoPuzzles.has(puzzleId)) return;
+
+    const newCompleted = new Set([...completedCryptoPuzzles, puzzleId]);
+    setCompletedCryptoPuzzles(newCompleted);
+    localStorage.setItem('cyberquest-crypto-puzzles', JSON.stringify([...newCompleted]));
+
+    if (user) {
+      try {
+        await supabase.from('lab_progress').insert({
+          user_id: user.id,
+          lab_id: puzzleId,
+          lab_type: 'crypto_puzzle',
+          points_earned: 150,
+        });
+      } catch (error: any) {
+        if (error?.code !== '23505') {
+          console.error('Error saving crypto puzzle progress:', error);
+        }
+      }
+    }
+
+    addPoints(150);
+    checkAchievements('crypto_puzzles', newCompleted.size);
+    if (newCompleted.size >= 3) {
+      checkAchievements('crypto_master', 1);
+    }
+  }, [completedCryptoPuzzles, user, checkAchievements]);
+
+  // Complete specific terminal flag
+  const completeTerminalFlag = useCallback(async (flagId: string) => {
+    if (completedTerminalFlags.has(flagId)) return;
+
+    const newCompleted = new Set([...completedTerminalFlags, flagId]);
+    setCompletedTerminalFlags(newCompleted);
+    localStorage.setItem('cyberquest-terminal-flags', JSON.stringify([...newCompleted]));
+
+    if (user) {
+      try {
+        await supabase.from('lab_progress').insert({
+          user_id: user.id,
+          lab_id: flagId,
+          lab_type: 'terminal_flag',
+          points_earned: 50,
+        });
+      } catch (error: any) {
+        if (error?.code !== '23505') {
+          console.error('Error saving terminal flag progress:', error);
+        }
+      }
+    }
+
+    addPoints(50);
+    if (newCompleted.size >= 5) {
+      checkAchievements('terminal_complete', 1);
+      checkAchievements('terminal_master', 1);
+    }
+  }, [completedTerminalFlags, user, checkAchievements]);
+
+  // Check functions
+  const isSqlLevelCompleted = useCallback((level: number) => completedSqlLevels.has(level), [completedSqlLevels]);
+  const isCryptoPuzzleCompleted = useCallback((puzzleId: string) => completedCryptoPuzzles.has(puzzleId), [completedCryptoPuzzles]);
+  const isTerminalFlagCompleted = useCallback((flagId: string) => completedTerminalFlags.has(flagId), [completedTerminalFlags]);
+
+  // Legacy increment functions (for backwards compatibility)
+  const incrementCryptoPuzzles = useCallback(() => {
+    const nextPuzzleId = `crypto-${completedCryptoPuzzles.size + 1}`;
+    completeCryptoPuzzle(nextPuzzleId);
+  }, [completedCryptoPuzzles, completeCryptoPuzzle]);
 
   const incrementSqlLevels = useCallback(() => {
-    setSqlLevelsCompleted(prev => {
-      const newVal = prev + 1;
-      localStorage.setItem('cyberquest-sql', newVal.toString());
-      checkAchievements('sql_levels', newVal);
-      // Check for SQL Master milestone (all 5 levels completed)
-      if (newVal >= 5) {
-        checkAchievements('sql_master', 1);
-      }
-      return newVal;
-    });
-  }, [checkAchievements]);
+    const nextLevel = completedSqlLevels.size + 1;
+    completeSqlLevel(nextLevel);
+  }, [completedSqlLevels, completeSqlLevel]);
 
   const incrementTerminalFlags = useCallback(() => {
-    setTerminalFlagsFound(prev => {
-      const newVal = prev + 1;
-      localStorage.setItem('cyberquest-terminal', newVal.toString());
-      if (newVal >= 5) {
-        checkAchievements('terminal_complete', 1);
-        // Check for Terminal Commander milestone (all 5 objectives completed)
-        checkAchievements('terminal_master', 1);
-      }
-      return newVal;
-    });
-  }, [checkAchievements]);
+    const nextFlagId = `terminal-${completedTerminalFlags.size + 1}`;
+    completeTerminalFlag(nextFlagId);
+  }, [completedTerminalFlags, completeTerminalFlag]);
 
   const incrementChatMessages = useCallback(() => {
     setChatMessagesSent(prev => {
@@ -272,6 +402,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       incrementSqlLevels,
       incrementTerminalFlags,
       incrementChatMessages,
+      completeSqlLevel,
+      completeCryptoPuzzle,
+      completeTerminalFlag,
+      isSqlLevelCompleted,
+      isCryptoPuzzleCompleted,
+      isTerminalFlagCompleted,
     }}>
       {children}
     </GameContext.Provider>
