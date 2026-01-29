@@ -13,10 +13,69 @@ serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')!;
+
+    // Authentication check
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Missing or invalid authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Verify the user's JWT and get their identity
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
     
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Invalid token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const userId = claimsData.claims.sub;
+    if (!userId) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - No user ID in token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Use service role client to check admin role (bypasses RLS for role check)
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    
+    const { data: roleData, error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (roleError) {
+      console.error('Role check error:', roleError);
+      return new Response(
+        JSON.stringify({ error: 'Error checking user permissions' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!roleData) {
+      return new Response(
+        JSON.stringify({ error: 'Forbidden - Admin role required' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // User is authenticated and has admin role - proceed with import
+    console.log(`Admin user ${userId} initiated knowledge import`);
 
     // Fetch CSV data from public folder
     const csvResponse = await fetch(`${supabaseUrl}/storage/v1/object/public/data/cysecbench.csv`);
@@ -61,8 +120,8 @@ serve(async (req) => {
           const embeddingData = await embeddingResponse.json();
           const embedding = embeddingData.data[0].embedding;
           
-          // Insert into database
-          const { error } = await supabase
+          // Insert into database using admin client
+          const { error } = await supabaseAdmin
             .from('knowledge_base')
             .insert({
               prompt,
@@ -121,8 +180,8 @@ serve(async (req) => {
         const embeddingData = await embeddingResponse.json();
         const embedding = embeddingData.data[0].embedding;
         
-        // Insert into database
-        const { error } = await supabase
+        // Insert into database using admin client
+        const { error } = await supabaseAdmin
           .from('knowledge_base')
           .insert({
             prompt,
