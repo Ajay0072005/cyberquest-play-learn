@@ -1,9 +1,11 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Shield, Play, Code } from "lucide-react";
+import { Shield, Play, Code, Map } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/cyber-hero-bg.jpg";
 
 export const Hero: React.FC = () => {
+  const navigate = useNavigate();
   const scrollToChallenges = () => {
     const challengesSection = document.getElementById('challenges');
     if (challengesSection) {
@@ -44,9 +46,9 @@ export const Hero: React.FC = () => {
               <Play className="h-5 w-5 group-hover:scale-110 transition-transform" />
               Start Learning
             </Button>
-            <Button variant="outline" size="xl" className="border-primary/50 text-primary hover:bg-primary/10" onClick={scrollToChallenges}>
-              <Code className="h-5 w-5" />
-              Browse Challenges
+            <Button variant="outline" size="xl" className="border-primary/50 text-primary hover:bg-primary/10" onClick={() => navigate('/path/script-kiddie')}>
+              <Map className="h-5 w-5" />
+              Career Path
             </Button>
           </div>
           
