@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN ai_tutor_avatar jsonb DEFAULT null;

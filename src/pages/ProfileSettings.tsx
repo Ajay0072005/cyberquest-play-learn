@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, User, Save, Upload, Camera, KeyRound, Eye, EyeOff } from 'lucide-react';
 import { PasswordStrengthIndicator, isPasswordStrong } from '@/components/PasswordStrengthIndicator';
+import AvatarCustomizer from '@/components/avatar/AvatarCustomizer';
 
 const ProfileSettings = () => {
   const { user } = useAuth();
@@ -428,6 +429,9 @@ const ProfileSettings = () => {
             </Button>
           </CardContent>
         </Card>
+
+        {/* AI Tutor Avatar */}
+        <AvatarCustomizer />
       </div>
     </DashboardLayout>
   );
