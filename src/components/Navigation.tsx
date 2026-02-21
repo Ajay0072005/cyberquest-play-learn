@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Shield, User, LogOut, Settings, Menu, X } from "lucide-react";
+import { Shield, User, LogOut, Settings, Menu, X, ChevronDown } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import {
   DropdownMenu,
@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { careerPaths } from "@/data/careerPathsData";
 import {
   Sheet,
   SheetContent,
@@ -53,7 +54,6 @@ export const Navigation: React.FC = () => {
 
   const navLinks = [
     { to: "/dashboard", label: "Dashboard" },
-    { to: "/path/script-kiddie", label: "Career Path" },
   ];
 
   const handleMobileNavClick = (to: string) => {
@@ -86,6 +86,26 @@ export const Navigation: React.FC = () => {
               {link.label}
             </Link>
           ))}
+          <DropdownMenu>
+            <DropdownMenuTrigger className={`flex items-center gap-1 transition-colors ${
+              location.pathname.startsWith('/path/') 
+                ? 'text-primary cyber-glow' 
+                : 'text-muted-foreground hover:text-primary'
+            }`}>
+              Career Path
+              <ChevronDown className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-popover" align="start">
+              {careerPaths.map((path) => (
+                <DropdownMenuItem key={path.slug} asChild>
+                  <Link to={`/path/${path.slug}`} className="cursor-pointer">
+                    <path.icon className="mr-2 h-4 w-4" />
+                    <span>Lv.{path.level} — {path.title}</span>
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         
         <div className="flex items-center gap-2 md:gap-4">
@@ -191,6 +211,21 @@ export const Navigation: React.FC = () => {
                         {link.label}
                       </button>
                     ))}
+                    <p className="px-3 pt-3 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Career Path</p>
+                    {careerPaths.map((path) => (
+                      <button
+                        key={path.slug}
+                        onClick={() => handleMobileNavClick(`/path/${path.slug}`)}
+                        className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-left text-sm transition-colors ${
+                          location.pathname === `/path/${path.slug}` 
+                            ? 'bg-primary/10 text-primary' 
+                            : 'text-foreground hover:bg-muted'
+                        }`}
+                      >
+                        <path.icon className="h-4 w-4" />
+                        Lv.{path.level} — {path.title}
+                      </button>
+                    ))}
                   </div>
 
                   <div className="border-t border-border pt-4 space-y-1">
@@ -252,6 +287,21 @@ export const Navigation: React.FC = () => {
                         }`}
                       >
                         {link.label}
+                      </button>
+                    ))}
+                    <p className="px-3 pt-3 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Career Path</p>
+                    {careerPaths.map((path) => (
+                      <button
+                        key={path.slug}
+                        onClick={() => handleMobileNavClick(`/path/${path.slug}`)}
+                        className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-left text-sm transition-colors ${
+                          location.pathname === `/path/${path.slug}` 
+                            ? 'bg-primary/10 text-primary' 
+                            : 'text-foreground hover:bg-muted'
+                        }`}
+                      >
+                        <path.icon className="h-4 w-4" />
+                        Lv.{path.level} — {path.title}
                       </button>
                     ))}
                   </div>
