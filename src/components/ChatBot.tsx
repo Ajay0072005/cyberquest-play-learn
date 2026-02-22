@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { X, MessageSquare, Send, Bot, User } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
+import AvatarSVG from '@/components/avatar/AvatarSVG';
+import { AvatarConfig, defaultAvatarConfig } from '@/components/avatar/avatarOptions';
 
 interface Message {
   id: string;
@@ -14,7 +17,9 @@ interface Message {
 }
 
 export const ChatBot: React.FC = () => {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [tutorAvatar, setTutorAvatar] = useState<AvatarConfig | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -35,6 +40,21 @@ export const ChatBot: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    const fetchAvatar = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from('profiles')
+        .select('ai_tutor_avatar')
+        .eq('user_id', user.id)
+        .single();
+      if (data?.ai_tutor_avatar) {
+        setTutorAvatar(data.ai_tutor_avatar as unknown as AvatarConfig);
+      }
+    };
+    fetchAvatar();
+  }, [user]);
 
   const sendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -148,8 +168,8 @@ export const ChatBot: React.FC = () => {
                   }`}
                 >
                   {message.sender === "bot" && (
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                      <Bot className="h-4 w-4 text-primary" />
+                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                      <AvatarSVG config={tutorAvatar || defaultAvatarConfig} size={32} />
                     </div>
                   )}
                   
@@ -180,8 +200,8 @@ export const ChatBot: React.FC = () => {
               {/* Typing Indicator */}
               {isTyping && (
                 <div className="flex gap-3 justify-start">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <Bot className="h-4 w-4 text-primary" />
+                  <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                    <AvatarSVG config={tutorAvatar || defaultAvatarConfig} size={32} />
                   </div>
                    <div className="bg-muted text-foreground px-3 py-2 rounded-lg">
                      <div className="flex gap-1">
