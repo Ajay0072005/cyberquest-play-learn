@@ -11,6 +11,9 @@ import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import AvatarSVG from '@/components/avatar/AvatarSVG';
+import { AvatarConfig, defaultAvatarConfig } from '@/components/avatar/avatarOptions';
+import { useAuth } from '@/context/AuthContext';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -20,13 +23,30 @@ interface Message {
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
 const Chat = () => {
+  const { user } = useAuth();
   const { toast } = useToast();
   const { incrementChatMessages } = useGame();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [tutorAvatar, setTutorAvatar] = useState<AvatarConfig | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const fetchAvatar = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from('profiles')
+        .select('ai_tutor_avatar')
+        .eq('user_id', user.id)
+        .single();
+      if (data?.ai_tutor_avatar) {
+        setTutorAvatar(data.ai_tutor_avatar as unknown as AvatarConfig);
+      }
+    };
+    fetchAvatar();
+  }, [user]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -219,11 +239,9 @@ const Chat = () => {
                     )}
                   >
                     {message.role === 'assistant' && (
-                      <Avatar className="h-8 w-8 border border-primary/20">
-                        <AvatarFallback className="bg-primary/10 text-primary">
-                          <Bot className="h-4 w-4" />
-                        </AvatarFallback>
-                      </Avatar>
+                      <div className="h-8 w-8 rounded-full border border-primary/20 overflow-hidden flex-shrink-0">
+                        <AvatarSVG config={tutorAvatar || defaultAvatarConfig} size={32} />
+                      </div>
                     )}
                     <div
                       className={cn(
@@ -250,11 +268,9 @@ const Chat = () => {
                 ))}
                 {isLoading && messages[messages.length - 1]?.role === 'user' && (
                   <div className="flex gap-3">
-                    <Avatar className="h-8 w-8 border border-primary/20">
-                      <AvatarFallback className="bg-primary/10 text-primary">
-                        <Bot className="h-4 w-4" />
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="h-8 w-8 rounded-full border border-primary/20 overflow-hidden flex-shrink-0">
+                      <AvatarSVG config={tutorAvatar || defaultAvatarConfig} size={32} />
+                    </div>
                     <div className="bg-muted rounded-lg px-4 py-2">
                       <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                     </div>
