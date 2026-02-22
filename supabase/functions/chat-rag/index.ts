@@ -76,52 +76,57 @@ serve(async (req) => {
     // Use service role client for database operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Generate embedding for user query
-    const embeddingResponse = await fetch('https://ai.gateway.lovable.dev/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        input: message.trim(),
-        model: 'text-embedding-3-small'
-      }),
-    });
+    // Try to generate embedding for vector search, fall back to text search
+    let context = '';
+    try {
+      const embeddingResponse = await fetch('https://ai.gateway.lovable.dev/v1/embeddings', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lovableApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          input: message.trim(),
+          model: 'text-embedding-3-small'
+        }),
+      });
 
-    if (!embeddingResponse.ok) {
-      throw new Error('Failed to generate query embedding');
+      if (embeddingResponse.ok) {
+        const embeddingData = await embeddingResponse.json();
+        const queryEmbedding = embeddingData.data[0].embedding;
+
+        const { data: similarQuestions, error: searchError } = await supabase.rpc(
+          'match_knowledge',
+          {
+            query_embedding: queryEmbedding,
+            match_threshold: 0.7,
+            match_count: 5
+          }
+        );
+
+        if (!searchError && similarQuestions) {
+          context = similarQuestions
+            .map((q: any) => `Q: ${q.prompt}\nCategory: ${q.category}`)
+            .join('\n\n');
+        }
+      } else {
+        console.log('Embedding API returned status:', embeddingResponse.status);
+      }
+    } catch (embErr) {
+      console.log('Embedding/vector search failed, using fallback:', embErr);
     }
 
-    const embeddingData = await embeddingResponse.json();
-    const queryEmbedding = embeddingData.data[0].embedding;
-
-    // Search for similar questions using vector similarity
-    const { data: similarQuestions, error: searchError } = await supabase.rpc(
-      'match_knowledge',
-      {
-        query_embedding: queryEmbedding,
-        match_threshold: 0.7,
-        match_count: 5
-      }
-    );
-
-    // If RPC doesn't exist yet, use a direct query
-    let context = '';
-    if (searchError) {
-      console.log('RPC not found, using direct query');
+    // Fallback: use direct text search if no context from embeddings
+    if (!context) {
       const { data, error } = await supabase
         .from('knowledge_base')
         .select('prompt, category')
+        .ilike('prompt', `%${message.trim().split(' ').slice(0, 3).join('%')}%`)
         .limit(5);
       
-      if (!error && data) {
+      if (!error && data && data.length > 0) {
         context = data.map(q => `Q: ${q.prompt}\nCategory: ${q.category}`).join('\n\n');
       }
-    } else {
-      context = similarQuestions
-        ?.map((q: any) => `Q: ${q.prompt}\nCategory: ${q.category}`)
-        .join('\n\n') || '';
     }
 
     // Generate response using Lovable AI with RAG context
