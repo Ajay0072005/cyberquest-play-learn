@@ -6,6 +6,7 @@ import { X, MessageSquare, Send, Bot, User } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
+import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import AvatarSVG from '@/components/avatar/AvatarSVG';
 import { AvatarConfig, defaultAvatarConfig } from '@/components/avatar/avatarOptions';
 
@@ -181,7 +182,13 @@ export const ChatBot: React.FC = () => {
                         : "bg-muted/80 text-foreground border border-border/30"
                     }`}
                   >
-                    <p className="whitespace-pre-wrap break-words leading-relaxed">{message.text}</p>
+                    {message.sender === "bot" ? (
+                      <div className="whitespace-pre-wrap break-words leading-relaxed text-sm">
+                        <MarkdownRenderer content={message.text} />
+                      </div>
+                    ) : (
+                      <p className="whitespace-pre-wrap break-words leading-relaxed">{message.text}</p>
+                    )}
                     <span className="text-[10px] opacity-50 mt-1 block text-right">
                       {message.timestamp.toLocaleTimeString([], {
                         hour: "2-digit",
