@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X, MessageSquare, Send, Bot, User } from "lucide-react";
+import { X, MessageSquare, Send, Bot, User, GripVertical } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
@@ -21,6 +21,9 @@ export const ChatBot: React.FC = () => {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [tutorAvatar, setTutorAvatar] = useState<AvatarConfig | null>(null);
+  const [chatSize, setChatSize] = useState({ width: 384, height: 480 });
+  const [isResizing, setIsResizing] = useState(false);
+  const resizeRef = useRef<{ startX: number; startY: number; startW: number; startH: number } | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -33,6 +36,32 @@ export const ChatBot: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+    resizeRef.current = { startX: e.clientX, startY: e.clientY, startW: chatSize.width, startH: chatSize.height };
+
+    const handleMouseMove = (ev: MouseEvent) => {
+      if (!resizeRef.current) return;
+      const dw = resizeRef.current.startX - ev.clientX;
+      const dh = resizeRef.current.startY - ev.clientY;
+      setChatSize({
+        width: Math.max(320, Math.min(800, resizeRef.current.startW + dw)),
+        height: Math.max(400, Math.min(800, resizeRef.current.startH + dh)),
+      });
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      resizeRef.current = null;
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  }, [chatSize]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -147,7 +176,18 @@ export const ChatBot: React.FC = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-24 right-6 z-50 w-[340px] sm:w-96 h-[480px] flex flex-col bg-card/95 backdrop-blur-md border-primary/20 shadow-xl rounded-2xl overflow-hidden">
+        <Card
+          className={`fixed bottom-24 right-6 z-50 flex flex-col bg-card/95 backdrop-blur-md border-primary/20 shadow-xl rounded-2xl overflow-hidden ${isResizing ? 'select-none' : ''}`}
+          style={{ width: chatSize.width, height: chatSize.height }}
+        >
+          {/* Resize Handle - top-left corner */}
+          <div
+            onMouseDown={handleResizeStart}
+            className="absolute top-0 left-0 z-10 w-6 h-6 cursor-nw-resize flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity"
+            title="Drag to resize"
+          >
+            <GripVertical className="h-3 w-3 text-muted-foreground rotate-45" />
+          </div>
           <CardHeader className="py-3 px-4 border-b border-border/30 bg-muted/30">
             <CardTitle className="flex items-center gap-2 text-base font-semibold">
               <Bot className="h-5 w-5 text-primary" />
