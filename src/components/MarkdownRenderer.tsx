@@ -1,27 +1,45 @@
+import React, { useState } from 'react';
 import ReactMarkdown, { Components } from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Copy, Check } from 'lucide-react';
 
 interface MarkdownRendererProps {
   content: string;
 }
 
 export const MarkdownRenderer = ({ content }: MarkdownRendererProps) => {
+  const [copiedBlock, setCopiedBlock] = useState<string | null>(null);
+
+  const handleCopy = (code: string, id: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedBlock(id);
+    setTimeout(() => setCopiedBlock(null), 2000);
+  };
+
   const components: Components = {
     code({ className, children, ...props }) {
       const match = /language-(\w+)/.exec(className || '');
       const language = match ? match[1] : '';
       const codeString = String(children).replace(/\n$/, '');
       const isMultiLine = codeString.includes('\n');
+      const blockId = `${language}-${codeString.slice(0, 20)}`;
       
       if (isMultiLine || language) {
         return (
-          <div className="relative my-2 rounded-lg overflow-hidden">
+          <div className="relative my-2 rounded-lg overflow-hidden group">
             {language && (
               <div className="flex items-center justify-between bg-muted/80 px-3 py-1 text-xs text-muted-foreground border-b border-border">
                 <span>{language}</span>
               </div>
             )}
+            <button
+              onClick={() => handleCopy(codeString, blockId)}
+              className="absolute top-1 right-1 z-10 p-1.5 rounded-md bg-muted/80 hover:bg-muted text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+              title="Copy code"
+            >
+              {copiedBlock === blockId ? <Check className="h-3.5 w-3.5 text-primary" /> : <Copy className="h-3.5 w-3.5" />}
+            </button>
             <SyntaxHighlighter
               style={oneDark}
               language={language || 'text'}
