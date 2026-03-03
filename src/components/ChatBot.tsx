@@ -146,12 +146,13 @@ export const ChatBot: React.FC = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-24 right-6 z-50 w-96 h-[500px] flex flex-col cyber-bg border-primary/30 shadow-cyber">
-          <CardHeader className="pb-3 border-b border-border/50">
-            <CardTitle className="flex items-center gap-2 text-lg font-cyber">
-              <Bot className="h-5 w-5 text-primary cyber-glow" />
+        <Card className="fixed bottom-24 right-6 z-50 w-[340px] sm:w-96 h-[480px] flex flex-col bg-card/95 backdrop-blur-md border-primary/20 shadow-xl rounded-2xl overflow-hidden">
+          <CardHeader className="py-3 px-4 border-b border-border/30 bg-muted/30">
+            <CardTitle className="flex items-center gap-2 text-base font-semibold">
+              <Bot className="h-5 w-5 text-primary" />
               CyberBot
-              <span className="text-xs text-muted-foreground font-normal ml-auto">
+              <span className="text-[10px] text-primary font-normal ml-auto flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
                 Online
               </span>
             </CardTitle>
@@ -174,14 +175,14 @@ export const ChatBot: React.FC = () => {
                   )}
                   
                   <div
-                    className={`max-w-[280px] px-3 py-2 rounded-lg text-sm ${
+                    className={`max-w-[260px] px-3 py-2 rounded-lg text-sm ${
                       message.sender === "user"
-                        ? "bg-primary text-black ml-auto shadow-lg border border-primary/20"
-                        : "bg-muted text-foreground"
+                        ? "bg-primary/20 text-primary border border-primary/30 ml-auto"
+                        : "bg-muted/80 text-foreground border border-border/30"
                     }`}
                   >
-                    <p className="terminal-text">{message.text}</p>
-                    <span className="text-xs opacity-70 mt-1 block">
+                    <p className="whitespace-pre-wrap break-words leading-relaxed">{message.text}</p>
+                    <span className="text-[10px] opacity-50 mt-1 block text-right">
                       {message.timestamp.toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit"
