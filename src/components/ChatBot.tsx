@@ -216,7 +216,7 @@ export const ChatBot: React.FC = () => {
                   )}
                   
                   <div
-                    className={`max-w-[260px] px-3 py-2 rounded-lg text-sm ${
+                    className={`max-w-[80%] px-3 py-2 rounded-lg text-sm ${
                       message.sender === "user"
                         ? "bg-primary/20 text-primary border border-primary/30 ml-auto"
                         : "bg-muted/80 text-foreground border border-border/30"
