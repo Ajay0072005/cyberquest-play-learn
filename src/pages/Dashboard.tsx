@@ -211,8 +211,8 @@ const Dashboard: React.FC = () => {
           <CardContent className="p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Points</p>
-                <p className="text-2xl md:text-3xl font-cyber font-bold text-primary cyber-glow">{points}</p>
+                <p className="text-sm text-muted-foreground">Total XP</p>
+                <p className="text-2xl md:text-3xl font-cyber font-bold text-primary cyber-glow">{points.toLocaleString()} XP</p>
               </div>
               <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
                 <Trophy className="h-6 w-6 text-primary" />
