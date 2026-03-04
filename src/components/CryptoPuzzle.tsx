@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Lock, Key, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Lock, Key, CheckCircle, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useGame } from '@/context/GameContext';
 
@@ -45,6 +45,7 @@ export const CryptoPuzzle: React.FC<CryptoPuzzleProps> = ({ onBack }) => {
   const [currentPuzzle, setCurrentPuzzle] = useState(0);
   const [userInput, setUserInput] = useState('');
   const [showHint, setShowHint] = useState(false);
+  const [showSolution, setShowSolution] = useState(false);
   const [solved, setSolved] = useState<string[]>([]);
   const { toast } = useToast();
   const { addPoints, completeChallenge, incrementCryptoPuzzles } = useGame();
@@ -80,6 +81,7 @@ export const CryptoPuzzle: React.FC<CryptoPuzzleProps> = ({ onBack }) => {
       setCurrentPuzzle(prev => prev + 1);
       setUserInput('');
       setShowHint(false);
+      setShowSolution(false);
     }
   };
 
@@ -88,6 +90,7 @@ export const CryptoPuzzle: React.FC<CryptoPuzzleProps> = ({ onBack }) => {
       setCurrentPuzzle(prev => prev - 1);
       setUserInput('');
       setShowHint(false);
+      setShowSolution(false);
     }
   };
 
@@ -150,7 +153,7 @@ export const CryptoPuzzle: React.FC<CryptoPuzzleProps> = ({ onBack }) => {
                   />
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button
                     onClick={checkSolution}
                     className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary"
@@ -165,11 +168,31 @@ export const CryptoPuzzle: React.FC<CryptoPuzzleProps> = ({ onBack }) => {
                   >
                     {showHint ? 'Hide Hint' : 'Show Hint'}
                   </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowSolution(!showSolution)}
+                    className="flex items-center gap-2"
+                  >
+                    {showSolution ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showSolution ? 'Hide Solution' : 'View Solution'}
+                  </Button>
                 </div>
 
                 {showHint && (
                   <div className="bg-accent/20 p-3 rounded border-l-4 border-accent">
                     <p className="text-sm">💡 {puzzle.hint}</p>
+                  </div>
+                )}
+
+                {showSolution && (
+                  <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
+                    <h4 className="font-semibold text-primary mb-2 flex items-center gap-2">
+                      <Eye className="h-4 w-4" />
+                      Solution
+                    </h4>
+                    <div className="bg-black/30 rounded p-3 font-mono text-sm text-primary">
+                      {puzzle.solution}
+                    </div>
                   </div>
                 )}
               </div>

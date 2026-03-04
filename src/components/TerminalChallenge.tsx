@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useGame } from '@/context/GameContext';
 import { useToast } from '@/hooks/use-toast';
-import { Terminal as TerminalIcon, Award, ArrowLeft } from 'lucide-react';
+import { Terminal as TerminalIcon, Award, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
 interface TerminalLine {
   text: string;
@@ -399,30 +399,68 @@ export const TerminalChallenge: React.FC<TerminalChallengeProps> = ({ onBack }) 
         </CardContent>
       </Card>
 
-      <Card className="cyber-bg border-primary/30">
-        <CardHeader>
-          <CardTitle className="text-lg">Mission Objectives</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2 text-sm">
-            <li className={foundFlags.has('FLAG{hidden_files_r_cool}') ? 'line-through opacity-50' : ''}>
-              ✓ Find the hidden file in the home directory
-            </li>
-            <li className={foundFlags.has('FLAG{log_analysis_master}') ? 'line-through opacity-50' : ''}>
-              ✓ Analyze system log files for clues
-            </li>
-            <li className={foundFlags.has('FLAG{system_files_exposed}') ? 'line-through opacity-50' : ''}>
-              ✓ Examine system configuration files
-            </li>
-            <li className={foundFlags.has('FLAG{backups_are_treasure}') ? 'line-through opacity-50' : ''}>
-              ✓ Locate the backup file
-            </li>
-            <li className={foundFlags.has('FLAG{root_access_granted}') ? 'line-through opacity-50' : ''}>
-              ✓ Access the root directory
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
+      <TerminalSolutions />
     </div>
+  );
+};
+
+const TerminalSolutions = () => {
+  const [showSolutions, setShowSolutions] = useState(false);
+  
+  const solutions = [
+    { flag: 'FLAG{hidden_files_r_cool}', path: '/home/hacker/.hidden', command: 'cat .hidden', points: 50 },
+    { flag: 'FLAG{log_analysis_master}', path: '/var/log/error.log', command: 'cd /var/log && cat error.log', points: 60 },
+    { flag: 'FLAG{system_files_exposed}', path: '/etc/passwd', command: 'cat /etc/passwd', points: 75 },
+    { flag: 'FLAG{backups_are_treasure}', path: '/tmp/backup.tar.gz', command: 'cd /tmp && cat backup.tar.gz', points: 100 },
+    { flag: 'FLAG{root_access_granted}', path: '/root/.secret', command: 'cd /root && cat .secret', points: 150 },
+  ];
+
+  return (
+    <Card className="cyber-bg border-primary/30">
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center justify-between">
+          <span>Mission Objectives</span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowSolutions(!showSolutions)}
+            className="gap-2"
+          >
+            {showSolutions ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showSolutions ? 'Hide Solutions' : 'View Solutions'}
+          </Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-2 text-sm">
+          <li>✓ Find the hidden file in the home directory</li>
+          <li>✓ Analyze system log files for clues</li>
+          <li>✓ Examine system configuration files</li>
+          <li>✓ Locate the backup file</li>
+          <li>✓ Access the root directory</li>
+        </ul>
+
+        {showSolutions && (
+          <div className="mt-4 space-y-3 border-t border-border/50 pt-4">
+            <h4 className="font-semibold text-primary flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              All Solutions
+            </h4>
+            {solutions.map((sol, idx) => (
+              <div key={idx} className="bg-primary/10 border border-primary/30 rounded-lg p-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-mono text-sm text-primary">{sol.flag}</span>
+                  <Badge variant="outline" className="text-xs">{sol.points} XP</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">Path: {sol.path}</p>
+                <code className="text-xs bg-black/30 rounded px-2 py-1 mt-1 inline-block font-mono text-primary">
+                  {sol.command}
+                </code>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
