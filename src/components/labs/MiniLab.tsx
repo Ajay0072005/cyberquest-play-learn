@@ -13,7 +13,9 @@ import {
   AlertTriangle,
   Lightbulb,
   Terminal,
-  ArrowLeft
+  ArrowLeft,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useGame } from '@/context/GameContext';
@@ -86,6 +88,7 @@ export const MiniLab: React.FC<MiniLabProps> = ({ lab, onComplete, onBack }) => 
   const [showHint, setShowHint] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<StepKey[]>([]);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [showSolution, setShowSolution] = useState(false);
   const { toast } = useToast();
   const { addPoints, completeChallenge } = useGame();
   const { completeLab } = useLabProgress();
@@ -134,6 +137,7 @@ export const MiniLab: React.FC<MiniLabProps> = ({ lab, onComplete, onBack }) => 
     setShowExplanation(false);
     setUserAnswer('');
     setShowHint(false);
+    setShowSolution(false);
     
     if (currentStep === 'fix') {
       onComplete();
@@ -305,15 +309,37 @@ export const MiniLab: React.FC<MiniLabProps> = ({ lab, onComplete, onBack }) => 
                   </div>
                 )}
 
-                <div className="flex items-center justify-between">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowHint(true)}
-                    disabled={showHint}
-                  >
-                    <Lightbulb className="h-4 w-4 mr-2" />
-                    Show Hint
-                  </Button>
+                {showSolution && (
+                  <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
+                    <h4 className="font-semibold text-primary mb-2 flex items-center gap-2">
+                      <Eye className="h-4 w-4" />
+                      Solution
+                    </h4>
+                    <div className="bg-black/30 rounded p-3 font-mono text-sm text-primary">
+                      {stepData.expectedAnswer}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">{stepData.explanation}</p>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowHint(true)}
+                      disabled={showHint}
+                    >
+                      <Lightbulb className="h-4 w-4 mr-2" />
+                      Show Hint
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowSolution(!showSolution)}
+                    >
+                      {showSolution ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+                      {showSolution ? 'Hide Solution' : 'View Solution'}
+                    </Button>
+                  </div>
                   <Button 
                     onClick={handleSubmit}
                     className="bg-gradient-to-r from-primary to-primary/70"

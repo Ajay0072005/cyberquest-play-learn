@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Terminal, CheckCircle, XCircle, Lightbulb, Target } from "lucide-react";
+import { ArrowLeft, Terminal, CheckCircle, XCircle, Lightbulb, Target, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useGame } from "@/context/GameContext";
 
@@ -88,6 +88,7 @@ export const SQLInjectionGame: React.FC<{ onBack?: () => void }> = ({ onBack }) 
   const [passwordInput, setPasswordInput] = useState("");
   const [queryHistory, setQueryHistory] = useState<string[]>([]);
   const [showHints, setShowHints] = useState(false);
+  const [showSolution, setShowSolution] = useState(false);
   const [completedLevels, setCompletedLevels] = useState<number[]>([]);
   const [currentHint, setCurrentHint] = useState(0);
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -147,6 +148,7 @@ export const SQLInjectionGame: React.FC<{ onBack?: () => void }> = ({ onBack }) 
       setCurrentLevel(prev => prev + 1);
       setQueryHistory([]);
       setShowHints(false);
+      setShowSolution(false);
       setCurrentHint(0);
     }
   };
@@ -156,6 +158,7 @@ export const SQLInjectionGame: React.FC<{ onBack?: () => void }> = ({ onBack }) 
       setCurrentLevel(prev => prev - 1);
       setQueryHistory([]);
       setShowHints(false);
+      setShowSolution(false);
       setCurrentHint(0);
     }
   };
@@ -232,8 +235,8 @@ export const SQLInjectionGame: React.FC<{ onBack?: () => void }> = ({ onBack }) 
                 </div>
               </div>
 
-              {/* Hints */}
-              <div>
+              {/* Hints & Solution */}
+              <div className="space-y-3">
                 <Button
                   variant="outline"
                   onClick={() => setShowHints(!showHints)}
@@ -244,7 +247,7 @@ export const SQLInjectionGame: React.FC<{ onBack?: () => void }> = ({ onBack }) 
                 </Button>
 
                 {showHints && (
-                  <div className="mt-4 space-y-2">
+                  <div className="space-y-2">
                     {level.hints.slice(0, currentHint + 1).map((hint, index) => (
                       <div key={index} className="bg-accent/20 p-3 rounded border-l-4 border-accent">
                         <p className="text-sm">{hint}</p>
@@ -255,6 +258,32 @@ export const SQLInjectionGame: React.FC<{ onBack?: () => void }> = ({ onBack }) 
                         Next Hint
                       </Button>
                     )}
+                  </div>
+                )}
+
+                <Button
+                  variant="outline"
+                  onClick={() => setShowSolution(!showSolution)}
+                  className="w-full flex items-center gap-2"
+                >
+                  {showSolution ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showSolution ? "Hide Solution" : "View Solution"}
+                </Button>
+
+                {showSolution && (
+                  <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 space-y-2">
+                    <h4 className="font-semibold text-primary flex items-center gap-2">
+                      <Eye className="h-4 w-4" />
+                      Solution
+                    </h4>
+                    {level.solution.map((sol, idx) => (
+                      <div key={idx} className="bg-black/30 rounded p-2 font-mono text-sm text-primary">
+                        {sol}
+                      </div>
+                    ))}
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Expected result: {level.expectedResult}
+                    </p>
                   </div>
                 )}
               </div>
