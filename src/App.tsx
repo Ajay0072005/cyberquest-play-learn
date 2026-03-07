@@ -71,11 +71,7 @@ const App = () => (
                   <ProfileSettings />
                 </ProtectedRoute>
               } />
-              <Route path="/leaderboard" element={
-                <ProtectedRoute>
-                  <Leaderboard />
-                </ProtectedRoute>
-              } />
+              <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/chat" element={
                 <ProtectedRoute>
                   <Chat />
