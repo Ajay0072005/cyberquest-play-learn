@@ -9,26 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { 
   Trophy, Target, Clock, Zap, Shield, Lock, CheckCircle, TrendingUp, Calendar, Database, Upload, Download, Loader2, Flame, Star, Award, ChevronRight, Gamepad2,
-  Globe, Terminal, Search, Network, Bug, Eye, Key, Wifi, ShieldCheck, FileCode
-} from 'lucide-react';
-  Trophy, 
-  Target, 
-  Clock, 
-  Zap, 
-  Shield, 
-  Lock,
-  CheckCircle,
-  TrendingUp,
-  Calendar,
-  Database,
-  Upload,
-  Download,
-  Loader2,
-  Flame,
-  Star,
-  Award,
-  ChevronRight,
-  Gamepad2
+  Globe, Terminal as TerminalIcon, Search, Network, Bug, Eye, Key, Wifi, ShieldCheck, FileCode
 } from 'lucide-react';
 import { useGame } from '@/context/GameContext';
 import { useAuth } from '@/context/AuthContext';
