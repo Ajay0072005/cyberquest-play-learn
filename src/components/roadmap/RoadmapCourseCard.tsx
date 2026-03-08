@@ -1,10 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { CheckCircle2 } from "lucide-react";
 import type { RoadmapCourse } from "@/data/roadmapData";
 
 interface Props {
   course: RoadmapCourse;
+  completed?: boolean;
 }
 
 const difficultyColors: Record<string, string> = {
@@ -19,17 +21,24 @@ const typeColors: Record<string, string> = {
   "Add-on": "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
 };
 
-export const RoadmapCourseCard: React.FC<Props> = ({ course }) => {
+export const RoadmapCourseCard: React.FC<Props> = ({ course, completed }) => {
   const navigate = useNavigate();
 
   return (
     <button
       onClick={() => course.link && navigate(course.link)}
-      className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-lg border border-border bg-card/80 hover:bg-card hover:border-primary/40 transition-all text-left ${
-        course.link ? "cursor-pointer" : "cursor-default"
-      }`}
+      className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-lg border transition-all text-left ${
+        completed
+          ? "border-emerald-500/50 bg-emerald-500/10 hover:bg-emerald-500/15"
+          : "border-border bg-card/80 hover:bg-card hover:border-primary/40"
+      } ${course.link ? "cursor-pointer" : "cursor-default"}`}
     >
-      <span className="text-sm font-medium truncate">{course.title}</span>
+      <div className="flex items-center gap-2 min-w-0">
+        {completed && (
+          <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+        )}
+        <span className="text-sm font-medium truncate">{course.title}</span>
+      </div>
       <div className="flex items-center gap-1.5 shrink-0">
         <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${difficultyColors[course.difficulty]}`}>
           {course.difficulty}
