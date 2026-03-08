@@ -9,8 +9,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Clock, Search, X, Shield, AlertTriangle, ChevronRight, ExternalLink,
-  Crosshair, BookOpen, HelpCircle, Calendar, DollarSign, Users, Eye, EyeOff
+  Crosshair, BookOpen, HelpCircle, Calendar, DollarSign, Users, Eye, EyeOff, ArrowUpDown
 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { cyberAttacks, CyberAttack } from '@/data/cyberAttacksData';
 
 const categories = ['All', 'Ransomware', 'Data Breach', 'Supply Chain', 'Zero-Day', 'Nation-State', 'Wiper', 'DDoS', 'Social Engineering', 'ICS', 'Espionage'];
@@ -24,17 +31,46 @@ const severityColor: Record<string, string> = {
 const CyberTimeTravel = () => {
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('All');
+  const [sortBy, setSortBy] = useState('latest');
   const [selectedAttack, setSelectedAttack] = useState<CyberAttack | null>(null);
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return cyberAttacks.filter(a => {
+    let result = cyberAttacks.filter(a => {
       const matchesCat = catFilter === 'All' || a.category.toLowerCase().includes(catFilter.toLowerCase());
       const matchesSearch = !q || a.name.toLowerCase().includes(q) || a.summary.toLowerCase().includes(q) || a.target.toLowerCase().includes(q) || a.attackVector.toLowerCase().includes(q) || String(a.year).includes(q);
       return matchesCat && matchesSearch;
     });
-  }, [search, catFilter]);
+
+    // Apply sorting
+    switch (sortBy) {
+      case 'year-asc':
+        result.sort((a, b) => a.year - b.year);
+        break;
+      case 'year-desc':
+        result.sort((a, b) => b.year - a.year);
+        break;
+      case 'name-asc':
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name-desc':
+        result.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'severity':
+        const severityOrder = { Critical: 0, High: 1, Medium: 2 };
+        result.sort((a, b) => severityOrder[a.severity as keyof typeof severityOrder] - severityOrder[b.severity as keyof typeof severityOrder]);
+        break;
+      case 'impact':
+        result.sort((a, b) => b.estimatedCost.localeCompare(a.estimatedCost));
+        break;
+      case 'latest':
+      default:
+        result.sort((a, b) => b.year - a.year);
+    }
+
+    return result;
+  }, [search, catFilter, sortBy]);
 
   const toggleAnswer = (idx: number) => {
     setRevealedAnswers(prev => {
@@ -79,12 +115,29 @@ const CyberTimeTravel = () => {
               </button>
             )}
           </div>
-          <div className="flex gap-2 flex-wrap">
-            {categories.map(cat => (
-              <Button key={cat} variant={catFilter === cat ? 'default' : 'outline'} size="sm" onClick={() => setCatFilter(cat)}>
-                {cat}
-              </Button>
-            ))}
+          <div className="flex gap-2 flex-wrap items-center justify-between">
+            <div className="flex gap-2 flex-wrap">
+              {categories.map(cat => (
+                <Button key={cat} variant={catFilter === cat ? 'default' : 'outline'} size="sm" onClick={() => setCatFilter(cat)}>
+                  {cat}
+                </Button>
+              ))}
+            </div>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[180px]">
+                <ArrowUpDown className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Sort by..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="latest">Latest Year</SelectItem>
+                <SelectItem value="year-asc">Year (Oldest)</SelectItem>
+                <SelectItem value="year-desc">Year (Newest)</SelectItem>
+                <SelectItem value="severity">Critical Level</SelectItem>
+                <SelectItem value="name-asc">A - Z</SelectItem>
+                <SelectItem value="name-desc">Z - A</SelectItem>
+                <SelectItem value="impact">Impact (Highest)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
