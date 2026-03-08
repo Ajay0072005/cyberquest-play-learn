@@ -221,12 +221,16 @@ export const SkillMatrix: React.FC = () => {
                   axisLine={false}
                 />
                 <Radar
+                  key={activeTrack}
                   name="Skills"
                   dataKey="score"
                   stroke="hsl(var(--primary))"
                   fill="hsl(var(--primary))"
                   fillOpacity={0.25}
                   strokeWidth={2}
+                  isAnimationActive={true}
+                  animationDuration={800}
+                  animationEasing="ease-in-out"
                 />
               </RadarChart>
             </ResponsiveContainer>
