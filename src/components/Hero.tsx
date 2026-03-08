@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Shield, Play, Code, Map } from "lucide-react";
+import { Play, Code, Map } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/cyber-hero-bg.jpg";
 
@@ -56,9 +56,6 @@ export const Hero: React.FC = () => {
       </div>
       
       {/* Floating elements */}
-      <div className="absolute top-20 left-10 opacity-30">
-        <Shield className="h-12 w-12 text-primary animate-pulse" />
-      </div>
       <div className="absolute bottom-20 right-10 opacity-30">
         <Code className="h-10 w-10 text-secondary animate-pulse" />
       </div>
