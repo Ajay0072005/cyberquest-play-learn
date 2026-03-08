@@ -9,7 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { 
   Trophy, Target, Clock, Zap, Shield, Lock, CheckCircle, TrendingUp, Calendar, Database, Upload, Download, Loader2, Flame, Star, Award, ChevronRight, Gamepad2,
-  Globe, Terminal as TerminalIcon, Search, Network, Bug, Eye, Key, Wifi, ShieldCheck, FileCode
+  Globe, Terminal as TerminalIcon, Search, Network, Bug, Eye, Key, Wifi, ShieldCheck, FileCode,
+  BookOpen
 } from 'lucide-react';
 import { useGame } from '@/context/GameContext';
 import { useAuth } from '@/context/AuthContext';
@@ -19,18 +20,18 @@ import { AchievementBadge } from '@/components/AchievementBadge';
 import { useNavigate } from 'react-router-dom';
 
 const securityTools = [
-  { name: 'Nmap', description: 'Network discovery and security auditing tool', url: 'https://nmap.org/download', icon: Network, category: 'Network Scanning', color: 'bg-blue-500/20 text-blue-400' },
-  { name: 'Wireshark', description: 'Network protocol analyzer for traffic inspection', url: 'https://www.wireshark.org/download.html', icon: Eye, category: 'Packet Analysis', color: 'bg-cyan-500/20 text-cyan-400' },
-  { name: 'Burp Suite', description: 'Web application security testing platform', url: 'https://portswigger.net/burp/communitydownload', icon: Bug, category: 'Web Security', color: 'bg-orange-500/20 text-orange-400' },
-  { name: 'Metasploit', description: 'Penetration testing framework', url: 'https://www.metasploit.com/download', icon: ShieldCheck, category: 'Pen Testing', color: 'bg-red-500/20 text-red-400' },
-  { name: 'Kali Linux', description: 'Debian-based Linux distro for security testing', url: 'https://www.kali.org/get-kali/', icon: TerminalIcon, category: 'Operating System', color: 'bg-indigo-500/20 text-indigo-400' },
-  { name: 'John the Ripper', description: 'Fast password cracker for multiple platforms', url: 'https://www.openwall.com/john/', icon: Key, category: 'Password Cracking', color: 'bg-yellow-500/20 text-yellow-400' },
-  { name: 'Aircrack-ng', description: 'WiFi network security assessment tools', url: 'https://www.aircrack-ng.org/downloads.html', icon: Wifi, category: 'Wireless Security', color: 'bg-green-500/20 text-green-400' },
-  { name: 'OWASP ZAP', description: 'Open-source web app security scanner', url: 'https://www.zaproxy.org/download/', icon: Search, category: 'Web Security', color: 'bg-purple-500/20 text-purple-400' },
-  { name: 'Hashcat', description: 'Advanced password recovery and hash cracking', url: 'https://hashcat.net/hashcat/', icon: FileCode, category: 'Password Cracking', color: 'bg-pink-500/20 text-pink-400' },
-  { name: 'Ghidra', description: 'NSA reverse engineering framework', url: 'https://ghidra-sre.org/', icon: Globe, category: 'Reverse Engineering', color: 'bg-emerald-500/20 text-emerald-400' },
-  { name: 'Nikto', description: 'Web server vulnerability scanner', url: 'https://github.com/sullo/nikto', icon: Shield, category: 'Web Scanning', color: 'bg-amber-500/20 text-amber-400' },
-  { name: 'Maltego', description: 'Open-source intelligence and forensics tool', url: 'https://www.maltego.com/downloads/', icon: Globe, category: 'OSINT', color: 'bg-teal-500/20 text-teal-400' },
+  { name: 'Nmap', description: 'Network discovery and security auditing tool', url: 'https://nmap.org/download', icon: Network, category: 'Network Scanning', color: 'bg-blue-500/20 text-blue-400', learn: 'https://www.youtube.com/watch?v=4t4kBkMsDbQ', learnLabel: 'Nmap Tutorial for Beginners' },
+  { name: 'Wireshark', description: 'Network protocol analyzer for traffic inspection', url: 'https://www.wireshark.org/download.html', icon: Eye, category: 'Packet Analysis', color: 'bg-cyan-500/20 text-cyan-400', learn: 'https://www.youtube.com/watch?v=lb1Dw0elw0Q', learnLabel: 'Wireshark Crash Course' },
+  { name: 'Burp Suite', description: 'Web application security testing platform', url: 'https://portswigger.net/burp/communitydownload', icon: Bug, category: 'Web Security', color: 'bg-orange-500/20 text-orange-400', learn: 'https://portswigger.net/web-security', learnLabel: 'PortSwigger Web Security Academy' },
+  { name: 'Metasploit', description: 'Penetration testing framework', url: 'https://www.metasploit.com/download', icon: ShieldCheck, category: 'Pen Testing', color: 'bg-red-500/20 text-red-400', learn: 'https://www.youtube.com/watch?v=8lR27r8Y_ik', learnLabel: 'Metasploit for Beginners' },
+  { name: 'Kali Linux', description: 'Debian-based Linux distro for security testing', url: 'https://www.kali.org/get-kali/', icon: TerminalIcon, category: 'Operating System', color: 'bg-indigo-500/20 text-indigo-400', learn: 'https://www.kali.org/docs/', learnLabel: 'Kali Linux Documentation' },
+  { name: 'John the Ripper', description: 'Fast password cracker for multiple platforms', url: 'https://www.openwall.com/john/', icon: Key, category: 'Password Cracking', color: 'bg-yellow-500/20 text-yellow-400', learn: 'https://www.youtube.com/watch?v=XjVYl1Ts6XI', learnLabel: 'John the Ripper Tutorial' },
+  { name: 'Aircrack-ng', description: 'WiFi network security assessment tools', url: 'https://www.aircrack-ng.org/downloads.html', icon: Wifi, category: 'Wireless Security', color: 'bg-green-500/20 text-green-400', learn: 'https://www.aircrack-ng.org/doku.php?id=getting_started', learnLabel: 'Aircrack-ng Getting Started' },
+  { name: 'OWASP ZAP', description: 'Open-source web app security scanner', url: 'https://www.zaproxy.org/download/', icon: Search, category: 'Web Security', color: 'bg-purple-500/20 text-purple-400', learn: 'https://www.zaproxy.org/getting-started/', learnLabel: 'ZAP Getting Started Guide' },
+  { name: 'Hashcat', description: 'Advanced password recovery and hash cracking', url: 'https://hashcat.net/hashcat/', icon: FileCode, category: 'Password Cracking', color: 'bg-pink-500/20 text-pink-400', learn: 'https://hashcat.net/wiki/', learnLabel: 'Hashcat Wiki & Docs' },
+  { name: 'Ghidra', description: 'NSA reverse engineering framework', url: 'https://ghidra-sre.org/', icon: Globe, category: 'Reverse Engineering', color: 'bg-emerald-500/20 text-emerald-400', learn: 'https://www.youtube.com/watch?v=fTGTnrgjuGA', learnLabel: 'Ghidra RE Tutorial' },
+  { name: 'Nikto', description: 'Web server vulnerability scanner', url: 'https://github.com/sullo/nikto', icon: Shield, category: 'Web Scanning', color: 'bg-amber-500/20 text-amber-400', learn: 'https://www.youtube.com/watch?v=K78YOmbuT48', learnLabel: 'Nikto Scanner Tutorial' },
+  { name: 'Maltego', description: 'Open-source intelligence and forensics tool', url: 'https://www.maltego.com/downloads/', icon: Globe, category: 'OSINT', color: 'bg-teal-500/20 text-teal-400', learn: 'https://www.youtube.com/watch?v=sP-Pl_SRQVo', learnLabel: 'Maltego OSINT Guide' },
 ];
 
 interface RecentAchievement {
@@ -557,6 +558,16 @@ const Dashboard: React.FC = () => {
                           <div className="flex-1 min-w-0">
                             <h4 className="text-sm font-semibold group-hover:text-primary transition-colors">{tool.name}</h4>
                             <p className="text-[11px] text-muted-foreground truncate">{tool.description}</p>
+                            <a
+                              href={tool.learn}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1 mt-1 text-[11px] text-primary hover:underline"
+                            >
+                              <BookOpen className="h-3 w-3" />
+                              {tool.learnLabel}
+                            </a>
                           </div>
                           <Download className="h-4 w-4 text-muted-foreground shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </a>
@@ -598,7 +609,19 @@ const Dashboard: React.FC = () => {
                         <Download className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{tool.description}</p>
-                      <Badge variant="outline" className="mt-2 text-[10px]">{tool.category}</Badge>
+                      <div className="flex items-center gap-3 mt-2">
+                        <Badge variant="outline" className="text-[10px]">{tool.category}</Badge>
+                        <a
+                          href={tool.learn}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
+                        >
+                          <BookOpen className="h-3 w-3" />
+                          Learn
+                        </a>
+                      </div>
                     </div>
                   </a>
                 ))}
