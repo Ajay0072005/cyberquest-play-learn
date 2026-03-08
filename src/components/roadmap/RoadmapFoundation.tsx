@@ -5,10 +5,13 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 interface Props {
   stages: RoadmapStage[];
+  completedIds: Set<string>;
 }
 
-const StageCard: React.FC<{ stage: RoadmapStage; index: number }> = ({ stage, index }) => {
+const StageCard: React.FC<{ stage: RoadmapStage; index: number; completedIds: Set<string> }> = ({ stage, index, completedIds }) => {
   const { ref, isVisible } = useScrollReveal(0.2);
+  const completedCount = stage.courses.filter((c) => completedIds.has(c.id)).length;
+  const totalCount = stage.courses.length;
 
   return (
     <div
@@ -28,18 +31,32 @@ const StageCard: React.FC<{ stage: RoadmapStage; index: number }> = ({ stage, in
       </div>
       <p className="text-sm text-muted-foreground mb-4">{stage.description}</p>
 
-      {stage.courses.length > 0 && (
-        <div className="space-y-2">
-          {stage.courses.map((course) => (
-            <RoadmapCourseCard key={course.id} course={course} />
-          ))}
-        </div>
+      {totalCount > 0 && (
+        <>
+          {/* Progress bar */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
+              />
+            </div>
+            <span className="text-xs text-muted-foreground shrink-0">
+              {completedCount}/{totalCount}
+            </span>
+          </div>
+          <div className="space-y-2">
+            {stage.courses.map((course) => (
+              <RoadmapCourseCard key={course.id} course={course} completed={completedIds.has(course.id)} />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
 };
 
-export const RoadmapFoundation: React.FC<Props> = ({ stages }) => {
+export const RoadmapFoundation: React.FC<Props> = ({ stages, completedIds }) => {
   return (
     <div className="relative flex flex-col items-center gap-0">
       {stages.map((stage, index) => (
@@ -47,7 +64,7 @@ export const RoadmapFoundation: React.FC<Props> = ({ stages }) => {
           {index > 0 && (
             <div className="w-0.5 h-10 bg-border" />
           )}
-          <StageCard stage={stage} index={index} />
+          <StageCard stage={stage} index={index} completedIds={completedIds} />
         </React.Fragment>
       ))}
 
