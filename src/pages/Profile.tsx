@@ -227,7 +227,7 @@ const Profile = () => {
             <ProfileSection title="Certifications" placeholder="Share your biggest achievements." isEmpty={certifications.length === 0} addLabel="Add certifications" isEditing={editingCerts} onEditToggle={setEditingCerts}
               editForm={
                 <div className="space-y-3">
-                  <TagInput tags={certifications} onChange={setCertifications} placeholder="e.g. CEH, OSCP" />
+                  <TagInput tags={certifications} onChange={setCertifications} placeholder="e.g. CEH, OSCP" suggestions={['CEH', 'OSCP', 'CISSP', 'CompTIA Security+', 'CompTIA Network+', 'CISM', 'CISA', 'GPEN', 'GCIH', 'GSEC', 'OSWE', 'OSCE', 'eJPT', 'eCPPT', 'AWS Security Specialty', 'Azure Security Engineer', 'CCNA Security', 'SSCP', 'CASP+', 'CySA+']} />
                   <div className="flex gap-2">
                     <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ certifications }); setEditingCerts(false); }}>Save</Button>
                     <Button size="sm" variant="ghost" onClick={() => setEditingCerts(false)}>Cancel</Button>
@@ -243,7 +243,7 @@ const Profile = () => {
             <ProfileSection title="Skills" placeholder="Show off your technical skills." isEmpty={skills.length === 0} addLabel="Add skills" isEditing={editingSkills} onEditToggle={setEditingSkills}
               editForm={
                 <div className="space-y-3">
-                  <TagInput tags={skills} onChange={setSkills} placeholder="e.g. Penetration Testing, Python" />
+                  <TagInput tags={skills} onChange={setSkills} placeholder="e.g. Penetration Testing, Python" suggestions={['Penetration Testing', 'Python', 'Network Security', 'Ethical Hacking', 'Malware Analysis', 'Reverse Engineering', 'Cryptography', 'Web Security', 'Cloud Security', 'Incident Response', 'Digital Forensics', 'OSINT', 'Social Engineering', 'Firewall Management', 'SIEM', 'Threat Modeling', 'Vulnerability Assessment', 'Linux', 'Bash Scripting', 'Wireshark']} />
                   <div className="flex gap-2">
                     <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ skills }); setEditingSkills(false); }}>Save</Button>
                     <Button size="sm" variant="ghost" onClick={() => setEditingSkills(false)}>Cancel</Button>
@@ -295,7 +295,7 @@ const Profile = () => {
             <ProfileSection title="Top Interests" placeholder="Let us know your top interests." isEmpty={interests.length === 0} addLabel="Add interests" isEditing={editingInterests} onEditToggle={setEditingInterests}
               editForm={
                 <div className="space-y-3">
-                  <TagInput tags={interests} onChange={setInterests} placeholder="e.g. CTF, Bug Bounty" />
+                  <TagInput tags={interests} onChange={setInterests} placeholder="e.g. CTF, Bug Bounty" suggestions={['CTF', 'Bug Bounty', 'Red Teaming', 'Blue Teaming', 'Purple Teaming', 'Threat Hunting', 'Malware Research', 'IoT Security', 'Mobile Security', 'Blockchain Security', 'AI/ML Security', 'Privacy', 'Compliance', 'DevSecOps', 'Zero Trust', 'Cyber Threat Intelligence', 'Incident Response', 'Digital Forensics', 'Automotive Security', 'SCADA/ICS']} />
                   <div className="flex gap-2">
                     <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ interests }); setEditingInterests(false); }}>Save</Button>
                     <Button size="sm" variant="ghost" onClick={() => setEditingInterests(false)}>Cancel</Button>
