@@ -5,7 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Newspaper, ExternalLink, RefreshCw, Shield, Bug, Database, Globe, Clock } from 'lucide-react';
+import { Newspaper, ExternalLink, RefreshCw, Shield, Bug, Database, Globe, Clock, Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 
 interface NewsArticle {
@@ -41,6 +42,7 @@ const CyberNews = () => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
   const [error, setError] = useState('');
 
   const fetchNews = async () => {
@@ -66,7 +68,10 @@ const CyberNews = () => {
     fetchNews();
   }, []);
 
-  const filtered = filter === 'all' ? articles : articles.filter(a => a.category === filter);
+  const query = search.trim().toLowerCase();
+  const filtered = articles
+    .filter(a => filter === 'all' || a.category === filter)
+    .filter(a => !query || a.title.toLowerCase().includes(query) || a.description.toLowerCase().includes(query) || a.source.toLowerCase().includes(query));
 
   return (
     <DashboardLayout>
@@ -110,6 +115,22 @@ const CyberNews = () => {
               </Button>
             );
           })}
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search articles by keyword, source..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 pr-9"
+          />
+          {search && (
+            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
         {/* Error */}
