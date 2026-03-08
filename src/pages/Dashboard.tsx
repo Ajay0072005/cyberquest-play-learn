@@ -465,7 +465,8 @@ const Dashboard: React.FC = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="tools">
+        <TabsContent value="tools" className="space-y-6">
+          {/* Knowledge Base Import */}
           <Card className="cyber-bg border-primary/30">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -480,7 +481,6 @@ const Dashboard: React.FC = () => {
               <p className="text-sm text-muted-foreground">
                 Load 12,663 cybersecurity questions from the cysecbench.csv dataset into the AI chatbot's knowledge base using RAG (Retrieval Augmented Generation).
               </p>
-              
               <Button 
                 onClick={handleImportData} 
                 disabled={isImporting}
@@ -499,6 +499,44 @@ const Dashboard: React.FC = () => {
                   </>
                 )}
               </Button>
+            </CardContent>
+          </Card>
+
+          {/* Security Tools Downloads */}
+          <Card className="cyber-bg border-primary/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Download className="h-5 w-5 text-primary" />
+                Security Tools & Downloads
+              </CardTitle>
+              <CardDescription>
+                Essential cybersecurity tools used by professionals worldwide
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {securityTools.map((tool) => (
+                  <a
+                    key={tool.name}
+                    href={tool.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-start gap-3 p-4 rounded-lg border border-border/50 bg-muted/10 hover:border-primary/50 hover:bg-primary/5 transition-all"
+                  >
+                    <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${tool.color}`}>
+                      <tool.icon className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-semibold group-hover:text-primary transition-colors">{tool.name}</h4>
+                        <Download className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{tool.description}</p>
+                      <Badge variant="outline" className="mt-2 text-[10px]">{tool.category}</Badge>
+                    </div>
+                  </a>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
