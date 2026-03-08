@@ -135,9 +135,16 @@ export type Database = {
         Row: {
           ai_tutor_avatar: Json | null
           avatar_url: string | null
+          certifications: string[] | null
           created_at: string
           id: string
+          interests: string[] | null
+          is_public: boolean | null
+          location: string | null
           points: number
+          skills: string[] | null
+          social_links: Json | null
+          summary: string | null
           updated_at: string
           user_id: string
           username: string | null
@@ -145,9 +152,16 @@ export type Database = {
         Insert: {
           ai_tutor_avatar?: Json | null
           avatar_url?: string | null
+          certifications?: string[] | null
           created_at?: string
           id?: string
+          interests?: string[] | null
+          is_public?: boolean | null
+          location?: string | null
           points?: number
+          skills?: string[] | null
+          social_links?: Json | null
+          summary?: string | null
           updated_at?: string
           user_id: string
           username?: string | null
@@ -155,9 +169,16 @@ export type Database = {
         Update: {
           ai_tutor_avatar?: Json | null
           avatar_url?: string | null
+          certifications?: string[] | null
           created_at?: string
           id?: string
+          interests?: string[] | null
+          is_public?: boolean | null
+          location?: string | null
           points?: number
+          skills?: string[] | null
+          social_links?: Json | null
+          summary?: string | null
           updated_at?: string
           user_id?: string
           username?: string | null
