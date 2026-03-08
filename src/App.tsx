@@ -26,6 +26,7 @@ import PracticalLabs from "./pages/PracticalLabs";
 import CareerPath from "./pages/CareerPath";
 import AdminRoles from "./pages/AdminRoles";
 import ModeratorDashboard from "./pages/ModeratorDashboard";
+import Roadmap from "./pages/Roadmap";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
             <BottomNav />
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/roadmap" element={<Roadmap />} />
               <Route path="/path/:slug" element={<CareerPath />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
