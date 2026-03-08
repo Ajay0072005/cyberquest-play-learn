@@ -203,10 +203,13 @@ const CyberTimeTravel = () => {
                   <div className="p-2 rounded-lg bg-primary/20">
                     <AlertTriangle className="h-5 w-5 text-primary" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <DialogTitle className="text-lg font-cyber">{selectedAttack.name} ({selectedAttack.year})</DialogTitle>
                     <p className="text-xs text-muted-foreground mt-0.5">{selectedAttack.attribution}</p>
                   </div>
+                  <a href={selectedAttack.documentationUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 transition-colors">
+                    <ExternalLink className="h-5 w-5" />
+                  </a>
                 </div>
                 <div className="flex gap-2 flex-wrap mt-2">
                   <Badge variant="outline" className={severityColor[selectedAttack.severity]}>{selectedAttack.severity}</Badge>
