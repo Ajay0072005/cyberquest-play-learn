@@ -37,12 +37,40 @@ const CyberTimeTravel = () => {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return cyberAttacks.filter(a => {
+    let result = cyberAttacks.filter(a => {
       const matchesCat = catFilter === 'All' || a.category.toLowerCase().includes(catFilter.toLowerCase());
       const matchesSearch = !q || a.name.toLowerCase().includes(q) || a.summary.toLowerCase().includes(q) || a.target.toLowerCase().includes(q) || a.attackVector.toLowerCase().includes(q) || String(a.year).includes(q);
       return matchesCat && matchesSearch;
     });
-  }, [search, catFilter]);
+
+    // Apply sorting
+    switch (sortBy) {
+      case 'year-asc':
+        result.sort((a, b) => a.year - b.year);
+        break;
+      case 'year-desc':
+        result.sort((a, b) => b.year - a.year);
+        break;
+      case 'name-asc':
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name-desc':
+        result.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'severity':
+        const severityOrder = { Critical: 0, High: 1, Medium: 2 };
+        result.sort((a, b) => severityOrder[a.severity as keyof typeof severityOrder] - severityOrder[b.severity as keyof typeof severityOrder]);
+        break;
+      case 'impact':
+        result.sort((a, b) => b.estimatedCost.localeCompare(a.estimatedCost));
+        break;
+      case 'latest':
+      default:
+        result.sort((a, b) => b.year - a.year);
+    }
+
+    return result;
+  }, [search, catFilter, sortBy]);
 
   const toggleAnswer = (idx: number) => {
     setRevealedAnswers(prev => {
