@@ -20,8 +20,8 @@
     --popover: 215 25% 18%;
     --popover-foreground: 0 0% 95%;
 
-    /* Bright Green Primary (TryHackMe style) */
-    --primary: 120 100% 50%;
+    /* Bright Blue Primary */
+    --primary: 195 100% 50%;
     --primary-foreground: 215 25% 15%;
 
     /* Dark Secondary */
@@ -32,7 +32,7 @@
     --muted: 215 25% 20%;
     --muted-foreground: 0 0% 70%;
 
-    /* Green Accent */
+    /* Blue Accent */
     --accent: 215 25% 20%;
     --accent-foreground: 0 0% 95%;
 
@@ -43,28 +43,28 @@
     /* Borders & Inputs */
     --border: 215 25% 25%;
     --input: 215 25% 18%;
-    --ring: 120 100% 50%;
+    --ring: 195 100% 50%;
 
     --radius: 3rem;
 
-    /* TryHackMe Colors */
-    --cyber-green: 120 100% 50%;
-    --cyber-green-glow: 120 100% 60%;
+    /* Cyber Colors - Blue Theme */
+    --cyber-green: 195 100% 50%;
+    --cyber-green-glow: 195 100% 60%;
     --electric-blue: 195 100% 50%;
     --neon-purple: 300 100% 60%;
     --dark-void: 215 25% 15%;
     --dark-surface: 215 25% 18%;
-    --terminal-green: 120 100% 45%;
+    --terminal-green: 195 100% 45%;
 
     /* Dark Gradients */
-    --gradient-cyber: linear-gradient(135deg, hsl(120 100% 50%), hsl(195 100% 50%));
+    --gradient-cyber: linear-gradient(135deg, hsl(195 100% 50%), hsl(195 100% 60%));
     --gradient-void: linear-gradient(180deg, hsl(215 25% 15%), hsl(215 25% 18%));
-    --gradient-glow: radial-gradient(circle, hsl(120 100% 50% / 0.15), transparent);
+    --gradient-glow: radial-gradient(circle, hsl(195 100% 50% / 0.15), transparent);
 
     /* Glowing Shadows */
-    --shadow-neon: 0 0 20px hsl(120 100% 50% / 0.3);
-    --shadow-cyber: 0 10px 30px hsl(120 100% 50% / 0.2);
-    --glow-intense: 0 0 40px hsl(120 100% 50% / 0.4);
+    --shadow-neon: 0 0 20px hsl(195 100% 50% / 0.3);
+    --shadow-cyber: 0 10px 30px hsl(195 100% 50% / 0.2);
+    --glow-intense: 0 0 40px hsl(195 100% 50% / 0.4);
 
     /* Animations */
     --transition-cyber: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
