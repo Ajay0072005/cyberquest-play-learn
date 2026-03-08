@@ -14,6 +14,7 @@ import { Loader2, MapPin, Github, Linkedin, Twitter, Globe, Lock, Trophy, Award,
 import { ProfileSection } from '@/components/profile/ProfileSection';
 import { TagInput } from '@/components/profile/TagInput';
 import AvatarCustomizer from '@/components/avatar/AvatarCustomizer';
+import ActivityHeatmap from '@/components/profile/ActivityHeatmap';
 
 interface SocialLinks {
   github?: string;
@@ -309,6 +310,9 @@ const Profile = () => {
             </ProfileSection>
           </div>
         </div>
+
+        {/* Yearly Activity Heatmap */}
+        <ActivityHeatmap />
 
         {/* AI Tutor Avatar */}
         <AvatarCustomizer />
