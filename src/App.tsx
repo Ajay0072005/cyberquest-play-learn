@@ -31,6 +31,7 @@ import Roadmap from "./pages/Roadmap";
 import CyberGame from "./pages/CyberGame";
 import CyberNews from "./pages/CyberNews";
 import CyberTimeTravel from "./pages/CyberTimeTravel";
+import AboutUs from "./pages/AboutUs";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
             <BottomNav />
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/about" element={<AboutUs />} />
               <Route path="/roadmap" element={<Roadmap />} />
               <Route path="/cyber-game" element={
                 <ProtectedRoute>

@@ -14,6 +14,10 @@ export const Hero: React.FC = () => {
     }
   };
 
+  const handleLogoClick = () => {
+    navigate('/about');
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -35,7 +39,12 @@ export const Hero: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           {/* Logo */}
           <div className="mb-0 flex justify-center">
-            <img src={logo} alt="CyberQuest" className="h-60 w-60 md:h-80 md:w-80 drop-shadow-[0_0_30px_rgba(0,255,65,0.4)]" />
+            <button 
+              onClick={handleLogoClick}
+              className="hover:scale-105 transition-transform duration-300 cursor-pointer"
+            >
+              <img src={logo} alt="CyberQuest" className="h-60 w-60 md:h-80 md:w-80 drop-shadow-[0_0_30px_rgba(0,255,65,0.4)]" />
+            </button>
           </div>
           
           {/* Glitch effect title */}
