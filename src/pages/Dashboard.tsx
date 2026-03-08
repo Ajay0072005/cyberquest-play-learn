@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { 
-  Trophy, Target, Clock, Zap, Shield, Lock, CheckCircle, TrendingUp, Calendar, Database, Upload, Download, Loader2, Flame, Star, Award, ChevronRight, Gamepad2,
+  Trophy, Target, Clock, Zap, Shield, Lock, CheckCircle, TrendingUp, Calendar, Download, Flame, Star, Award, ChevronRight, Gamepad2,
   Globe, Terminal as TerminalIcon, Search, Network, Bug, Eye, Key, Wifi, ShieldCheck, FileCode,
   BookOpen
 } from 'lucide-react';
@@ -47,7 +47,6 @@ interface RecentAchievement {
 const Dashboard: React.FC = () => {
   const { points, level, completedChallenges, cryptoPuzzlesSolved, sqlLevelsCompleted, terminalFlagsFound, chatMessagesSent } = useGame();
   const { user } = useAuth();
-  const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
 
   const [recentAchievements, setRecentAchievements] = useState<RecentAchievement[]>([]);
@@ -92,37 +91,6 @@ const Dashboard: React.FC = () => {
     fetchRecentAchievements();
   }, [user]);
 
-  const handleImportData = async () => {
-    setIsImporting(true);
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('import-knowledge');
-      
-      if (error) throw error;
-      
-      if (data?.error) {
-        toast({
-          title: "Import Failed",
-          description: data.error,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Import Successful",
-          description: `Successfully imported ${data.imported} cybersecurity questions!`,
-        });
-      }
-    } catch (error) {
-      console.error('Import error:', error);
-      toast({
-        title: "Import Failed",
-        description: "Failed to import knowledge base. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsImporting(false);
-    }
-  };
 
   // Get Sherlock course progress from localStorage
   const sherlockProgress = JSON.parse(localStorage.getItem('sherlock-progress') || '{}');
@@ -470,42 +438,6 @@ const Dashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="tools" className="space-y-6">
-          {/* Knowledge Base Import */}
-          <Card className="cyber-bg border-primary/30">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                AI Chatbot Knowledge Base
-              </CardTitle>
-              <CardDescription>
-                Import the cybersecurity question dataset into the AI chatbot
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Load 12,663 cybersecurity questions from the cysecbench.csv dataset into the AI chatbot's knowledge base using RAG (Retrieval Augmented Generation).
-              </p>
-              <Button 
-                onClick={handleImportData} 
-                disabled={isImporting}
-                variant="cyber"
-                className="w-full sm:w-auto"
-              >
-                {isImporting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Importing... (This may take a few minutes)
-                  </>
-                ) : (
-                  <>
-                    <Upload className="mr-2 h-4 w-4" />
-                    Import Knowledge Base
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
-
           {/* Beginner Toolkit Recommendation */}
           <Card className="cyber-bg border-primary/30">
             <CardHeader>
