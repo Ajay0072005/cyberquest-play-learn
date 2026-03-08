@@ -558,6 +558,16 @@ const Dashboard: React.FC = () => {
                           <div className="flex-1 min-w-0">
                             <h4 className="text-sm font-semibold group-hover:text-primary transition-colors">{tool.name}</h4>
                             <p className="text-[11px] text-muted-foreground truncate">{tool.description}</p>
+                            <a
+                              href={tool.learn}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1 mt-1 text-[11px] text-primary hover:underline"
+                            >
+                              <BookOpen className="h-3 w-3" />
+                              {tool.learnLabel}
+                            </a>
                           </div>
                           <Download className="h-4 w-4 text-muted-foreground shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </a>
