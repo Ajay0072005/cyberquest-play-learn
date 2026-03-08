@@ -17,6 +17,7 @@ export interface CyberAttack {
   attribution: string;
   timeline: { date: string; event: string }[];
   analysisQuestions: { question: string; answer: string }[];
+  documentationUrl: string; // Link to official documentation/analysis
 }
 
 export const cyberAttacks: CyberAttack[] = [
