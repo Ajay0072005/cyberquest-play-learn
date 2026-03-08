@@ -134,6 +134,7 @@ export type Database = {
       profiles: {
         Row: {
           ai_tutor_avatar: Json | null
+          ai_tutor_name: string | null
           avatar_url: string | null
           certifications: string[] | null
           created_at: string
@@ -151,6 +152,7 @@ export type Database = {
         }
         Insert: {
           ai_tutor_avatar?: Json | null
+          ai_tutor_name?: string | null
           avatar_url?: string | null
           certifications?: string[] | null
           created_at?: string
@@ -168,6 +170,7 @@ export type Database = {
         }
         Update: {
           ai_tutor_avatar?: Json | null
+          ai_tutor_name?: string | null
           avatar_url?: string | null
           certifications?: string[] | null
           created_at?: string
