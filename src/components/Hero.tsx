@@ -34,8 +34,8 @@ export const Hero: React.FC = () => {
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
           {/* Logo */}
-          <div className="mb-8 flex justify-center">
-            <img src={logo} alt="CyberQuest" className="h-48 w-48 md:h-64 md:w-64 drop-shadow-[0_0_30px_rgba(0,255,65,0.4)]" />
+          <div className="mb-2 flex justify-center">
+            <img src={logo} alt="CyberQuest" className="h-60 w-60 md:h-80 md:w-80 drop-shadow-[0_0_30px_rgba(0,255,65,0.4)]" />
           </div>
           
           {/* Glitch effect title */}
