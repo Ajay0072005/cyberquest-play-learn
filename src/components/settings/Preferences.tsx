@@ -117,7 +117,7 @@ const Preferences = () => {
   const handleEchoChange = (checked: boolean) => {
     setEchoEnabled(checked);
     saveLocalPref('echo', checked);
-    toast({ title: 'Preference updated', description: `Echo ${checked ? 'enabled' : 'disabled'}` });
+    toast({ title: 'Preference updated', description: `${tutorName} ${checked ? 'enabled' : 'disabled'}` });
   };
 
   const handleSoundChange = (checked: boolean) => {
@@ -276,10 +276,10 @@ const Preferences = () => {
             </div>
           </div>
 
-          {/* Echo */}
+          {/* AI Assistant Toggle */}
           <div className="flex items-center justify-between py-4">
             <div>
-              <p className="font-semibold text-foreground">Echo</p>
+              <p className="font-semibold text-foreground">{tutorName}</p>
               <p className="text-sm text-muted-foreground">AI-powered assistant to help you learn and solve challenges.</p>
             </div>
             <Switch checked={echoEnabled} onCheckedChange={handleEchoChange} />
