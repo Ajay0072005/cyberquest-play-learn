@@ -31,6 +31,7 @@ const severityColor: Record<string, string> = {
 const CyberTimeTravel = () => {
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('All');
+  const [sortBy, setSortBy] = useState('latest');
   const [selectedAttack, setSelectedAttack] = useState<CyberAttack | null>(null);
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
 
