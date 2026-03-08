@@ -5,9 +5,16 @@ import { RoadmapFoundation } from "@/components/roadmap/RoadmapFoundation";
 import { RoadmapCareerTracks } from "@/components/roadmap/RoadmapCareerTracks";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useLabProgress } from "@/hooks/useLabProgress";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Roadmap() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { completedLabs } = useLabProgress();
+
+  // Build a Set of completed lab IDs for quick lookup
+  const completedIds = new Set(completedLabs.map((l) => l.lab_id));
 
   return (
     <div className="min-h-screen bg-background">
@@ -25,10 +32,10 @@ export default function Roadmap() {
           </div>
 
           {/* Foundation Stages */}
-          <RoadmapFoundation stages={foundationStages} />
+          <RoadmapFoundation stages={foundationStages} completedIds={completedIds} />
 
           {/* Career Tracks */}
-          <RoadmapCareerTracks tracks={careerTracks} />
+          <RoadmapCareerTracks tracks={careerTracks} completedIds={completedIds} />
 
           {/* What's Next */}
           <div className="text-center mt-20">
