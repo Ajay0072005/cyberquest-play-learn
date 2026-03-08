@@ -18,6 +18,7 @@ import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ProfileSettings from "./pages/ProfileSettings";
+import Profile from "./pages/Profile";
 import Leaderboard from "./pages/Leaderboard";
 import Chat from "./pages/Chat";
 import Achievements from "./pages/Achievements";
@@ -82,7 +83,7 @@ const App = () => (
               } />
               <Route path="/profile" element={
                 <ProtectedRoute>
-                  <ProfileSettings />
+                  <Profile />
                 </ProtectedRoute>
               } />
               <Route path="/leaderboard" element={<Leaderboard />} />
