@@ -23,7 +23,8 @@ import {
   Flame,
   Star,
   Award,
-  ChevronRight
+  ChevronRight,
+  Gamepad2
 } from 'lucide-react';
 import { useGame } from '@/context/GameContext';
 import { useAuth } from '@/context/AuthContext';
@@ -265,6 +266,22 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* CyberQuest 3D Banner */}
+      <Card className="mb-8 border-primary/30 bg-gradient-to-r from-primary/10 via-card to-purple-500/10 overflow-hidden hover:border-primary/50 transition-colors cursor-pointer group" onClick={() => navigate('/cyber-game')}>
+        <CardContent className="p-4 md:p-6 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Gamepad2 className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-cyber font-bold text-lg text-foreground">Play CyberQuest 3D</h3>
+              <p className="text-sm text-muted-foreground">Explore a neon cyber city and solve 5 cybersecurity missions</p>
+            </div>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+        </CardContent>
+      </Card>
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-6">
