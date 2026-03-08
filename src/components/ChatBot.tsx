@@ -27,7 +27,6 @@ export const ChatBot: React.FC = () => {
   const resizeRef = useRef<{ startX: number; startY: number; startW: number; startH: number } | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const initMessageSent = useRef(false);
-  ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
