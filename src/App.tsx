@@ -29,6 +29,7 @@ import ModeratorDashboard from "./pages/ModeratorDashboard";
 import Roadmap from "./pages/Roadmap";
 import CyberGame from "./pages/CyberGame";
 import CyberNews from "./pages/CyberNews";
+import CyberTimeTravel from "./pages/CyberTimeTravel";
 
 const queryClient = new QueryClient();
 
@@ -115,11 +116,8 @@ const App = () => (
                   <ModeratorDashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/cyber-news" element={
-                <ProtectedRoute>
-                  <CyberNews />
-                </ProtectedRoute>
-              } />
+              <Route path="/cyber-news" element={<ProtectedRoute><CyberNews /></ProtectedRoute>} />
+              <Route path="/time-travel" element={<ProtectedRoute><CyberTimeTravel /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
