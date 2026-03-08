@@ -13,7 +13,8 @@ import {
   FlaskConical,
   ShieldAlert,
   ShieldCheck,
-  Newspaper
+  Newspaper,
+  Clock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
@@ -30,6 +31,7 @@ const navItems = [
   { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
   { icon: MessageSquare, label: 'AI Chat', path: '/chat' },
   { icon: Newspaper, label: 'Cyber News', path: '/cyber-news' },
+  { icon: Clock, label: 'Time Travel', path: '/time-travel' },
 ];
 
 export const DashboardSidebar: React.FC = () => {
