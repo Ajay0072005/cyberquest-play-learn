@@ -238,7 +238,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Current Streak</p>
-                <p className="text-2xl md:text-3xl font-cyber font-bold text-orange-400">3 days</p>
+                <p className="text-2xl md:text-3xl font-cyber font-bold text-orange-400">{currentStreak} day{currentStreak !== 1 ? 's' : ''}</p>
               </div>
               <div className="h-12 w-12 rounded-full bg-orange-500/20 flex items-center justify-center">
                 <Flame className="h-6 w-6 text-orange-400" />
