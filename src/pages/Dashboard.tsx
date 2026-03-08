@@ -609,7 +609,19 @@ const Dashboard: React.FC = () => {
                         <Download className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{tool.description}</p>
-                      <Badge variant="outline" className="mt-2 text-[10px]">{tool.category}</Badge>
+                      <div className="flex items-center gap-3 mt-2">
+                        <Badge variant="outline" className="text-[10px]">{tool.category}</Badge>
+                        <a
+                          href={tool.learn}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
+                        >
+                          <BookOpen className="h-3 w-3" />
+                          Learn
+                        </a>
+                      </div>
                     </div>
                   </a>
                 ))}
