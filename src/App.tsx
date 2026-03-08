@@ -28,6 +28,7 @@ import AdminRoles from "./pages/AdminRoles";
 import ModeratorDashboard from "./pages/ModeratorDashboard";
 import Roadmap from "./pages/Roadmap";
 import CyberGame from "./pages/CyberGame";
+import CyberNews from "./pages/CyberNews";
 
 const queryClient = new QueryClient();
 
@@ -112,6 +113,11 @@ const App = () => (
               <Route path="/moderator" element={
                 <ProtectedRoute>
                   <ModeratorDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/cyber-news" element={
+                <ProtectedRoute>
+                  <CyberNews />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
