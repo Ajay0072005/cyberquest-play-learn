@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { cn } from '@/lib/utils';
-import { Settings, KeyRound, UserCog } from 'lucide-react';
+import { Settings, KeyRound, UserCog, SlidersHorizontal } from 'lucide-react';
 import AccountDetails from '@/components/settings/AccountDetails';
 import PasswordSecurity from '@/components/settings/PasswordSecurity';
+import Preferences from '@/components/settings/Preferences';
 
 const settingsTabs = [
   { id: 'account', label: 'Account Details', icon: UserCog },
+  { id: 'preferences', label: 'Preferences', icon: SlidersHorizontal },
   { id: 'password', label: 'Password and Security', icon: KeyRound },
 ] as const;
 
