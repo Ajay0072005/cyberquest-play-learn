@@ -33,7 +33,6 @@ export const foundationStages: RoadmapStage[] = [
     icon: Cpu,
     courses: [
       { id: "pre-security", title: "Pre Security", difficulty: "Easy", type: "Path", link: "/path/script-kiddie" },
-      { id: "pre-security-cert", title: "Pre Security (SEC0)", difficulty: "Easy", type: "Professional Certification" },
     ],
   },
   {
@@ -43,7 +42,6 @@ export const foundationStages: RoadmapStage[] = [
     icon: Shield,
     courses: [
       { id: "cyber-101", title: "Cyber Security 101", difficulty: "Easy", type: "Path", link: "/path/script-kiddie" },
-      { id: "cyber-101-cert", title: "Cyber Security 101 (SEC1)", difficulty: "Intermediate", type: "Professional Certification" },
     ],
   },
   {
@@ -64,7 +62,6 @@ export const careerTracks: CareerTrack[] = [
     color: "from-emerald-500 to-emerald-400",
     courses: [
       { id: "soc-1", title: "SOC Level 1", difficulty: "Easy", type: "Path", link: "/path/security-enthusiast" },
-      { id: "sa-level1", title: "Security Analyst Level 1 (SAL1)", difficulty: "Intermediate", type: "Professional Certification" },
       { id: "soc-2", title: "SOC Level 2", difficulty: "Intermediate", type: "Path", link: "/path/junior-pentester" },
       { id: "endpoint-inv", title: "Advanced Endpoint Investigations", difficulty: "Hard", type: "Path", link: "/path/penetration-tester" },
     ],
@@ -77,7 +74,6 @@ export const careerTracks: CareerTrack[] = [
     color: "from-red-500 to-red-400",
     courses: [
       { id: "jr-pt", title: "Jr. Penetration Tester", difficulty: "Intermediate", type: "Path", link: "/path/junior-pentester" },
-      { id: "jr-pt-cert", title: "Jr. Penetration Tester (PT1)", difficulty: "Intermediate", type: "Professional Certification" },
       { id: "web-fund", title: "Web Fundamentals", difficulty: "Easy", type: "Path", link: "/path/security-enthusiast" },
       { id: "web-app-pt", title: "Web Application Pentesting", difficulty: "Intermediate", type: "Path", link: "/path/penetration-tester" },
       { id: "web-red", title: "Web Application Red Teaming", difficulty: "Hard", type: "Path", link: "/path/senior-pentester" },
