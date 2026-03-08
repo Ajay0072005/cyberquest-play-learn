@@ -8,23 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { 
-  Trophy, 
-  Target, 
-  Clock, 
-  Zap, 
-  Shield, 
-  Lock,
-  CheckCircle,
-  TrendingUp,
-  Calendar,
-  Database,
-  Upload,
-  Loader2,
-  Flame,
-  Star,
-  Award,
-  ChevronRight,
-  Gamepad2
+  Trophy, Target, Clock, Zap, Shield, Lock, CheckCircle, TrendingUp, Calendar, Database, Upload, Download, Loader2, Flame, Star, Award, ChevronRight, Gamepad2,
+  Globe, Terminal as TerminalIcon, Search, Network, Bug, Eye, Key, Wifi, ShieldCheck, FileCode
 } from 'lucide-react';
 import { useGame } from '@/context/GameContext';
 import { useAuth } from '@/context/AuthContext';
@@ -32,6 +17,21 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import { useNavigate } from 'react-router-dom';
+
+const securityTools = [
+  { name: 'Nmap', description: 'Network discovery and security auditing tool', url: 'https://nmap.org/download', icon: Network, category: 'Network Scanning', color: 'bg-blue-500/20 text-blue-400' },
+  { name: 'Wireshark', description: 'Network protocol analyzer for traffic inspection', url: 'https://www.wireshark.org/download.html', icon: Eye, category: 'Packet Analysis', color: 'bg-cyan-500/20 text-cyan-400' },
+  { name: 'Burp Suite', description: 'Web application security testing platform', url: 'https://portswigger.net/burp/communitydownload', icon: Bug, category: 'Web Security', color: 'bg-orange-500/20 text-orange-400' },
+  { name: 'Metasploit', description: 'Penetration testing framework', url: 'https://www.metasploit.com/download', icon: ShieldCheck, category: 'Pen Testing', color: 'bg-red-500/20 text-red-400' },
+  { name: 'Kali Linux', description: 'Debian-based Linux distro for security testing', url: 'https://www.kali.org/get-kali/', icon: TerminalIcon, category: 'Operating System', color: 'bg-indigo-500/20 text-indigo-400' },
+  { name: 'John the Ripper', description: 'Fast password cracker for multiple platforms', url: 'https://www.openwall.com/john/', icon: Key, category: 'Password Cracking', color: 'bg-yellow-500/20 text-yellow-400' },
+  { name: 'Aircrack-ng', description: 'WiFi network security assessment tools', url: 'https://www.aircrack-ng.org/downloads.html', icon: Wifi, category: 'Wireless Security', color: 'bg-green-500/20 text-green-400' },
+  { name: 'OWASP ZAP', description: 'Open-source web app security scanner', url: 'https://www.zaproxy.org/download/', icon: Search, category: 'Web Security', color: 'bg-purple-500/20 text-purple-400' },
+  { name: 'Hashcat', description: 'Advanced password recovery and hash cracking', url: 'https://hashcat.net/hashcat/', icon: FileCode, category: 'Password Cracking', color: 'bg-pink-500/20 text-pink-400' },
+  { name: 'Ghidra', description: 'NSA reverse engineering framework', url: 'https://ghidra-sre.org/', icon: Globe, category: 'Reverse Engineering', color: 'bg-emerald-500/20 text-emerald-400' },
+  { name: 'Nikto', description: 'Web server vulnerability scanner', url: 'https://github.com/sullo/nikto', icon: Shield, category: 'Web Scanning', color: 'bg-amber-500/20 text-amber-400' },
+  { name: 'Maltego', description: 'Open-source intelligence and forensics tool', url: 'https://www.maltego.com/downloads/', icon: Globe, category: 'OSINT', color: 'bg-teal-500/20 text-teal-400' },
+];
 
 interface RecentAchievement {
   id: string;
@@ -464,7 +464,8 @@ const Dashboard: React.FC = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="tools">
+        <TabsContent value="tools" className="space-y-6">
+          {/* Knowledge Base Import */}
           <Card className="cyber-bg border-primary/30">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -479,7 +480,6 @@ const Dashboard: React.FC = () => {
               <p className="text-sm text-muted-foreground">
                 Load 12,663 cybersecurity questions from the cysecbench.csv dataset into the AI chatbot's knowledge base using RAG (Retrieval Augmented Generation).
               </p>
-              
               <Button 
                 onClick={handleImportData} 
                 disabled={isImporting}
@@ -498,6 +498,44 @@ const Dashboard: React.FC = () => {
                   </>
                 )}
               </Button>
+            </CardContent>
+          </Card>
+
+          {/* Security Tools Downloads */}
+          <Card className="cyber-bg border-primary/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Download className="h-5 w-5 text-primary" />
+                Security Tools & Downloads
+              </CardTitle>
+              <CardDescription>
+                Essential cybersecurity tools used by professionals worldwide
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {securityTools.map((tool) => (
+                  <a
+                    key={tool.name}
+                    href={tool.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-start gap-3 p-4 rounded-lg border border-border/50 bg-muted/10 hover:border-primary/50 hover:bg-primary/5 transition-all"
+                  >
+                    <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${tool.color}`}>
+                      <tool.icon className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-semibold group-hover:text-primary transition-colors">{tool.name}</h4>
+                        <Download className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{tool.description}</p>
+                      <Badge variant="outline" className="mt-2 text-[10px]">{tool.category}</Badge>
+                    </div>
+                  </a>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
