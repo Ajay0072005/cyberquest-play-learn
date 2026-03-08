@@ -69,6 +69,7 @@ const ProfileSettings = () => {
           </div>
           <div>
             {activeTab === 'account' && <AccountDetails />}
+            {activeTab === 'preferences' && <Preferences />}
             {activeTab === 'password' && <PasswordSecurity />}
           </div>
         </div>
@@ -76,6 +77,7 @@ const ProfileSettings = () => {
         {/* Desktop Content */}
         <div className="flex-1 hidden md:block">
           {activeTab === 'account' && <AccountDetails />}
+          {activeTab === 'preferences' && <Preferences />}
           {activeTab === 'password' && <PasswordSecurity />}
         </div>
       </div>
