@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Play, Code, Map } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/cyber-hero-bg.jpg";
+import logo from "@/assets/logo-transparent.png";
 
 export const Hero: React.FC = () => {
   const navigate = useNavigate();
@@ -32,6 +33,11 @@ export const Hero: React.FC = () => {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
+          {/* Logo */}
+          <div className="mb-8 flex justify-center">
+            <img src={logo} alt="CyberQuest" className="h-48 w-48 md:h-64 md:w-64 drop-shadow-[0_0_30px_rgba(0,255,65,0.4)]" />
+          </div>
+          
           {/* Glitch effect title */}
           <h1 className="text-5xl md:text-7xl font-cyber font-black mb-6 cyber-glow glitch-effect">
             CYBERQUEST
