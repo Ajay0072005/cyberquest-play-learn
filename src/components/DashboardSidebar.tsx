@@ -14,7 +14,8 @@ import {
   ShieldAlert,
   ShieldCheck,
   Newspaper,
-  Clock
+  Clock,
+  User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
@@ -100,9 +101,25 @@ export const DashboardSidebar: React.FC = () => {
       {/* User Section */}
       <div className="p-2 border-t border-border space-y-1">
         <Link
+          to="/profile"
+          className={cn(
+            "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all",
+            location.pathname === '/profile'
+              ? "bg-primary/20 text-primary border border-primary/30"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            collapsed && "justify-center px-2"
+          )}
+        >
+          <User className="h-5 w-5 flex-shrink-0" />
+          {!collapsed && <span className="text-sm font-medium">Profile</span>}
+        </Link>
+        <Link
           to="/settings"
           className={cn(
-            "flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all",
+            "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all",
+            location.pathname === '/settings'
+              ? "bg-primary/20 text-primary border border-primary/30"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground",
             collapsed && "justify-center px-2"
           )}
         >
