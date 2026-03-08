@@ -42,6 +42,7 @@ const CyberNews = () => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
   const [error, setError] = useState('');
 
   const fetchNews = async () => {
@@ -67,7 +68,10 @@ const CyberNews = () => {
     fetchNews();
   }, []);
 
-  const filtered = filter === 'all' ? articles : articles.filter(a => a.category === filter);
+  const query = search.trim().toLowerCase();
+  const filtered = articles
+    .filter(a => filter === 'all' || a.category === filter)
+    .filter(a => !query || a.title.toLowerCase().includes(query) || a.description.toLowerCase().includes(query) || a.source.toLowerCase().includes(query));
 
   return (
     <DashboardLayout>
