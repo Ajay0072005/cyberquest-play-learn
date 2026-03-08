@@ -5,8 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Newspaper, ExternalLink, RefreshCw, Shield, Bug, Database, Globe, Clock } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Newspaper, ExternalLink, RefreshCw, Shield, Bug, Database, Globe, Clock, Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 interface NewsArticle {
   title: string;
