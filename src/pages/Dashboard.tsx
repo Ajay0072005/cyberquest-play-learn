@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
+import { SkillMatrix } from '@/components/SkillMatrix';
 import { PointsDisplay } from '@/components/PointsDisplay';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -402,6 +403,9 @@ const Dashboard: React.FC = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Skill Matrix */}
+          <SkillMatrix />
         </TabsContent>
 
         <TabsContent value="challenges">
