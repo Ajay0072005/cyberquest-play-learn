@@ -30,22 +30,26 @@ const Chat = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [tutorAvatar, setTutorAvatar] = useState<AvatarConfig | null>(null);
+  const [tutorName, setTutorName] = useState('CyberBot');
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const fetchAvatar = async () => {
+    const fetchProfile = async () => {
       if (!user) return;
       const { data } = await supabase
         .from('profiles')
-        .select('ai_tutor_avatar')
+        .select('ai_tutor_avatar, ai_tutor_name')
         .eq('user_id', user.id)
         .single();
       if (data?.ai_tutor_avatar) {
         setTutorAvatar(data.ai_tutor_avatar as unknown as AvatarConfig);
       }
+      if ((data as any)?.ai_tutor_name) {
+        setTutorName((data as any).ai_tutor_name);
+      }
     };
-    fetchAvatar();
+    fetchProfile();
   }, [user]);
 
   useEffect(() => {
@@ -197,7 +201,7 @@ const Chat = () => {
             <Sparkles className="h-6 w-6 text-primary" />
             CyberBot
           </h1>
-          <p className="text-muted-foreground mt-1">Your AI cybersecurity assistant</p>
+          <p className="text-muted-foreground mt-1">Your AI cybersecurity assistant — {tutorName}</p>
         </div>
 
         <Card className="flex-1 flex flex-col bg-card border-border overflow-hidden">
@@ -208,7 +212,7 @@ const Chat = () => {
                   <Bot className="h-8 w-8 text-primary" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-2">
-                  Welcome to CyberBot
+                  Welcome to {tutorName}
                 </h3>
                 <p className="text-muted-foreground mb-6 max-w-md">
                   I'm your AI assistant for learning cybersecurity. Ask me about security concepts, 

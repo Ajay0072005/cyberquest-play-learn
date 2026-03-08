@@ -21,16 +21,12 @@ export const ChatBot: React.FC = () => {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [tutorAvatar, setTutorAvatar] = useState<AvatarConfig | null>(null);
+  const [tutorName, setTutorName] = useState('CyberBot');
   const [chatSize, setChatSize] = useState({ width: 384, height: 480 });
   const [isResizing, setIsResizing] = useState(false);
   const resizeRef = useRef<{ startX: number; startY: number; startW: number; startH: number } | null>(null);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      text: "Hello! I'm CyberBot, your AI-powered cybersecurity assistant. I have access to 12,663 cybersecurity questions and can help you learn. Ask me anything!",
-      sender: "bot",
-      timestamp: new Date()
-    }
+  const [messages, setMessages] = useState<Message[]>([]);
+  const initMessageSent = useRef(false);
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -72,18 +68,32 @@ export const ChatBot: React.FC = () => {
   }, [messages]);
 
   useEffect(() => {
-    const fetchAvatar = async () => {
+    const fetchProfile = async () => {
       if (!user) return;
       const { data } = await supabase
         .from('profiles')
-        .select('ai_tutor_avatar')
+        .select('ai_tutor_avatar, ai_tutor_name')
         .eq('user_id', user.id)
         .single();
       if (data?.ai_tutor_avatar) {
         setTutorAvatar(data.ai_tutor_avatar as unknown as AvatarConfig);
       }
+      if ((data as any)?.ai_tutor_name) {
+        setTutorName((data as any).ai_tutor_name);
+      }
+      // Set initial message after name is loaded
+      if (!initMessageSent.current) {
+        initMessageSent.current = true;
+        const name = (data as any)?.ai_tutor_name || 'CyberBot';
+        setMessages([{
+          id: "1",
+          text: `Hello! I'm ${name}, your AI-powered cybersecurity assistant. I have access to 12,663 cybersecurity questions and can help you learn. Ask me anything!`,
+          sender: "bot",
+          timestamp: new Date()
+        }]);
+      }
     };
-    fetchAvatar();
+    fetchProfile();
   }, [user]);
 
   const sendMessage = async () => {
@@ -191,7 +201,7 @@ export const ChatBot: React.FC = () => {
           <CardHeader className="py-3 px-4 border-b border-border/30 bg-muted/30">
             <CardTitle className="flex items-center gap-2 text-base font-semibold">
               <Bot className="h-5 w-5 text-primary" />
-              CyberBot
+              {tutorName}
               <span className="text-[10px] text-primary font-normal ml-auto flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
                 Online
