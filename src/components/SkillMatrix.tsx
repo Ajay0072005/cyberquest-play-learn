@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Radar,
   RadarChart,
@@ -9,90 +9,143 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Shield, Swords, Server, FileSearch, Triangle } from "lucide-react";
+import { useLabProgress } from "@/hooks/useLabProgress";
+import { useGame } from "@/context/GameContext";
 
-interface SkillCategory {
-  subject: string;
-  score: number;
-  fullMark: number;
-}
+const SKILL_SUBJECTS = [
+  "Security Operations",
+  "Incident Response",
+  "Malware Analysis",
+  "Penetration Testing",
+  "Exploitation",
+  "Red Teaming",
+] as const;
 
-interface Track {
+// Maps lab_type and mini-lab categories to skill contributions (weights per skill index)
+const labTypeSkillMap: Record<string, number[]> = {
+  // lab_type values
+  sql_level:      [10, 0, 0, 30, 30, 0],
+  crypto_puzzle:  [5, 0, 20, 10, 20, 0],
+  terminal_flag:  [10, 10, 0, 20, 15, 20],
+  story_mission:  [15, 25, 10, 5, 5, 10],
+  // mini-lab categories
+  "Web Security":       [15, 5, 0, 25, 25, 5],
+  "Social Engineering": [10, 15, 5, 5, 5, 10],
+  "Access Control":     [15, 10, 0, 15, 20, 10],
+  "Server Security":    [10, 10, 10, 20, 20, 15],
+  "Authentication":     [15, 5, 0, 20, 25, 5],
+};
+
+// Mini-lab IDs mapped to their category for skill attribution
+const miniLabCategories: Record<string, string> = {
+  "sql-injection-login": "Web Security",
+  "phishing-analysis": "Social Engineering",
+  "xss-stored": "Web Security",
+  "broken-auth": "Access Control",
+  "csrf-attack": "Web Security",
+  "privilege-escalation": "Access Control",
+  "command-injection": "Server Security",
+  "insecure-deserialization": "Server Security",
+  "ssrf-attack": "Server Security",
+  "jwt-vulnerabilities": "Authentication",
+  "path-traversal": "Server Security",
+};
+
+interface TrackConfig {
   id: string;
   label: string;
   icon: React.ElementType;
-  skills: SkillCategory[];
+  // Weight multipliers per skill index — which skills matter most for this track
+  weights: number[];
 }
 
-const levels = ["Entry level", "Intermediate", "Advanced"] as const;
-
-const buildSkills = (scores: number[]): SkillCategory[] => {
-  const subjects = [
-    "Security Operations",
-    "Incident Response",
-    "Malware Analysis",
-    "Penetration Testing",
-    "Exploitation",
-    "Red Teaming",
-  ];
-  return subjects.map((subject, i) => ({
-    subject,
-    score: scores[i],
-    fullMark: 100,
-  }));
-};
-
-const tracks: Track[] = [
+const tracks: TrackConfig[] = [
   {
     id: "foundational",
     label: "Foundational",
     icon: Triangle,
-    skills: buildSkills([70, 45, 35, 50, 30, 20]),
+    weights: [1, 1, 1, 1, 1, 1], // even
   },
   {
     id: "security-analyst",
     label: "Security Analyst",
     icon: FileSearch,
-    skills: buildSkills([90, 80, 60, 40, 25, 20]),
+    weights: [1.5, 1.5, 1.2, 0.6, 0.4, 0.3],
   },
   {
     id: "penetration-tester",
     label: "Penetration Tester",
     icon: Swords,
-    skills: buildSkills([40, 35, 45, 90, 85, 70]),
+    weights: [0.5, 0.4, 0.6, 1.5, 1.5, 1.3],
   },
   {
     id: "security-engineer",
     label: "Security Engineer",
     icon: Server,
-    skills: buildSkills([75, 65, 50, 55, 45, 40]),
+    weights: [1.3, 1.1, 0.9, 1, 0.8, 0.7],
   },
 ];
 
-const levelMultipliers: Record<string, number> = {
-  "Entry level": 0.5,
-  Intermediate: 0.75,
-  Advanced: 1,
-};
+// Max raw score per skill before capping (tuned so completing ~12-15 labs reaches 100%)
+const MAX_RAW = 250;
 
 export const SkillMatrix: React.FC = () => {
   const [activeTrack, setActiveTrack] = useState(tracks[0].id);
-  const [selectedLevel, setSelectedLevel] = useState<string>("Entry level");
+  const { completedLabs } = useLabProgress();
+  const { sqlLevelsCompleted, cryptoPuzzlesSolved, terminalFlagsFound } = useGame();
+
+  const rawSkills = useMemo(() => {
+    const scores = new Array(6).fill(0);
+
+    // Accumulate from lab_progress records (mini_labs + story_missions)
+    completedLabs.forEach((lab) => {
+      let key = lab.lab_type;
+
+      // For mini_labs, use category-based mapping
+      if (lab.lab_type === "mini_lab") {
+        const cat = miniLabCategories[lab.lab_id];
+        if (cat) key = cat;
+        else return;
+      }
+
+      const mapping = labTypeSkillMap[key];
+      if (!mapping) return;
+
+      mapping.forEach((w, i) => {
+        scores[i] += w;
+      });
+    });
+
+    // Accumulate from GameContext counts (sql, crypto, terminal)
+    const gameEntries: [string, number][] = [
+      ["sql_level", sqlLevelsCompleted],
+      ["crypto_puzzle", cryptoPuzzlesSolved],
+      ["terminal_flag", terminalFlagsFound],
+    ];
+
+    gameEntries.forEach(([type, count]) => {
+      const mapping = labTypeSkillMap[type];
+      if (!mapping) return;
+      mapping.forEach((w, i) => {
+        scores[i] += w * count;
+      });
+    });
+
+    return scores;
+  }, [completedLabs, sqlLevelsCompleted, cryptoPuzzlesSolved, terminalFlagsFound]);
 
   const track = tracks.find((t) => t.id === activeTrack)!;
-  const multiplier = levelMultipliers[selectedLevel];
 
-  const scaledSkills = track.skills.map((s) => ({
-    ...s,
-    score: Math.round(s.score * multiplier),
-  }));
+  const chartData = useMemo(() => {
+    return SKILL_SUBJECTS.map((subject, i) => {
+      const weighted = rawSkills[i] * track.weights[i];
+      const score = Math.min(100, Math.round((weighted / MAX_RAW) * 100));
+      return { subject, score, fullMark: 100 };
+    });
+  }, [rawSkills, track]);
+
+  const hasAnyProgress = rawSkills.some((s) => s > 0);
 
   return (
     <Card className="cyber-bg border-primary/30">
@@ -102,23 +155,11 @@ export const SkillMatrix: React.FC = () => {
             <Shield className="h-5 w-5 text-primary" />
             Skill Matrix
           </CardTitle>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground hidden sm:inline">
-              Select level
-            </span>
-            <Select value={selectedLevel} onValueChange={setSelectedLevel}>
-              <SelectTrigger className="w-[150px] h-8 text-sm border-primary/30">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {levels.map((l) => (
-                  <SelectItem key={l} value={l}>
-                    {l}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {!hasAnyProgress && (
+            <Badge variant="outline" className="text-xs border-muted-foreground/30 text-muted-foreground">
+              Complete labs to fill your matrix
+            </Badge>
+          )}
         </div>
       </CardHeader>
       <CardContent>
@@ -153,7 +194,7 @@ export const SkillMatrix: React.FC = () => {
                 cx="50%"
                 cy="50%"
                 outerRadius="70%"
-                data={scaledSkills}
+                data={chartData}
               >
                 <PolarGrid
                   stroke="hsl(var(--border))"
@@ -194,7 +235,7 @@ export const SkillMatrix: React.FC = () => {
 
         {/* Legend */}
         <div className="flex flex-wrap gap-2 mt-2 justify-center">
-          {scaledSkills.map((s) => (
+          {chartData.map((s) => (
             <Badge
               key={s.subject}
               variant="outline"
