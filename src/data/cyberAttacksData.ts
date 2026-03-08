@@ -99,6 +99,7 @@ export const cyberAttacks: CyberAttack[] = [
       { question: 'What was the initial infection vector?', answer: 'A compromised update of M.E.Doc, a widely-used Ukrainian tax accounting software.' },
       { question: 'Why did Maersk suffer total infrastructure loss?', answer: 'Flat network architecture allowed rapid lateral movement; lack of segmentation meant one infected machine could reach the entire domain.' },
     ],
+    documentationUrl: 'https://attack.mitre.org/software/S0370/',
   },
   {
     id: 4, name: 'Stuxnet', year: 2010, category: 'Nation-State/ICS', severity: 'Critical',
@@ -125,6 +126,7 @@ export const cyberAttacks: CyberAttack[] = [
       { question: 'How did Stuxnet bypass the air gap?', answer: 'Via infected USB drives brought into the facility by contractors or employees, exploiting Windows autorun vulnerabilities.' },
       { question: 'What made Stuxnet detection difficult?', answer: 'It replayed recorded normal telemetry data to operators while silently modifying centrifuge speeds, making everything appear normal.' },
     ],
+    documentationUrl: 'https://www.symantec.com/security/press/2010-09-09',
   },
   {
     id: 5, name: 'Equifax Breach', year: 2017, category: 'Data Breach', severity: 'Critical',
