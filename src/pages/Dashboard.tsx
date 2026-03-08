@@ -50,7 +50,34 @@ const Dashboard: React.FC = () => {
   const { toast } = useToast();
 
   const [recentAchievements, setRecentAchievements] = useState<RecentAchievement[]>([]);
+  const [currentStreak, setCurrentStreak] = useState(0);
   const navigate = useNavigate();
+
+  // Calculate login streak
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const savedDays: string[] = JSON.parse(localStorage.getItem('cyberquest-login-days') || '[]');
+
+    if (!savedDays.includes(today)) {
+      savedDays.push(today);
+      localStorage.setItem('cyberquest-login-days', JSON.stringify(savedDays));
+    }
+
+    // Calculate streak from sorted unique days
+    const sorted = [...new Set(savedDays)].sort().reverse();
+    let streak = 1;
+    for (let i = 0; i < sorted.length - 1; i++) {
+      const curr = new Date(sorted[i]);
+      const prev = new Date(sorted[i + 1]);
+      const diff = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24);
+      if (diff === 1) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    setCurrentStreak(streak);
+  }, []);
 
   // Fetch recently earned achievements
   useEffect(() => {
@@ -211,7 +238,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Current Streak</p>
-                <p className="text-2xl md:text-3xl font-cyber font-bold text-orange-400">3 days</p>
+                <p className="text-2xl md:text-3xl font-cyber font-bold text-orange-400">{currentStreak} day{currentStreak !== 1 ? 's' : ''}</p>
               </div>
               <div className="h-12 w-12 rounded-full bg-orange-500/20 flex items-center justify-center">
                 <Flame className="h-6 w-6 text-orange-400" />
