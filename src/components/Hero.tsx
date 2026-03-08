@@ -52,13 +52,6 @@ export const Hero: React.FC = () => {
             </Button>
           </div>
           
-          {/* Stats */}
-          <div className="flex justify-center mt-16">
-            <div className="text-center p-6 bg-card/50 rounded-lg backdrop-blur-sm border border-border/50 max-w-xs">
-              <div className="text-3xl font-cyber text-secondary mb-2">10K+</div>
-              <div className="text-muted-foreground">Active Learners</div>
-            </div>
-          </div>
         </div>
       </div>
       
