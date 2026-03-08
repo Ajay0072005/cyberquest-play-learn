@@ -9,8 +9,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Clock, Search, X, Shield, AlertTriangle, ChevronRight, ExternalLink,
-  Crosshair, BookOpen, HelpCircle, Calendar, DollarSign, Users, Eye, EyeOff
+  Crosshair, BookOpen, HelpCircle, Calendar, DollarSign, Users, Eye, EyeOff, ArrowUpDown
 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { cyberAttacks, CyberAttack } from '@/data/cyberAttacksData';
 
 const categories = ['All', 'Ransomware', 'Data Breach', 'Supply Chain', 'Zero-Day', 'Nation-State', 'Wiper', 'DDoS', 'Social Engineering', 'ICS', 'Espionage'];
