@@ -12,7 +12,8 @@ import {
   BookOpen,
   FlaskConical,
   ShieldAlert,
-  ShieldCheck
+  ShieldCheck,
+  Newspaper
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
@@ -28,6 +29,7 @@ const navItems = [
   { icon: Award, label: 'Achievements', path: '/achievements' },
   { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
   { icon: MessageSquare, label: 'AI Chat', path: '/chat' },
+  { icon: Newspaper, label: 'Cyber News', path: '/cyber-news' },
 ];
 
 export const DashboardSidebar: React.FC = () => {
