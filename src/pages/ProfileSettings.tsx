@@ -1,28 +1,55 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, User, Save, Upload, Camera, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Save, KeyRound, Eye, EyeOff, Github, Linkedin, Twitter, Globe, Link as LinkIcon } from 'lucide-react';
 import { PasswordStrengthIndicator, isPasswordStrong } from '@/components/PasswordStrengthIndicator';
 import AvatarCustomizer from '@/components/avatar/AvatarCustomizer';
+import { ProfileHeader } from '@/components/profile/ProfileHeader';
+import { ProfileSection } from '@/components/profile/ProfileSection';
+import { TagInput } from '@/components/profile/TagInput';
+
+interface SocialLinks {
+  github?: string;
+  linkedin?: string;
+  twitter?: string;
+  website?: string;
+  [key: string]: string | undefined;
+}
 
 const ProfileSettings = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
+
+  // Profile data
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
-  
-  // Password change state
+  const [summary, setSummary] = useState('');
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>({});
+  const [skills, setSkills] = useState<string[]>([]);
+  const [certifications, setCertifications] = useState<string[]>([]);
+  const [interests, setInterests] = useState<string[]>([]);
+  const [isPublic, setIsPublic] = useState(false);
+  const [location, setLocation] = useState('');
+
+  // Edit states for sections
+  const [editingSummary, setEditingSummary] = useState(false);
+  const [editingSocials, setEditingSocials] = useState(false);
+  const [editingSkills, setEditingSkills] = useState(false);
+  const [editingCerts, setEditingCerts] = useState(false);
+  const [editingInterests, setEditingInterests] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
+
+  // Password state
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
@@ -32,143 +59,56 @@ const ProfileSettings = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user) return;
-      
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('username, avatar_url')
+          .select('*')
           .eq('user_id', user.id)
           .single();
 
-        if (error && error.code !== 'PGRST116') {
-          throw error;
-        }
+        if (error && error.code !== 'PGRST116') throw error;
 
         if (data) {
           setUsername(data.username || '');
           setAvatarUrl(data.avatar_url || '');
+          setSummary((data as any).summary || '');
+          setSocialLinks((data as any).social_links || {});
+          setSkills((data as any).skills || []);
+          setCertifications((data as any).certifications || []);
+          setInterests((data as any).interests || []);
+          setIsPublic((data as any).is_public || false);
+          setLocation((data as any).location || '');
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load profile data',
-          variant: 'destructive',
-        });
+        toast({ title: 'Error', description: 'Failed to load profile data', variant: 'destructive' });
       } finally {
         setLoading(false);
       }
     };
-
     fetchProfile();
   }, [user, toast]);
 
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: 'Invalid file type',
-        description: 'Please upload an image file',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast({
-        title: 'File too large',
-        description: 'Please upload an image smaller than 2MB',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/avatar.${fileExt}`;
-
-      // Upload the file
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(fileName, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      // Get the public URL
-      const { data: urlData } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(fileName);
-
-      const newAvatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
-      setAvatarUrl(newAvatarUrl);
-
-      // Update the profile with the new avatar URL using upsert
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .upsert({ 
-          user_id: user.id,
-          avatar_url: newAvatarUrl 
-        }, { onConflict: 'user_id' });
-
-      if (updateError) throw updateError;
-
-      toast({
-        title: 'Success',
-        description: 'Avatar uploaded successfully',
-      });
-    } catch (error) {
-      console.error('Error uploading avatar:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to upload avatar',
-        variant: 'destructive',
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleSave = async () => {
+  const saveProfile = async (fields: Record<string, any>) => {
     if (!user) return;
-
     setSaving(true);
     try {
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          user_id: user.id,
-          username: username.trim() || null,
-          avatar_url: avatarUrl.trim() || null,
-        }, { onConflict: 'user_id' });
-
+        .upsert({ user_id: user.id, ...fields } as any, { onConflict: 'user_id' });
       if (error) throw error;
-
-      toast({
-        title: 'Success',
-        description: 'Profile updated successfully',
-      });
+      toast({ title: 'Success', description: 'Profile updated successfully' });
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update profile',
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: 'Failed to update profile', variant: 'destructive' });
     } finally {
       setSaving(false);
     }
   };
 
-  const getInitials = () => {
-    if (username) {
-      return username.slice(0, 2).toUpperCase();
-    }
-    return user?.email?.slice(0, 2).toUpperCase() || 'U';
+  const handleVisibilityChange = async (pub: boolean) => {
+    setIsPublic(pub);
+    await saveProfile({ is_public: pub });
   };
 
   if (loading) {
@@ -183,248 +123,286 @@ const ProfileSettings = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Profile Settings</h1>
-          <p className="text-muted-foreground mt-1">Manage your account settings and preferences</p>
+      <div className="space-y-8 max-w-5xl mx-auto">
+        {/* Profile Header */}
+        <Card className="bg-card border-border">
+          <CardContent className="p-6">
+            <ProfileHeader
+              userId={user?.id || ''}
+              email={user?.email || ''}
+              username={username}
+              avatarUrl={avatarUrl}
+              location={location}
+              isPublic={isPublic}
+              onAvatarChange={setAvatarUrl}
+              onVisibilityChange={handleVisibilityChange}
+              onEditClick={() => setEditingProfile(!editingProfile)}
+            />
+
+            {editingProfile && (
+              <div className="mt-6 pt-6 border-t border-border space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input id="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username" className="bg-background border-border" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Location</Label>
+                    <Input id="location" value={location} onChange={e => setLocation(e.target.value)} placeholder="e.g. India" className="bg-background border-border" />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" disabled={saving} onClick={async () => {
+                    await saveProfile({ username: username.trim() || null, location: location.trim() || null });
+                    setEditingProfile(false);
+                  }}>
+                    {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                    Save
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setEditingProfile(false)}>Cancel</Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Two-column layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column */}
+          <div className="space-y-6">
+            {/* Summary */}
+            <ProfileSection
+              title="Summary"
+              placeholder="Tell the world about yourself and your hacking super powers..."
+              isEmpty={!summary}
+              addLabel="Add summary"
+              isEditing={editingSummary}
+              onEditToggle={setEditingSummary}
+              editForm={
+                <div className="space-y-3">
+                  <Textarea value={summary} onChange={e => setSummary(e.target.value)} placeholder="Write about yourself..." className="bg-background border-border min-h-[100px]" maxLength={500} />
+                  <p className="text-xs text-muted-foreground">{summary.length}/500</p>
+                  <div className="flex gap-2">
+                    <Button size="sm" disabled={saving} onClick={async () => {
+                      await saveProfile({ summary: summary.trim() || null });
+                      setEditingSummary(false);
+                    }}>Save</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingSummary(false)}>Cancel</Button>
+                  </div>
+                </div>
+              }
+            >
+              <p className="text-foreground text-sm whitespace-pre-wrap">{summary}</p>
+            </ProfileSection>
+
+            {/* Certifications */}
+            <ProfileSection
+              title="Certifications"
+              placeholder="Share with us your biggest achievements."
+              isEmpty={certifications.length === 0}
+              addLabel="Add certifications"
+              isEditing={editingCerts}
+              onEditToggle={setEditingCerts}
+              editForm={
+                <div className="space-y-3">
+                  <TagInput tags={certifications} onChange={setCertifications} placeholder="e.g. CEH, OSCP, CompTIA Security+" />
+                  <div className="flex gap-2">
+                    <Button size="sm" disabled={saving} onClick={async () => {
+                      await saveProfile({ certifications });
+                      setEditingCerts(false);
+                    }}>Save</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingCerts(false)}>Cancel</Button>
+                  </div>
+                </div>
+              }
+            >
+              <div className="flex flex-wrap gap-2">
+                {certifications.map(cert => (
+                  <Badge key={cert} variant="secondary" className="px-3 py-1">{cert}</Badge>
+                ))}
+              </div>
+            </ProfileSection>
+
+            {/* Skills */}
+            <ProfileSection
+              title="Skills"
+              placeholder="Show off your technical skills."
+              isEmpty={skills.length === 0}
+              addLabel="Add skills"
+              isEditing={editingSkills}
+              onEditToggle={setEditingSkills}
+              editForm={
+                <div className="space-y-3">
+                  <TagInput tags={skills} onChange={setSkills} placeholder="e.g. Penetration Testing, Python, Network Security" />
+                  <div className="flex gap-2">
+                    <Button size="sm" disabled={saving} onClick={async () => {
+                      await saveProfile({ skills });
+                      setEditingSkills(false);
+                    }}>Save</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingSkills(false)}>Cancel</Button>
+                  </div>
+                </div>
+              }
+            >
+              <div className="flex flex-wrap gap-2">
+                {skills.map(skill => (
+                  <Badge key={skill} className="bg-primary/10 text-primary border-primary/20 px-3 py-1">{skill}</Badge>
+                ))}
+              </div>
+            </ProfileSection>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            {/* Socials */}
+            <ProfileSection
+              title="Socials"
+              placeholder="Add your social profiles and a website link."
+              isEmpty={!socialLinks.github && !socialLinks.linkedin && !socialLinks.twitter && !socialLinks.website}
+              addLabel="Add socials"
+              isEditing={editingSocials}
+              onEditToggle={setEditingSocials}
+              editForm={
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2 text-sm"><Github className="h-4 w-4" /> GitHub</Label>
+                    <Input value={socialLinks.github || ''} onChange={e => setSocialLinks(prev => ({ ...prev, github: e.target.value }))} placeholder="https://github.com/username" className="bg-background border-border" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2 text-sm"><Linkedin className="h-4 w-4" /> LinkedIn</Label>
+                    <Input value={socialLinks.linkedin || ''} onChange={e => setSocialLinks(prev => ({ ...prev, linkedin: e.target.value }))} placeholder="https://linkedin.com/in/username" className="bg-background border-border" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2 text-sm"><Twitter className="h-4 w-4" /> Twitter / X</Label>
+                    <Input value={socialLinks.twitter || ''} onChange={e => setSocialLinks(prev => ({ ...prev, twitter: e.target.value }))} placeholder="https://x.com/username" className="bg-background border-border" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2 text-sm"><Globe className="h-4 w-4" /> Website</Label>
+                    <Input value={socialLinks.website || ''} onChange={e => setSocialLinks(prev => ({ ...prev, website: e.target.value }))} placeholder="https://yourwebsite.com" className="bg-background border-border" />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" disabled={saving} onClick={async () => {
+                      await saveProfile({ social_links: socialLinks });
+                      setEditingSocials(false);
+                    }}>Save</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingSocials(false)}>Cancel</Button>
+                  </div>
+                </div>
+              }
+            >
+              <div className="space-y-2">
+                {socialLinks.github && (
+                  <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                    <Github className="h-4 w-4" /> {socialLinks.github}
+                  </a>
+                )}
+                {socialLinks.linkedin && (
+                  <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                    <Linkedin className="h-4 w-4" /> {socialLinks.linkedin}
+                  </a>
+                )}
+                {socialLinks.twitter && (
+                  <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                    <Twitter className="h-4 w-4" /> {socialLinks.twitter}
+                  </a>
+                )}
+                {socialLinks.website && (
+                  <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                    <Globe className="h-4 w-4" /> {socialLinks.website}
+                  </a>
+                )}
+              </div>
+            </ProfileSection>
+
+            {/* Top Interests */}
+            <ProfileSection
+              title="Top Interests"
+              placeholder="Let us know what are your top interests."
+              isEmpty={interests.length === 0}
+              addLabel="Add interests"
+              isEditing={editingInterests}
+              onEditToggle={setEditingInterests}
+              editForm={
+                <div className="space-y-3">
+                  <TagInput tags={interests} onChange={setInterests} placeholder="e.g. CTF, Bug Bounty, Malware Analysis" />
+                  <div className="flex gap-2">
+                    <Button size="sm" disabled={saving} onClick={async () => {
+                      await saveProfile({ interests });
+                      setEditingInterests(false);
+                    }}>Save</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingInterests(false)}>Cancel</Button>
+                  </div>
+                </div>
+              }
+            >
+              <div className="flex flex-wrap gap-2">
+                {interests.map(interest => (
+                  <Badge key={interest} variant="outline" className="border-primary/30 text-foreground px-3 py-1">{interest}</Badge>
+                ))}
+              </div>
+            </ProfileSection>
+          </div>
         </div>
 
+        {/* Change Password */}
         <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5 text-primary" />
-              Profile Information
-            </CardTitle>
-            <CardDescription>
-              Update your profile details visible to other users
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Avatar Upload */}
-            <div className="flex items-center gap-6">
-              <div className="relative group">
-                <Avatar className="h-24 w-24 border-2 border-primary/20">
-                  <AvatarImage src={avatarUrl} alt={username || 'Avatar'} />
-                  <AvatarFallback className="bg-primary/10 text-primary text-2xl">
-                    {getInitials()}
-                  </AvatarFallback>
-                </Avatar>
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full cursor-pointer"
-                >
-                  {uploading ? (
-                    <Loader2 className="h-6 w-6 text-white animate-spin" />
-                  ) : (
-                    <Camera className="h-6 w-6 text-white" />
-                  )}
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  className="hidden"
-                />
-              </div>
-              <div className="space-y-2">
-                <p className="font-medium text-foreground">{username || 'No username set'}</p>
-                <p className="text-sm text-muted-foreground">{user?.email}</p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="gap-2"
-                >
-                  {uploading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Upload className="h-4 w-4" />
-                  )}
-                  Upload Photo
-                </Button>
-              </div>
-            </div>
-
-            {/* Username Field */}
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
-                className="max-w-md bg-background border-border"
-              />
-              <p className="text-xs text-muted-foreground">
-                This is your public display name
-              </p>
-            </div>
-
-            {/* Avatar URL Field (optional manual input) */}
-            <div className="space-y-2">
-              <Label htmlFor="avatar">Avatar URL (optional)</Label>
-              <Input
-                id="avatar"
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-                placeholder="https://example.com/avatar.png"
-                className="max-w-md bg-background border-border"
-              />
-              <p className="text-xs text-muted-foreground">
-                Or enter a URL to an external image
-              </p>
-            </div>
-
-            {/* Save Button */}
-            <Button 
-              onClick={handleSave} 
-              disabled={saving}
-              className="gap-2"
-            >
-              {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4" />
-              )}
-              Save Changes
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Account Info Card */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle>Account Information</CardTitle>
-            <CardDescription>Your account details</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label className="text-muted-foreground">Email</Label>
-              <p className="text-foreground">{user?.email}</p>
-            </div>
-            <div>
-              <Label className="text-muted-foreground">User ID</Label>
-              <p className="text-foreground font-mono text-sm">{user?.id}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Change Password Card */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+          <CardContent className="p-6 space-y-4">
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
               <KeyRound className="h-5 w-5 text-primary" />
               Change Password
-            </CardTitle>
-            <CardDescription>Update your account password</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="new-password">New Password</Label>
-              <div className="relative max-w-md">
-                <Input
-                  id="new-password"
-                  type={showNewPassword ? "text" : "password"}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password"
-                  className="bg-background border-border pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <div className="relative">
+                  <Input id="new-password" type={showNewPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Enter new password" className="bg-background border-border pr-10" />
+                  <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                <PasswordStrengthIndicator password={newPassword} />
               </div>
-              <PasswordStrengthIndicator password={newPassword} />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm New Password</Label>
-              <div className="relative max-w-md">
-                <Input
-                  id="confirm-password"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm new password"
-                  className="bg-background border-border pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <div className="relative">
+                  <Input id="confirm-password" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Confirm new password" className="bg-background border-border pr-10" />
+                  <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
             </div>
-
             <Button
+              disabled={changingPassword || !newPassword || !confirmPassword}
+              className="gap-2"
               onClick={async () => {
                 if (newPassword.length < 8) {
-                  toast({
-                    title: 'Password too short',
-                    description: 'Password must be at least 8 characters',
-                    variant: 'destructive',
-                  });
+                  toast({ title: 'Password too short', description: 'Password must be at least 8 characters', variant: 'destructive' });
                   return;
                 }
                 if (!isPasswordStrong(newPassword)) {
-                  toast({
-                    title: 'Weak Password',
-                    description: 'Please choose a stronger password that meets all requirements',
-                    variant: 'destructive',
-                  });
+                  toast({ title: 'Weak Password', description: 'Please choose a stronger password', variant: 'destructive' });
                   return;
                 }
                 if (newPassword !== confirmPassword) {
-                  toast({
-                    title: 'Passwords do not match',
-                    description: 'Please make sure both passwords are the same',
-                    variant: 'destructive',
-                  });
+                  toast({ title: 'Passwords do not match', description: 'Please make sure both passwords are the same', variant: 'destructive' });
                   return;
                 }
-
                 setChangingPassword(true);
                 try {
-                  const { error } = await supabase.auth.updateUser({
-                    password: newPassword,
-                  });
-
+                  const { error } = await supabase.auth.updateUser({ password: newPassword });
                   if (error) throw error;
-
-                  toast({
-                    title: 'Success',
-                    description: 'Your password has been updated',
-                  });
+                  toast({ title: 'Success', description: 'Your password has been updated' });
                   setNewPassword('');
                   setConfirmPassword('');
                 } catch (error: any) {
-                  console.error('Error changing password:', error);
-                  toast({
-                    title: 'Error',
-                    description: error.message || 'Failed to update password',
-                    variant: 'destructive',
-                  });
+                  toast({ title: 'Error', description: error.message || 'Failed to update password', variant: 'destructive' });
                 } finally {
                   setChangingPassword(false);
                 }
               }}
-              disabled={changingPassword || !newPassword || !confirmPassword}
-              className="gap-2"
             >
-              {changingPassword ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <KeyRound className="h-4 w-4" />
-              )}
+              {changingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
               Update Password
             </Button>
           </CardContent>
