@@ -115,12 +115,29 @@ const CyberTimeTravel = () => {
               </button>
             )}
           </div>
-          <div className="flex gap-2 flex-wrap">
-            {categories.map(cat => (
-              <Button key={cat} variant={catFilter === cat ? 'default' : 'outline'} size="sm" onClick={() => setCatFilter(cat)}>
-                {cat}
-              </Button>
-            ))}
+          <div className="flex gap-2 flex-wrap items-center justify-between">
+            <div className="flex gap-2 flex-wrap">
+              {categories.map(cat => (
+                <Button key={cat} variant={catFilter === cat ? 'default' : 'outline'} size="sm" onClick={() => setCatFilter(cat)}>
+                  {cat}
+                </Button>
+              ))}
+            </div>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[180px]">
+                <ArrowUpDown className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Sort by..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="latest">Latest Year</SelectItem>
+                <SelectItem value="year-asc">Year (Oldest)</SelectItem>
+                <SelectItem value="year-desc">Year (Newest)</SelectItem>
+                <SelectItem value="severity">Critical Level</SelectItem>
+                <SelectItem value="name-asc">A - Z</SelectItem>
+                <SelectItem value="name-desc">Z - A</SelectItem>
+                <SelectItem value="impact">Impact (Highest)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
