@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Shield, User, LogOut, Settings, Menu, X, ChevronDown } from "lucide-react";
+import { User, LogOut, Settings, Menu, X, ChevronDown } from "lucide-react";
+import logo from "@/assets/logo.png";
 import { useAuth } from "@/context/AuthContext";
 import {
   DropdownMenu,
@@ -65,7 +66,7 @@ export const Navigation: React.FC = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <Shield className="h-8 w-8 text-primary cyber-glow" />
+          <img src={logo} alt="CyberQuest" className="h-8 w-8" />
           <h1 className="text-xl md:text-2xl font-cyber font-bold cyber-glow">
             CyberQuest
           </h1>
@@ -175,7 +176,7 @@ export const Navigation: React.FC = () => {
                 <SheetContent side="right" className="w-[280px] bg-background border-border">
                   <SheetHeader className="border-b border-border pb-4">
                     <SheetTitle className="flex items-center gap-2">
-                      <Shield className="h-6 w-6 text-primary" />
+                      <img src={logo} alt="CyberQuest" className="h-6 w-6" />
                       <span className="font-cyber">CyberQuest</span>
                     </SheetTitle>
                   </SheetHeader>
@@ -270,7 +271,7 @@ export const Navigation: React.FC = () => {
                 <SheetContent side="right" className="w-[280px] bg-background border-border">
                   <SheetHeader className="border-b border-border pb-4">
                     <SheetTitle className="flex items-center gap-2">
-                      <Shield className="h-6 w-6 text-primary" />
+                      <img src={logo} alt="CyberQuest" className="h-6 w-6" />
                       <span className="font-cyber">CyberQuest</span>
                     </SheetTitle>
                   </SheetHeader>
