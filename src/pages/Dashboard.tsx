@@ -501,6 +501,73 @@ const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
 
+          {/* Beginner Toolkit Recommendation */}
+          <Card className="cyber-bg border-primary/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-primary" />
+                {level <= 3 ? 'Beginner' : level <= 7 ? 'Intermediate' : 'Advanced'} Toolkit
+              </CardTitle>
+              <CardDescription>
+                Recommended tools for your current skill level (Level {level})
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {(() => {
+                const toolkits: Record<string, { tools: string[]; tip: string }> = {
+                  beginner: {
+                    tools: ['Wireshark', 'Nmap', 'Kali Linux', 'OWASP ZAP'],
+                    tip: 'Start by learning to analyze network traffic with Wireshark, then explore scanning with Nmap. Kali Linux gives you a full security lab out of the box.',
+                  },
+                  intermediate: {
+                    tools: ['Burp Suite', 'Nmap', 'Nikto', 'John the Ripper', 'Aircrack-ng'],
+                    tip: 'Focus on web application testing with Burp Suite and Nikto. Practice password cracking techniques ethically with John the Ripper.',
+                  },
+                  advanced: {
+                    tools: ['Metasploit', 'Ghidra', 'Hashcat', 'Maltego', 'Burp Suite'],
+                    tip: 'Master exploitation frameworks with Metasploit, reverse engineering with Ghidra, and OSINT gathering with Maltego.',
+                  },
+                };
+                const tier = level <= 3 ? 'beginner' : level <= 7 ? 'intermediate' : 'advanced';
+                const kit = toolkits[tier];
+                const recommended = securityTools.filter(t => kit.tools.includes(t.name));
+
+                return (
+                  <>
+                    <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                      <p className="text-sm text-muted-foreground">
+                        <span className="font-semibold text-foreground">💡 Pro Tip:</span> {kit.tip}
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {recommended.map((tool, i) => (
+                        <a
+                          key={tool.name}
+                          href={tool.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center gap-3 p-3 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all"
+                        >
+                          <div className="flex items-center justify-center h-8 w-8 rounded-md bg-primary/20 text-primary font-bold text-sm shrink-0">
+                            {i + 1}
+                          </div>
+                          <div className={`h-8 w-8 rounded-md flex items-center justify-center shrink-0 ${tool.color}`}>
+                            <tool.icon className="h-4 w-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-semibold group-hover:text-primary transition-colors">{tool.name}</h4>
+                            <p className="text-[11px] text-muted-foreground truncate">{tool.description}</p>
+                          </div>
+                          <Download className="h-4 w-4 text-muted-foreground shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </a>
+                      ))}
+                    </div>
+                  </>
+                );
+              })()}
+            </CardContent>
+          </Card>
+
           {/* Security Tools Downloads */}
           <Card className="cyber-bg border-primary/30">
             <CardHeader>
