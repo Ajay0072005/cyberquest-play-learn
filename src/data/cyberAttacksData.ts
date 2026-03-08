@@ -46,6 +46,7 @@ export const cyberAttacks: CyberAttack[] = [
       { question: 'Why did hospitals (NHS) suffer the most?', answer: 'Many NHS systems ran unpatched Windows XP, which was end-of-life and did not receive the MS17-010 patch initially.' },
       { question: 'How was the attack slowed down?', answer: 'Security researcher Marcus Hutchins registered the kill switch domain hardcoded in the malware, which caused it to stop spreading.' },
     ],
+    documentationUrl: 'https://www.cisa.gov/news-events/alerts/2017/05/12/alert-wannacry-ransomware-attacks',
   },
   {
     id: 2, name: 'SolarWinds (Sunburst)', year: 2020, category: 'Supply Chain', severity: 'Critical',
@@ -72,6 +73,7 @@ export const cyberAttacks: CyberAttack[] = [
       { question: 'What is a supply chain attack?', answer: 'An attack that compromises a trusted vendor or software provider to distribute malware to all of their customers through legitimate update channels.' },
       { question: 'What defensive measure could have limited damage?', answer: 'Zero Trust architecture — not trusting internal traffic by default — combined with network segmentation and behavioral anomaly detection on DNS queries.' },
     ],
+    documentationUrl: 'https://www.cisa.gov/news-events/alerts/2020/12/13/alert-aa20-352a-advanced-network-supply-chain-compromise-affecting-communications-equipment',
   },
   {
     id: 3, name: 'NotPetya', year: 2017, category: 'Wiper/Ransomware', severity: 'Critical',
