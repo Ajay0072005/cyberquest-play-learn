@@ -61,10 +61,10 @@
     --gradient-void: linear-gradient(180deg, hsl(220 26% 14%), hsl(220 26% 17%));
     --gradient-glow: radial-gradient(circle, hsl(88 76% 44% / 0.15), transparent);
 
-    /* Glowing Shadows */
-    --shadow-neon: 0 0 20px hsl(88 76% 44% / 0.3);
-    --shadow-cyber: 0 10px 30px hsl(88 76% 44% / 0.15);
-    --glow-intense: 0 0 40px hsl(88 76% 44% / 0.4);
+    /* Subtle Shadows */
+    --shadow-neon: 0 2px 8px hsl(0 0% 0% / 0.2);
+    --shadow-cyber: 0 4px 12px hsl(0 0% 0% / 0.15);
+    --glow-intense: 0 2px 8px hsl(0 0% 0% / 0.2);
 
     /* Animations */
     --transition-cyber: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
