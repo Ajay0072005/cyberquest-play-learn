@@ -59,8 +59,8 @@ export const AchievementBadge = ({
               'relative rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer',
               sizeClasses[size],
               earned
-                ? 'bg-gradient-to-br from-primary/20 to-primary/40 border-2 border-primary shadow-[0_0_15px_rgba(0,255,0,0.3)] hover:shadow-[0_0_25px_rgba(0,255,0,0.5)]'
-                : 'bg-muted/50 border-2 border-border/50 opacity-50 grayscale'
+                ? 'bg-gradient-to-br from-primary/20 to-primary/40 border-2 border-primary hover:animate-pulse-badge hover:scale-110'
+                : 'bg-muted/50 border-2 border-border/50 opacity-50 grayscale hover:opacity-70'
             )}
           >
             {earned ? (

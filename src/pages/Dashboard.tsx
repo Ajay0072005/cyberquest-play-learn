@@ -204,36 +204,36 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-colors">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 stagger-children">
+        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift group">
           <CardContent className="p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total XP</p>
-                <p className="text-2xl md:text-3xl font-cyber font-bold text-primary cyber-glow">{points.toLocaleString()} XP</p>
+                <p className="text-2xl md:text-3xl font-cyber font-bold text-primary">{points.toLocaleString()} XP</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center group-hover:animate-level-up">
                 <Trophy className="h-6 w-6 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-colors">
+        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift group">
           <CardContent className="p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Challenges</p>
                 <p className="text-2xl md:text-3xl font-cyber font-bold text-blue-400">{totalChallengesCompleted}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-full bg-blue-500/20 flex items-center justify-center group-hover:animate-level-up">
                 <Target className="h-6 w-6 text-blue-400" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-colors">
+        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift group">
           <CardContent className="p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -241,13 +241,13 @@ const Dashboard: React.FC = () => {
                 <p className="text-2xl md:text-3xl font-cyber font-bold text-orange-400">{currentStreak} day{currentStreak !== 1 ? 's' : ''}</p>
               </div>
               <div className="h-12 w-12 rounded-full bg-orange-500/20 flex items-center justify-center">
-                <Flame className="h-6 w-6 text-orange-400" />
+                <Flame className={`h-6 w-6 text-orange-400 ${currentStreak >= 3 ? 'animate-streak-fire' : ''}`} />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-colors">
+        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift group">
           <CardContent className="p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -256,7 +256,7 @@ const Dashboard: React.FC = () => {
                   {achievements.filter(a => a.unlocked).length}/{achievements.length}
                 </p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-purple-500/20 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:animate-pulse-badge">
                 <Award className="h-6 w-6 text-purple-400" />
               </div>
             </div>
@@ -340,7 +340,7 @@ const Dashboard: React.FC = () => {
               </CardHeader>
               <CardContent>
                 {recentAchievements.length > 0 ? (
-                  <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                  <div className="flex flex-wrap gap-4 justify-center md:justify-start stagger-children">
                     {recentAchievements.map((achievement) => (
                       <AchievementBadge
                         key={achievement.id}
@@ -374,7 +374,7 @@ const Dashboard: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {recentActivity.map((activity, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/30 transition-colors">
+                  <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/30 transition-all hover-lift">
                     <div className="flex items-center gap-3">
                       {activity.type === 'challenge' ? (
                         <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
@@ -404,9 +404,9 @@ const Dashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="challenges">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger-children">
             {challengeCategories.map((category) => (
-              <Card key={category.name} className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover:scale-[1.02]">
+              <Card key={category.name} className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift">
                 <CardContent className="p-6">
                   <div className={`h-12 w-12 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center mb-4`}>
                     <Shield className="h-6 w-6 text-white" />
@@ -427,7 +427,7 @@ const Dashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="achievements">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger-children">
             {achievements.map((achievement) => (
               <Card 
                 key={achievement.name} 
