@@ -10,10 +10,10 @@ const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const getColor = (count: number) => {
-  if (count === 0) return 'bg-muted/50';
-  if (count === 1) return 'bg-amber-500';
-  if (count === 2) return 'bg-lime-500';
-  return 'bg-green-600';
+  if (count === 0) return 'bg-secondary/40';
+  if (count === 1) return 'bg-amber-400';
+  if (count === 2) return 'bg-cyan-400';
+  return 'bg-primary';
 };
 
 const getColorLabel = (count: number) => {
