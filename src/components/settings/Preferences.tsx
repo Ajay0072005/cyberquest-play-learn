@@ -299,12 +299,101 @@ const Preferences = () => {
           </div>
 
           {/* Profile Privacy */}
-          <div className="flex items-center justify-between py-4 last:pb-0">
+          <div className="flex items-center justify-between py-4">
             <div>
               <p className="font-semibold text-foreground">Make my profile Private</p>
               <p className="text-sm text-muted-foreground">You can hide your profile from search, leaderboards, and other users.</p>
             </div>
             <Switch checked={isPrivate} onCheckedChange={handlePrivacyChange} disabled={saving} />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Theme Customization */}
+      <Card className="bg-card border-border">
+        <CardContent className="p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-foreground flex items-center gap-2">
+                <Palette className="h-4 w-4 text-primary" />
+                Theme Customization
+              </p>
+              <p className="text-sm text-muted-foreground">Personalize colors and corner roundness</p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => { resetToDefault(); toast({ title: 'Theme reset', description: 'Default theme restored' }); }} className="gap-1.5 text-muted-foreground hover:text-foreground">
+              <RotateCcw className="h-3.5 w-3.5" />
+              Reset
+            </Button>
+          </div>
+
+          {/* Color Theme Presets */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-foreground">Color Theme</Label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {THEME_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  onClick={() => { setPreset(preset.id); toast({ title: 'Theme updated', description: `Switched to ${preset.name}` }); }}
+                  className={cn(
+                    'relative flex items-center gap-3 p-3 rounded-lg border transition-all text-left',
+                    currentPresetId === preset.id
+                      ? 'border-primary bg-primary/10 ring-1 ring-primary'
+                      : 'border-border bg-background hover:border-muted-foreground/50'
+                  )}
+                >
+                  <div
+                    className="w-8 h-8 rounded-full shrink-0 border-2 border-background shadow-sm"
+                    style={{ backgroundColor: `hsl(${preset.primary})` }}
+                  />
+                  <span className="text-sm font-medium text-foreground truncate">{preset.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Border Radius */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium text-foreground">Corner Roundness</Label>
+              <span className="text-xs text-muted-foreground font-mono">{borderRadius}rem</span>
+            </div>
+            <Slider
+              value={[borderRadius]}
+              onValueChange={([v]) => setBorderRadius(v)}
+              min={0}
+              max={1.5}
+              step={0.125}
+              className="w-full"
+            />
+            <div className="flex items-center gap-4 mt-2">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="w-8 h-6 border border-border bg-muted/30" style={{ borderRadius: '0px' }} />
+                Sharp
+              </div>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground ml-auto">
+                <div className="w-8 h-6 border border-border bg-muted/30" style={{ borderRadius: '12px' }} />
+                Rounded
+              </div>
+            </div>
+          </div>
+
+          {/* Live Preview */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-foreground">Preview</Label>
+            <div className="p-4 rounded-lg border border-border bg-background">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center" style={{ borderRadius: `calc(${borderRadius}rem - 2px)` }}>
+                  <Palette className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-foreground">Sample Card</p>
+                  <p className="text-xs text-muted-foreground">This is how your UI elements will look</p>
+                </div>
+                <Button size="sm" style={{ borderRadius: `calc(${borderRadius}rem - 2px)` }}>
+                  Button
+                </Button>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
