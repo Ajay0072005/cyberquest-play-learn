@@ -10,10 +10,10 @@ const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const getColor = (count: number) => {
-  if (count === 0) return 'bg-muted/50';
-  if (count === 1) return 'bg-amber-500';
-  if (count === 2) return 'bg-lime-500';
-  return 'bg-green-600';
+  if (count === 0) return 'bg-secondary/40';
+  if (count === 1) return 'bg-amber-400';
+  if (count === 2) return 'bg-cyan-400';
+  return 'bg-primary';
 };
 
 const getColorLabel = (count: number) => {
@@ -167,10 +167,10 @@ const ActivityHeatmap = () => {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-3 text-xs text-muted-foreground border border-border rounded-md px-3 py-1.5">
             <span className="font-medium">Key</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-muted/50" /> No activity</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-amber-500" /> 1 event</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-lime-500" /> 2 events</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-green-600" /> ≥ 3 events</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-secondary/40" /> No activity</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-amber-400" /> 1 event</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-cyan-400" /> 2 events</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-primary" /> ≥ 3 events</span>
           </div>
           <div className="border border-border rounded-md px-3 py-1.5 text-xs text-muted-foreground">
             Total events this year <span className="text-foreground font-bold text-sm ml-1">{totalEvents}</span>
