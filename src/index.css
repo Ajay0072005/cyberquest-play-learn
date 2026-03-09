@@ -8,32 +8,32 @@
 
 @layer base {
   :root {
-    /* Core Dark Theme */
-    --background: 215 25% 15%;
+    /* TryHackMe Dark Theme */
+    --background: 220 26% 14%;
     --foreground: 0 0% 95%;
 
     /* Card System */
-    --card: 215 25% 18%;
+    --card: 220 26% 17%;
     --card-foreground: 0 0% 95%;
 
     /* Interactive Elements */
-    --popover: 215 25% 18%;
+    --popover: 220 26% 17%;
     --popover-foreground: 0 0% 95%;
 
-    /* Bright Blue Primary */
-    --primary: 195 100% 50%;
-    --primary-foreground: 215 25% 15%;
+    /* TryHackMe Green Primary */
+    --primary: 88 76% 44%;
+    --primary-foreground: 220 26% 10%;
 
     /* Dark Secondary */
-    --secondary: 215 25% 20%;
+    --secondary: 220 26% 20%;
     --secondary-foreground: 0 0% 95%;
 
     /* Muted Elements */
-    --muted: 215 25% 20%;
-    --muted-foreground: 0 0% 70%;
+    --muted: 220 26% 20%;
+    --muted-foreground: 220 10% 60%;
 
-    /* Blue Accent */
-    --accent: 215 25% 20%;
+    /* Accent */
+    --accent: 220 26% 22%;
     --accent-foreground: 0 0% 95%;
 
     /* Danger/Alert */
@@ -41,30 +41,30 @@
     --destructive-foreground: 0 0% 95%;
 
     /* Borders & Inputs */
-    --border: 215 25% 25%;
-    --input: 215 25% 18%;
-    --ring: 195 100% 50%;
+    --border: 220 20% 22%;
+    --input: 220 26% 17%;
+    --ring: 88 76% 44%;
 
-    --radius: 3rem;
+    --radius: 0.5rem;
 
-    /* Cyber Colors - Blue Theme */
-    --cyber-green: 195 100% 50%;
-    --cyber-green-glow: 195 100% 60%;
-    --electric-blue: 195 100% 50%;
+    /* Cyber Colors - TryHackMe Green */
+    --cyber-green: 88 76% 44%;
+    --cyber-green-glow: 88 76% 55%;
+    --electric-blue: 200 80% 50%;
     --neon-purple: 300 100% 60%;
-    --dark-void: 215 25% 15%;
-    --dark-surface: 215 25% 18%;
-    --terminal-green: 195 100% 45%;
+    --dark-void: 220 26% 14%;
+    --dark-surface: 220 26% 17%;
+    --terminal-green: 88 76% 44%;
 
-    /* Dark Gradients */
-    --gradient-cyber: linear-gradient(135deg, hsl(195 100% 50%), hsl(195 100% 60%));
-    --gradient-void: linear-gradient(180deg, hsl(215 25% 15%), hsl(215 25% 18%));
-    --gradient-glow: radial-gradient(circle, hsl(195 100% 50% / 0.15), transparent);
+    /* TryHackMe Gradients */
+    --gradient-cyber: linear-gradient(135deg, hsl(88 76% 44%), hsl(88 76% 55%));
+    --gradient-void: linear-gradient(180deg, hsl(220 26% 14%), hsl(220 26% 17%));
+    --gradient-glow: radial-gradient(circle, hsl(88 76% 44% / 0.15), transparent);
 
     /* Glowing Shadows */
-    --shadow-neon: 0 0 20px hsl(195 100% 50% / 0.3);
-    --shadow-cyber: 0 10px 30px hsl(195 100% 50% / 0.2);
-    --glow-intense: 0 0 40px hsl(195 100% 50% / 0.4);
+    --shadow-neon: 0 0 20px hsl(88 76% 44% / 0.3);
+    --shadow-cyber: 0 10px 30px hsl(88 76% 44% / 0.15);
+    --glow-intense: 0 0 40px hsl(88 76% 44% / 0.4);
 
     /* Animations */
     --transition-cyber: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -74,18 +74,18 @@
     --font-cyber: 'Orbitron', monospace;
     --font-terminal: 'Fira Code', monospace;
 
-    --sidebar-background: 215 25% 15%;
+    --sidebar-background: 220 26% 12%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 195 100% 50%;
-    --sidebar-primary-foreground: 215 25% 15%;
-    --sidebar-accent: 215 25% 18%;
+    --sidebar-primary: 88 76% 44%;
+    --sidebar-primary-foreground: 220 26% 10%;
+    --sidebar-accent: 220 26% 17%;
     --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 215 25% 25%;
-    --sidebar-ring: 195 100% 50%;
-    --shadow-sm: -2px 1px 0px 10px hsla(0, 0%, 0%, 0);
-    --shadow: -2px 1px 0px 10px hsla(0, 0%, 0%, 0);
-    --shadow-md: -2px 1px 0px 10px hsla(0, 0%, 0%, 0);
-    --shadow-lg: -2px 1px 0px 10px hsla(0, 0%, 0%, 0);
+    --sidebar-border: 220 20% 22%;
+    --sidebar-ring: 88 76% 44%;
+    --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.1);
+    --shadow: 0 2px 4px hsl(0 0% 0% / 0.1);
+    --shadow-md: 0 4px 8px hsl(0 0% 0% / 0.15);
+    --shadow-lg: 0 8px 16px hsl(0 0% 0% / 0.2);
   }
 
   .dark {
