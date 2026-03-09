@@ -133,6 +133,7 @@ const App = () => (
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
+        </ThemeInitializer>
       </GameProvider>
     </AuthProvider>
   </QueryClientProvider>
