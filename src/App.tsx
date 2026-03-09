@@ -32,8 +32,14 @@ import CyberGame from "./pages/CyberGame";
 import CyberNews from "./pages/CyberNews";
 import CyberTimeTravel from "./pages/CyberTimeTravel";
 import AboutUs from "./pages/AboutUs";
+import { useThemeCustomization } from "./hooks/useThemeCustomization";
 
 const queryClient = new QueryClient();
+
+const ThemeInitializer = ({ children }: { children: React.ReactNode }) => {
+  useThemeCustomization();
+  return <>{children}</>;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
