@@ -4,11 +4,13 @@ import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { SlidersHorizontal, Loader2, Save, Bot, MapPin, ChevronDown } from 'lucide-react';
+import { SlidersHorizontal, Loader2, Save, Bot, MapPin, ChevronDown, Palette, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useThemeCustomization, THEME_PRESETS } from '@/hooks/useThemeCustomization';
 
 const LOCATIONS = [
   'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda',
