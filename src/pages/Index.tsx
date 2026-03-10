@@ -116,10 +116,10 @@ const Index = () => {
           </div>
           
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-cyber font-bold mb-4 cyber-glow">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
               Start Training
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Practice your skills with hands-on challenges and level up on your journey
             </p>
           </div>
