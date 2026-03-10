@@ -65,7 +65,7 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
   };
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/50 cyber-bg">
+    <Card className="group hover:shadow-md transition-all duration-200 border-border hover:border-primary/40">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -73,7 +73,7 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
               <IconComponent className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-lg font-cyber group-hover:cyber-glow transition-all duration-300">
+              <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors">
                 {title}
               </CardTitle>
               <p className="text-sm text-muted-foreground mt-1">{category}</p>
@@ -98,15 +98,14 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
           </div>
           <div className="w-full bg-muted rounded-full h-2">
             <div
-              className="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-500 shadow-sm"
+              className="bg-primary h-2 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
         <Button 
-          variant="cyber" 
-          className="w-full group-hover:shadow-cyber transition-all duration-300"
+          className="w-full"
           onClick={handleStartChallenge}
         >
           {completed === 0 ? "Start Challenge" : "Continue"}

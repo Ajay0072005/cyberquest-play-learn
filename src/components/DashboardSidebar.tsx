@@ -62,7 +62,7 @@ export const DashboardSidebar: React.FC = () => {
         <Link to="/" className={cn("flex items-center gap-2", collapsed && "justify-center w-full")}>
           <img src={logo} alt="CyberQuest" className="h-8 w-8 flex-shrink-0" />
           {!collapsed && (
-            <span className="text-xl font-cyber font-bold cyber-glow">CyberQuest</span>
+            <span className="text-xl font-cyber font-bold text-foreground">CyberQuest</span>
           )}
         </Link>
         <Button
@@ -91,7 +91,7 @@ export const DashboardSidebar: React.FC = () => {
                 collapsed && "justify-center px-2"
               )}
             >
-              <item.icon className={cn("h-5 w-5 flex-shrink-0", isActive && "cyber-glow")} />
+              <item.icon className={cn("h-5 w-5 flex-shrink-0", isActive && "text-primary")} />
               {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
             </Link>
           );

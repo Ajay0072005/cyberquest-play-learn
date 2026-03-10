@@ -176,88 +176,88 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-4">
-          <Avatar className="h-14 w-14 md:h-16 md:w-16 border-2 border-primary/50">
+          <Avatar className="h-14 w-14 md:h-16 md:w-16 border-2 border-border">
             <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback className="bg-primary/20 text-primary text-xl font-cyber">
+            <AvatarFallback className="bg-primary/10 text-primary text-xl font-semibold">
               {username.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-2xl md:text-3xl font-cyber font-bold cyber-glow">
-              Welcome, {username}!
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+              Welcome back, {username}
             </h1>
-            <p className="text-muted-foreground text-sm md:text-base">
+            <p className="text-muted-foreground text-sm">
               Ready to level up your cybersecurity skills?
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Badge variant="outline" className="px-3 py-1.5 border-primary/50 text-primary">
-            <Flame className="h-4 w-4 mr-1" />
+          <Badge variant="outline" className="px-3 py-1.5 border-border text-foreground">
+            <Flame className="h-4 w-4 mr-1 text-primary" />
             Level {level}
           </Badge>
-          <Badge variant="outline" className="px-3 py-1.5 border-secondary/50">
-            <Star className="h-4 w-4 mr-1" />
+          <Badge variant="outline" className="px-3 py-1.5 border-border text-foreground">
+            <Star className="h-4 w-4 mr-1 text-primary" />
             {points} XP
           </Badge>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 stagger-children">
-        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift group">
-          <CardContent className="p-4 md:p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card className="border-border hover:border-primary/40 transition-colors">
+          <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total XP</p>
-                <p className="text-2xl md:text-3xl font-cyber font-bold text-primary">{points.toLocaleString()} XP</p>
+                <p className="text-sm text-muted-foreground mb-1">Total XP</p>
+                <p className="text-2xl font-bold text-foreground">{points.toLocaleString()}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center group-hover:animate-level-up">
-                <Trophy className="h-6 w-6 text-primary" />
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Trophy className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift group">
-          <CardContent className="p-4 md:p-6">
+        <Card className="border-border hover:border-primary/40 transition-colors">
+          <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Challenges</p>
-                <p className="text-2xl md:text-3xl font-cyber font-bold text-blue-400">{totalChallengesCompleted}</p>
+                <p className="text-sm text-muted-foreground mb-1">Challenges</p>
+                <p className="text-2xl font-bold text-foreground">{totalChallengesCompleted}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-blue-500/20 flex items-center justify-center group-hover:animate-level-up">
-                <Target className="h-6 w-6 text-blue-400" />
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Target className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift group">
-          <CardContent className="p-4 md:p-6">
+        <Card className="border-border hover:border-primary/40 transition-colors">
+          <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Current Streak</p>
-                <p className="text-2xl md:text-3xl font-cyber font-bold text-orange-400">{currentStreak} day{currentStreak !== 1 ? 's' : ''}</p>
+                <p className="text-sm text-muted-foreground mb-1">Current Streak</p>
+                <p className="text-2xl font-bold text-foreground">{currentStreak} day{currentStreak !== 1 ? 's' : ''}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-orange-500/20 flex items-center justify-center">
-                <Flame className={`h-6 w-6 text-orange-400 ${currentStreak >= 3 ? 'animate-streak-fire' : ''}`} />
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Flame className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift group">
-          <CardContent className="p-4 md:p-6">
+        <Card className="border-border hover:border-primary/40 transition-colors">
+          <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Achievements</p>
-                <p className="text-2xl md:text-3xl font-cyber font-bold text-purple-400">
+                <p className="text-sm text-muted-foreground mb-1">Achievements</p>
+                <p className="text-2xl font-bold text-foreground">
                   {achievements.filter(a => a.unlocked).length}/{achievements.length}
                 </p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:animate-pulse-badge">
-                <Award className="h-6 w-6 text-purple-400" />
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Award className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardContent>
@@ -265,15 +265,15 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* CyberQuest 3D Banner */}
-      <Card className="mb-8 border-primary/30 bg-gradient-to-r from-primary/10 via-card to-purple-500/10 overflow-hidden hover:border-primary/50 transition-colors cursor-pointer group" onClick={() => navigate('/cyber-game')}>
-        <CardContent className="p-4 md:p-6 flex items-center justify-between gap-4">
+      <Card className="mb-8 border-border bg-card overflow-hidden hover:border-primary/40 transition-colors cursor-pointer group" onClick={() => navigate('/cyber-game')}>
+        <CardContent className="p-5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Gamepad2 className="h-6 w-6 text-primary" />
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Gamepad2 className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h3 className="font-cyber font-bold text-lg text-foreground">Play CyberQuest 3D</h3>
-              <p className="text-sm text-muted-foreground">Explore a neon cyber city and solve 5 cybersecurity missions</p>
+              <h3 className="font-semibold text-foreground">Play CyberQuest 3D</h3>
+              <p className="text-sm text-muted-foreground">Explore a cyber city and solve 5 security missions</p>
             </div>
           </div>
           <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
@@ -292,7 +292,7 @@ const Dashboard: React.FC = () => {
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Challenge Categories */}
-            <Card className="cyber-bg border-primary/30">
+            <Card className="border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Shield className="h-5 w-5 text-primary" />
@@ -320,7 +320,7 @@ const Dashboard: React.FC = () => {
             </Card>
 
             {/* Recently Unlocked Achievements */}
-            <Card className="cyber-bg border-primary/30">
+            <Card className="border-border">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2 text-lg">
@@ -340,7 +340,7 @@ const Dashboard: React.FC = () => {
               </CardHeader>
               <CardContent>
                 {recentAchievements.length > 0 ? (
-                  <div className="flex flex-wrap gap-4 justify-center md:justify-start stagger-children">
+                  <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                     {recentAchievements.map((achievement) => (
                       <AchievementBadge
                         key={achievement.id}
@@ -365,7 +365,7 @@ const Dashboard: React.FC = () => {
             </Card>
 
             {/* Recent Activity */}
-            <Card className="cyber-bg border-primary/30">
+            <Card className="border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Clock className="h-5 w-5 text-secondary" />
@@ -374,7 +374,7 @@ const Dashboard: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {recentActivity.map((activity, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/30 transition-all hover-lift">
+                  <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/30 transition-colors">
                     <div className="flex items-center gap-3">
                       {activity.type === 'challenge' ? (
                         <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
@@ -404,9 +404,9 @@ const Dashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="challenges">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger-children">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {challengeCategories.map((category) => (
-              <Card key={category.name} className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift">
+              <Card key={category.name} className="border-border hover:border-primary/40 transition-colors">
                 <CardContent className="p-6">
                   <div className={`h-12 w-12 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center mb-4`}>
                     <Shield className="h-6 w-6 text-white" />
@@ -427,11 +427,11 @@ const Dashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="achievements">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger-children">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {achievements.map((achievement) => (
               <Card 
                 key={achievement.name} 
-                className={`cyber-bg transition-all ${
+                className={`transition-colors ${
                   achievement.unlocked 
                     ? 'border-primary/50 hover:border-primary' 
                     : 'border-border/50 opacity-60'
@@ -466,7 +466,7 @@ const Dashboard: React.FC = () => {
 
         <TabsContent value="tools" className="space-y-6">
           {/* Beginner Toolkit Recommendation */}
-          <Card className="cyber-bg border-primary/30">
+           <Card className="border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Zap className="h-5 w-5 text-primary" />
@@ -543,7 +543,7 @@ const Dashboard: React.FC = () => {
           </Card>
 
           {/* Security Tools Downloads */}
-          <Card className="cyber-bg border-primary/30">
+          <Card className="border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Download className="h-5 w-5 text-primary" />

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Fira+Code:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&family=Fira+Code:wght@300;400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -138,16 +138,17 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
-    font-family: 'Orbitron', monospace;
+    @apply bg-background text-foreground;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
 @layer components {
-  /* Cyber Text Effects */
+  /* Cyber Text Effects — subtle */
   .cyber-glow {
     color: hsl(var(--primary));
-    text-shadow: 0 0 10px hsl(var(--cyber-green) / 0.6);
   }
   
   .terminal-text {
@@ -156,7 +157,7 @@
   }
   
   .glitch-effect {
-    animation: glitch 2s infinite;
+    /* disabled for cleaner feel */
   }
   
   /* Simple Border */
@@ -194,19 +195,10 @@
     @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-md;
   }
 
-  /* Staggered Children Animation */
+  /* Staggered Children Animation — subtle */
   .stagger-children > * {
-    @apply opacity-0 animate-fade-in;
+    @apply animate-fade-in;
   }
-  .stagger-children > *:nth-child(1) { animation-delay: 0ms; }
-  .stagger-children > *:nth-child(2) { animation-delay: 60ms; }
-  .stagger-children > *:nth-child(3) { animation-delay: 120ms; }
-  .stagger-children > *:nth-child(4) { animation-delay: 180ms; }
-  .stagger-children > *:nth-child(5) { animation-delay: 240ms; }
-  .stagger-children > *:nth-child(6) { animation-delay: 300ms; }
-  .stagger-children > *:nth-child(7) { animation-delay: 360ms; }
-  .stagger-children > *:nth-child(8) { animation-delay: 420ms; }
-  .stagger-children > *:nth-child(9) { animation-delay: 480ms; }
 
   /* Link underline animation */
   .story-link * {

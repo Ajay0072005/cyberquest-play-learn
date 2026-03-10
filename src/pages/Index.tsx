@@ -40,10 +40,10 @@ const Index = () => {
       <section className="py-20 bg-gradient-to-b from-background to-muted/20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-cyber font-bold mb-4 cyber-glow">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
               Your Cybersecurity Journey
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               From complete beginner to elite pentester — follow the path and unlock your potential
             </p>
           </div>
@@ -63,12 +63,12 @@ const Index = () => {
                   }`}
                 >
                   {/* Timeline dot */}
-                  <div className="absolute left-8 md:left-1/2 w-4 h-4 rounded-full bg-primary border-4 border-background transform -translate-x-1/2 z-10 shadow-[0_0_15px_hsl(var(--primary))]" />
+                  <div className="absolute left-8 md:left-1/2 w-3 h-3 rounded-full bg-primary border-2 border-background transform -translate-x-1/2 z-10" />
                   
                   {/* Card */}
                   <div className={`ml-16 md:ml-0 md:w-[calc(50%-2rem)] ${index % 2 === 0 ? 'md:pr-8' : 'md:pl-8'}`}>
                     <Link to={`/path/${stage.slug}`}>
-                      <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover:scale-[1.02] group cursor-pointer">
+                      <Card className="border-border hover:border-primary/40 transition-all hover:scale-[1.01] group cursor-pointer">
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
                             <div className={`h-14 w-14 rounded-xl bg-gradient-to-br ${stage.color} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
@@ -76,10 +76,10 @@ const Index = () => {
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xs font-cyber text-primary">LEVEL {stage.level}</span>
+                                <span className="text-xs text-primary font-medium">LEVEL {stage.level}</span>
                                 <ChevronRight className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                               </div>
-                              <h3 className="text-xl font-cyber font-bold mb-2 group-hover:text-primary transition-colors">
+                              <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
                                 {stage.title}
                               </h3>
                               <p className="text-sm text-muted-foreground mb-4">
@@ -116,10 +116,10 @@ const Index = () => {
           </div>
           
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-cyber font-bold mb-4 cyber-glow">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
               Start Training
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Practice your skills with hands-on challenges and level up on your journey
             </p>
           </div>
