@@ -176,88 +176,88 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-4">
-          <Avatar className="h-14 w-14 md:h-16 md:w-16 border-2 border-primary/50">
+          <Avatar className="h-14 w-14 md:h-16 md:w-16 border-2 border-border">
             <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback className="bg-primary/20 text-primary text-xl font-cyber">
+            <AvatarFallback className="bg-primary/10 text-primary text-xl font-semibold">
               {username.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-2xl md:text-3xl font-cyber font-bold cyber-glow">
-              Welcome, {username}!
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+              Welcome back, {username}
             </h1>
-            <p className="text-muted-foreground text-sm md:text-base">
+            <p className="text-muted-foreground text-sm">
               Ready to level up your cybersecurity skills?
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Badge variant="outline" className="px-3 py-1.5 border-primary/50 text-primary">
-            <Flame className="h-4 w-4 mr-1" />
+          <Badge variant="outline" className="px-3 py-1.5 border-border text-foreground">
+            <Flame className="h-4 w-4 mr-1 text-primary" />
             Level {level}
           </Badge>
-          <Badge variant="outline" className="px-3 py-1.5 border-secondary/50">
-            <Star className="h-4 w-4 mr-1" />
+          <Badge variant="outline" className="px-3 py-1.5 border-border text-foreground">
+            <Star className="h-4 w-4 mr-1 text-primary" />
             {points} XP
           </Badge>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 stagger-children">
-        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift group">
-          <CardContent className="p-4 md:p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card className="border-border hover:border-primary/40 transition-colors">
+          <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total XP</p>
-                <p className="text-2xl md:text-3xl font-cyber font-bold text-primary">{points.toLocaleString()} XP</p>
+                <p className="text-sm text-muted-foreground mb-1">Total XP</p>
+                <p className="text-2xl font-bold text-foreground">{points.toLocaleString()}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center group-hover:animate-level-up">
-                <Trophy className="h-6 w-6 text-primary" />
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Trophy className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift group">
-          <CardContent className="p-4 md:p-6">
+        <Card className="border-border hover:border-primary/40 transition-colors">
+          <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Challenges</p>
-                <p className="text-2xl md:text-3xl font-cyber font-bold text-blue-400">{totalChallengesCompleted}</p>
+                <p className="text-sm text-muted-foreground mb-1">Challenges</p>
+                <p className="text-2xl font-bold text-foreground">{totalChallengesCompleted}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-blue-500/20 flex items-center justify-center group-hover:animate-level-up">
-                <Target className="h-6 w-6 text-blue-400" />
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Target className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift group">
-          <CardContent className="p-4 md:p-6">
+        <Card className="border-border hover:border-primary/40 transition-colors">
+          <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Current Streak</p>
-                <p className="text-2xl md:text-3xl font-cyber font-bold text-orange-400">{currentStreak} day{currentStreak !== 1 ? 's' : ''}</p>
+                <p className="text-sm text-muted-foreground mb-1">Current Streak</p>
+                <p className="text-2xl font-bold text-foreground">{currentStreak} day{currentStreak !== 1 ? 's' : ''}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-orange-500/20 flex items-center justify-center">
-                <Flame className={`h-6 w-6 text-orange-400 ${currentStreak >= 3 ? 'animate-streak-fire' : ''}`} />
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Flame className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift group">
-          <CardContent className="p-4 md:p-6">
+        <Card className="border-border hover:border-primary/40 transition-colors">
+          <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Achievements</p>
-                <p className="text-2xl md:text-3xl font-cyber font-bold text-purple-400">
+                <p className="text-sm text-muted-foreground mb-1">Achievements</p>
+                <p className="text-2xl font-bold text-foreground">
                   {achievements.filter(a => a.unlocked).length}/{achievements.length}
                 </p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:animate-pulse-badge">
-                <Award className="h-6 w-6 text-purple-400" />
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Award className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardContent>
