@@ -105,8 +105,7 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
         </div>
 
         <Button 
-          variant="cyber" 
-          className="w-full group-hover:shadow-cyber transition-all duration-300"
+          className="w-full"
           onClick={handleStartChallenge}
         >
           {completed === 0 ? "Start Challenge" : "Continue"}

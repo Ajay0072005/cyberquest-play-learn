@@ -68,7 +68,7 @@ export const Navigation: React.FC = () => {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="CyberQuest" className="h-12 w-12" />
-          <h1 className="text-xl md:text-2xl font-cyber font-bold cyber-glow">
+          <h1 className="text-xl md:text-2xl font-cyber font-bold text-foreground">
             CyberQuest
           </h1>
         </Link>

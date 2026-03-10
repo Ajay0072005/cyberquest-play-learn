@@ -543,7 +543,7 @@ const Dashboard: React.FC = () => {
           </Card>
 
           {/* Security Tools Downloads */}
-          <Card className="cyber-bg border-primary/30">
+          <Card className="border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Download className="h-5 w-5 text-primary" />

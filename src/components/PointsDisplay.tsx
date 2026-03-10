@@ -11,16 +11,16 @@ export const PointsDisplay: React.FC = () => {
   const progress = ((points % 1000) / 1000) * 100;
 
   return (
-    <Card className="cyber-bg border-primary/30 animate-fade-in hover-lift transition-all">
+    <Card className="border-border">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-cyber-green animate-pulse-badge" />
-            <span className="font-cyber text-lg font-bold text-primary">
+            <Zap className="h-5 w-5 text-primary" />
+            <span className="text-lg font-semibold text-foreground">
               {points.toLocaleString()} XP
             </span>
           </div>
-          <Badge variant="outline" className="bg-cyber-blue/20 text-cyber-blue border-cyber-blue/30 animate-bounce-in">
+          <Badge variant="outline" className="border-border text-foreground">
             <Trophy className="h-3 w-3 mr-1" />
             Level {level}
           </Badge>
@@ -33,7 +33,7 @@ export const PointsDisplay: React.FC = () => {
           </div>
           <div className="w-full bg-muted rounded-full h-2">
             <div
-              className="bg-gradient-to-r from-cyber-green to-cyber-blue h-2 rounded-full transition-all duration-500 shadow-sm"
+              className="bg-primary h-2 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>

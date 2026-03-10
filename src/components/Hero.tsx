@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Code, Map } from "lucide-react";
+import { Play, Map } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/cyber-hero-bg.jpg";
 import logo from "@/assets/logo-transparent.png";

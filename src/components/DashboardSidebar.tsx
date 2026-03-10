@@ -91,7 +91,7 @@ export const DashboardSidebar: React.FC = () => {
                 collapsed && "justify-center px-2"
               )}
             >
-              <item.icon className={cn("h-5 w-5 flex-shrink-0", isActive && "cyber-glow")} />
+              <item.icon className={cn("h-5 w-5 flex-shrink-0", isActive && "text-primary")} />
               {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
             </Link>
           );
