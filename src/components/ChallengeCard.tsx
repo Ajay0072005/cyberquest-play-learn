@@ -73,7 +73,7 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
               <IconComponent className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-lg font-cyber group-hover:cyber-glow transition-all duration-300">
+              <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors">
                 {title}
               </CardTitle>
               <p className="text-sm text-muted-foreground mt-1">{category}</p>
