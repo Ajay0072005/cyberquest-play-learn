@@ -340,7 +340,7 @@ const Dashboard: React.FC = () => {
               </CardHeader>
               <CardContent>
                 {recentAchievements.length > 0 ? (
-                  <div className="flex flex-wrap gap-4 justify-center md:justify-start stagger-children">
+                  <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                     {recentAchievements.map((achievement) => (
                       <AchievementBadge
                         key={achievement.id}
