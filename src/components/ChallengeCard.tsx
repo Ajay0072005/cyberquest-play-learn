@@ -65,7 +65,7 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
   };
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/50 cyber-bg">
+    <Card className="group hover:shadow-md transition-all duration-200 border-border hover:border-primary/40">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
