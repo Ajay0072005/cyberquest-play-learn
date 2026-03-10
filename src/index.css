@@ -138,8 +138,10 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
-    font-family: 'Orbitron', monospace;
+    @apply bg-background text-foreground;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
