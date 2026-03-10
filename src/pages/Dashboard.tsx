@@ -292,7 +292,7 @@ const Dashboard: React.FC = () => {
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Challenge Categories */}
-            <Card className="cyber-bg border-primary/30">
+            <Card className="border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Shield className="h-5 w-5 text-primary" />
