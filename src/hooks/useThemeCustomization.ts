@@ -11,15 +11,35 @@ export interface ThemePreset {
 }
 
 export const THEME_PRESETS: ThemePreset[] = [
+  // Greens
   {
     id: 'tryhackme',
-    name: 'TryHackMe Green',
+    name: 'Hacker Green',
     primary: '88 76% 44%',
     accent: '220 26% 22%',
     background: '220 26% 14%',
     card: '220 26% 17%',
     foreground: '0 0% 95%',
   },
+  {
+    id: 'emerald',
+    name: 'Emerald',
+    primary: '160 84% 39%',
+    accent: '160 20% 20%',
+    background: '170 20% 11%',
+    card: '170 20% 15%',
+    foreground: '0 0% 95%',
+  },
+  {
+    id: 'mint',
+    name: 'Mint',
+    primary: '152 69% 53%',
+    accent: '155 20% 20%',
+    background: '160 18% 11%',
+    card: '160 18% 15%',
+    foreground: '0 0% 95%',
+  },
+  // Blues
   {
     id: 'ocean',
     name: 'Ocean Blue',
@@ -30,6 +50,25 @@ export const THEME_PRESETS: ThemePreset[] = [
     foreground: '0 0% 95%',
   },
   {
+    id: 'cobalt',
+    name: 'Cobalt',
+    primary: '225 73% 57%',
+    accent: '225 25% 20%',
+    background: '225 25% 11%',
+    card: '225 25% 15%',
+    foreground: '0 0% 95%',
+  },
+  {
+    id: 'sky',
+    name: 'Sky',
+    primary: '199 89% 48%',
+    accent: '200 25% 20%',
+    background: '205 25% 11%',
+    card: '205 25% 15%',
+    foreground: '0 0% 95%',
+  },
+  // Reds & Oranges
+  {
     id: 'ember',
     name: 'Ember Red',
     primary: '0 72% 51%',
@@ -39,8 +78,27 @@ export const THEME_PRESETS: ThemePreset[] = [
     foreground: '0 0% 95%',
   },
   {
+    id: 'rose',
+    name: 'Rose',
+    primary: '346 77% 50%',
+    accent: '345 20% 20%',
+    background: '345 15% 11%',
+    card: '345 15% 15%',
+    foreground: '0 0% 95%',
+  },
+  {
+    id: 'tangerine',
+    name: 'Tangerine',
+    primary: '25 95% 53%',
+    accent: '25 20% 20%',
+    background: '25 15% 11%',
+    card: '25 15% 15%',
+    foreground: '0 0% 95%',
+  },
+  // Purples & Pinks
+  {
     id: 'purple',
-    name: 'Neon Purple',
+    name: 'Violet',
     primary: '270 80% 60%',
     accent: '260 25% 22%',
     background: '260 25% 12%',
@@ -48,8 +106,27 @@ export const THEME_PRESETS: ThemePreset[] = [
     foreground: '0 0% 95%',
   },
   {
+    id: 'indigo',
+    name: 'Indigo',
+    primary: '243 75% 59%',
+    accent: '240 22% 20%',
+    background: '240 22% 11%',
+    card: '240 22% 15%',
+    foreground: '0 0% 95%',
+  },
+  {
+    id: 'fuchsia',
+    name: 'Fuchsia',
+    primary: '292 84% 61%',
+    accent: '290 22% 20%',
+    background: '290 20% 11%',
+    card: '290 20% 15%',
+    foreground: '0 0% 95%',
+  },
+  // Warm tones
+  {
     id: 'gold',
-    name: 'Gold Rush',
+    name: 'Gold',
     primary: '45 90% 50%',
     accent: '40 20% 22%',
     background: '40 15% 12%',
@@ -57,12 +134,50 @@ export const THEME_PRESETS: ThemePreset[] = [
     foreground: '0 0% 95%',
   },
   {
+    id: 'amber',
+    name: 'Amber',
+    primary: '38 92% 50%',
+    accent: '38 20% 20%',
+    background: '35 15% 11%',
+    card: '35 15% 15%',
+    foreground: '0 0% 95%',
+  },
+  // Cool tones
+  {
     id: 'cyan',
-    name: 'Cyber Cyan',
+    name: 'Cyan',
     primary: '180 80% 45%',
     accent: '185 25% 22%',
     background: '185 25% 12%',
     card: '185 25% 16%',
+    foreground: '0 0% 95%',
+  },
+  {
+    id: 'teal',
+    name: 'Teal',
+    primary: '173 80% 40%',
+    accent: '175 22% 20%',
+    background: '175 20% 11%',
+    card: '175 20% 15%',
+    foreground: '0 0% 95%',
+  },
+  // Neutrals
+  {
+    id: 'slate',
+    name: 'Slate',
+    primary: '215 20% 65%',
+    accent: '215 15% 20%',
+    background: '220 15% 11%',
+    card: '220 15% 15%',
+    foreground: '0 0% 95%',
+  },
+  {
+    id: 'zinc',
+    name: 'Zinc',
+    primary: '240 5% 65%',
+    accent: '240 5% 20%',
+    background: '240 6% 10%',
+    card: '240 6% 14%',
     foreground: '0 0% 95%',
   },
 ];
