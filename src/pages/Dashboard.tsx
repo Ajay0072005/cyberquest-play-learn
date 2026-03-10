@@ -466,7 +466,7 @@ const Dashboard: React.FC = () => {
 
         <TabsContent value="tools" className="space-y-6">
           {/* Beginner Toolkit Recommendation */}
-          <Card className="cyber-bg border-primary/30">
+           <Card className="border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Zap className="h-5 w-5 text-primary" />
