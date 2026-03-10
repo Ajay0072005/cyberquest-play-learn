@@ -62,7 +62,7 @@ export const DashboardSidebar: React.FC = () => {
         <Link to="/" className={cn("flex items-center gap-2", collapsed && "justify-center w-full")}>
           <img src={logo} alt="CyberQuest" className="h-8 w-8 flex-shrink-0" />
           {!collapsed && (
-            <span className="text-xl font-cyber font-bold cyber-glow">CyberQuest</span>
+            <span className="text-xl font-cyber font-bold text-foreground">CyberQuest</span>
           )}
         </Link>
         <Button
