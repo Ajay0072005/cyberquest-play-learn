@@ -98,7 +98,7 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({
           </div>
           <div className="w-full bg-muted rounded-full h-2">
             <div
-              className="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-500 shadow-sm"
+              className="bg-primary h-2 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
