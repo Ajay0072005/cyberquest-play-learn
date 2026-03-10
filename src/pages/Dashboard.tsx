@@ -365,7 +365,7 @@ const Dashboard: React.FC = () => {
             </Card>
 
             {/* Recent Activity */}
-            <Card className="cyber-bg border-primary/30">
+            <Card className="border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Clock className="h-5 w-5 text-secondary" />
