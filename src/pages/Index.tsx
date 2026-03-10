@@ -68,7 +68,7 @@ const Index = () => {
                   {/* Card */}
                   <div className={`ml-16 md:ml-0 md:w-[calc(50%-2rem)] ${index % 2 === 0 ? 'md:pr-8' : 'md:pl-8'}`}>
                     <Link to={`/path/${stage.slug}`}>
-                      <Card className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover:scale-[1.02] group cursor-pointer">
+                      <Card className="border-border hover:border-primary/40 transition-all hover:scale-[1.01] group cursor-pointer">
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
                             <div className={`h-14 w-14 rounded-xl bg-gradient-to-br ${stage.color} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
