@@ -76,10 +76,10 @@ const Index = () => {
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xs font-cyber text-primary">LEVEL {stage.level}</span>
+                                <span className="text-xs text-primary font-medium">LEVEL {stage.level}</span>
                                 <ChevronRight className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                               </div>
-                              <h3 className="text-xl font-cyber font-bold mb-2 group-hover:text-primary transition-colors">
+                              <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
                                 {stage.title}
                               </h3>
                               <p className="text-sm text-muted-foreground mb-4">
