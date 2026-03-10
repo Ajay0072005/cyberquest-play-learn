@@ -146,10 +146,9 @@
 }
 
 @layer components {
-  /* Cyber Text Effects */
+  /* Cyber Text Effects — subtle */
   .cyber-glow {
     color: hsl(var(--primary));
-    text-shadow: 0 0 10px hsl(var(--cyber-green) / 0.6);
   }
   
   .terminal-text {
