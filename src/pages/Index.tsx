@@ -40,10 +40,10 @@ const Index = () => {
       <section className="py-20 bg-gradient-to-b from-background to-muted/20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-cyber font-bold mb-4 cyber-glow">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
               Your Cybersecurity Journey
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               From complete beginner to elite pentester — follow the path and unlock your potential
             </p>
           </div>
