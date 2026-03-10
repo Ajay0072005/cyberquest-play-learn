@@ -374,7 +374,7 @@ const Dashboard: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {recentActivity.map((activity, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/30 transition-all hover-lift">
+                  <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/30 transition-colors">
                     <div className="flex items-center gap-3">
                       {activity.type === 'challenge' ? (
                         <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
