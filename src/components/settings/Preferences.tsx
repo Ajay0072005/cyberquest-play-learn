@@ -326,26 +326,26 @@ const Preferences = () => {
             </Button>
           </div>
 
-          {/* Color Theme Presets */}
+          {/* Color Palette */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium text-foreground">Color Theme</Label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <Label className="text-sm font-medium text-foreground">Color Palette</Label>
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
               {THEME_PRESETS.map((preset) => (
                 <button
                   key={preset.id}
                   onClick={() => { setPreset(preset.id); toast({ title: 'Theme updated', description: `Switched to ${preset.name}` }); }}
                   className={cn(
-                    'relative flex items-center gap-3 p-3 rounded-lg border transition-all text-left',
+                    'group flex flex-col items-center gap-2 p-3 rounded-lg border transition-all',
                     currentPresetId === preset.id
                       ? 'border-primary bg-primary/10 ring-1 ring-primary'
-                      : 'border-border bg-background hover:border-muted-foreground/50'
+                      : 'border-border bg-background hover:border-muted-foreground/40'
                   )}
                 >
                   <div
-                    className="w-8 h-8 rounded-full shrink-0 border-2 border-background shadow-sm"
+                    className="w-10 h-10 rounded-full shrink-0 shadow-sm ring-2 ring-background"
                     style={{ backgroundColor: `hsl(${preset.primary})` }}
                   />
-                  <span className="text-sm font-medium text-foreground truncate">{preset.name}</span>
+                  <span className="text-[11px] font-medium text-muted-foreground group-hover:text-foreground truncate w-full text-center">{preset.name}</span>
                 </button>
               ))}
             </div>
