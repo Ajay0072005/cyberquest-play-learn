@@ -427,11 +427,11 @@ const Dashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="achievements">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger-children">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {achievements.map((achievement) => (
               <Card 
                 key={achievement.name} 
-                className={`cyber-bg transition-all ${
+                className={`transition-colors ${
                   achievement.unlocked 
                     ? 'border-primary/50 hover:border-primary' 
                     : 'border-border/50 opacity-60'
