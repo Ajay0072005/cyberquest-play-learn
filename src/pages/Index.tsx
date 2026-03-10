@@ -63,7 +63,7 @@ const Index = () => {
                   }`}
                 >
                   {/* Timeline dot */}
-                  <div className="absolute left-8 md:left-1/2 w-4 h-4 rounded-full bg-primary border-4 border-background transform -translate-x-1/2 z-10 shadow-[0_0_15px_hsl(var(--primary))]" />
+                  <div className="absolute left-8 md:left-1/2 w-3 h-3 rounded-full bg-primary border-2 border-background transform -translate-x-1/2 z-10" />
                   
                   {/* Card */}
                   <div className={`ml-16 md:ml-0 md:w-[calc(50%-2rem)] ${index % 2 === 0 ? 'md:pr-8' : 'md:pl-8'}`}>
