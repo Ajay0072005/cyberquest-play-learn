@@ -404,9 +404,9 @@ const Dashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="challenges">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger-children">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {challengeCategories.map((category) => (
-              <Card key={category.name} className="cyber-bg border-primary/30 hover:border-primary/50 transition-all hover-lift">
+              <Card key={category.name} className="border-border hover:border-primary/40 transition-colors">
                 <CardContent className="p-6">
                   <div className={`h-12 w-12 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center mb-4`}>
                     <Shield className="h-6 w-6 text-white" />
