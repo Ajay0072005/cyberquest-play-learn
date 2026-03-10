@@ -157,7 +157,7 @@
   }
   
   .glitch-effect {
-    animation: glitch 2s infinite;
+    /* disabled for cleaner feel */
   }
   
   /* Simple Border */
