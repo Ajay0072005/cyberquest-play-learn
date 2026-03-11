@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,11 +10,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, MapPin, Github, Linkedin, Twitter, Globe, Lock, Trophy, Award, Pencil, Save } from 'lucide-react';
+import {
+  Loader2, MapPin, Github, Linkedin, Twitter, Globe, Lock, Trophy, Award,
+  Pencil, Save, User, FileText, Link2, Wrench, ShieldCheck, Heart, Activity, Sparkles, ChevronLeft, ChevronRight
+} from 'lucide-react';
 import { ProfileSection } from '@/components/profile/ProfileSection';
 import { TagInput } from '@/components/profile/TagInput';
 import AvatarCustomizer from '@/components/avatar/AvatarCustomizer';
 import ActivityHeatmap from '@/components/profile/ActivityHeatmap';
+import { cn } from '@/lib/utils';
 
 interface SocialLinks {
   github?: string;
@@ -24,12 +28,27 @@ interface SocialLinks {
   [key: string]: string | undefined;
 }
 
+const TABS = [
+  { id: 'overview', label: 'Overview', icon: User },
+  { id: 'summary', label: 'Summary', icon: FileText },
+  { id: 'socials', label: 'Socials', icon: Link2 },
+  { id: 'skills', label: 'Skills', icon: Wrench },
+  { id: 'certifications', label: 'Certifications', icon: ShieldCheck },
+  { id: 'interests', label: 'Interests', icon: Heart },
+  { id: 'activity', label: 'Yearly Activity', icon: Activity },
+  { id: 'avatar', label: 'AI Tutor', icon: Sparkles },
+] as const;
+
+type TabId = (typeof TABS)[number]['id'];
+
 const Profile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [achievementCount, setAchievementCount] = useState(0);
+  const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const tabsRef = useRef<HTMLDivElement>(null);
 
   // Profile data
   const [username, setUsername] = useState('');
@@ -105,6 +124,11 @@ const Profile = () => {
     return user?.email?.slice(0, 2).toUpperCase() || 'U';
   };
 
+  const scrollTabs = (direction: 'left' | 'right') => {
+    if (!tabsRef.current) return;
+    tabsRef.current.scrollBy({ left: direction === 'left' ? -200 : 200, behavior: 'smooth' });
+  };
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -119,97 +143,179 @@ const Profile = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 max-w-5xl mx-auto">
+      <div className="space-y-0 max-w-5xl mx-auto">
         {/* Profile Header */}
-        <Card className="bg-card border-border">
+        <Card className="bg-card border-border rounded-b-none">
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              <Avatar className="h-28 w-28 border-2 border-primary/30">
+              <Avatar className="h-24 w-24 border-2 border-primary/30">
                 <AvatarImage src={avatarUrl} alt={username || 'Avatar'} />
-                <AvatarFallback className="bg-primary/10 text-primary text-3xl font-bold">
+                <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
 
-              <div className="flex-1 space-y-1">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-xl md:text-2xl font-bold text-foreground truncate">
                     {username || 'Anonymous User'}
                   </h1>
-                  {username && <span className="text-muted-foreground text-sm">@{username}</span>}
+                  <Badge variant={isPublic ? 'default' : 'secondary'} className="gap-1 text-xs">
+                    {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+                    {isPublic ? 'Public' : 'Private'}
+                  </Badge>
                 </div>
                 {location && (
-                  <div className="flex items-center gap-1 text-muted-foreground text-sm">
+                  <div className="flex items-center gap-1 text-muted-foreground text-sm mt-1">
                     <MapPin className="h-3.5 w-3.5" /> {location}
                   </div>
                 )}
-                <div className="flex items-center gap-4 mt-2">
-                  <div className="flex items-center gap-1.5 text-sm">
-                    <Trophy className="h-4 w-4 text-primary" />
-                    <span className="text-foreground font-medium">{points}</span>
-                    <span className="text-muted-foreground">points</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-sm">
-                    <Award className="h-4 w-4 text-primary" />
-                    <span className="text-foreground font-medium">{achievementCount}</span>
-                    <span className="text-muted-foreground">achievements</span>
-                  </div>
-                </div>
+                <p className="text-muted-foreground text-sm mt-0.5">{user?.email}</p>
               </div>
 
-              <div className="flex items-center gap-2 self-start">
-                <Badge variant={isPublic ? 'default' : 'secondary'} className="gap-1.5">
-                  {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
-                  {isPublic ? 'Public' : 'Private'}
-                </Badge>
-                <Button variant="outline" size="sm" onClick={() => setEditingProfile(!editingProfile)} className="gap-1.5">
-                  <Pencil className="h-3.5 w-3.5" />
-                  Edit
-                </Button>
+              {/* Stats cards */}
+              <div className="grid grid-cols-2 gap-3 self-start">
+                <div className="bg-secondary/50 rounded-lg px-4 py-2.5 text-center min-w-[100px]">
+                  <p className="text-xs text-muted-foreground mb-0.5">Points</p>
+                  <div className="flex items-center justify-center gap-1.5">
+                    <Trophy className="h-4 w-4 text-primary" />
+                    <span className="text-lg font-bold text-foreground">{points}</span>
+                  </div>
+                </div>
+                <div className="bg-secondary/50 rounded-lg px-4 py-2.5 text-center min-w-[100px]">
+                  <p className="text-xs text-muted-foreground mb-0.5">Badges</p>
+                  <div className="flex items-center justify-center gap-1.5">
+                    <Award className="h-4 w-4 text-primary" />
+                    <span className="text-lg font-bold text-foreground">{achievementCount}</span>
+                  </div>
+                </div>
               </div>
             </div>
-
-            {editingProfile && (
-              <div className="mt-6 pt-6 border-t border-border space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
-                    <Input id="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username" className="bg-background border-border" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="location">Location</Label>
-                    <Input id="location" value={location} onChange={e => setLocation(e.target.value)} placeholder="e.g. India" className="bg-background border-border" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Visibility</Label>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant={isPublic ? 'default' : 'outline'} onClick={() => setIsPublic(true)}>
-                      <Globe className="h-3.5 w-3.5 mr-1" /> Public
-                    </Button>
-                    <Button size="sm" variant={!isPublic ? 'default' : 'outline'} onClick={() => setIsPublic(false)}>
-                      <Lock className="h-3.5 w-3.5 mr-1" /> Private
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" disabled={saving} onClick={async () => {
-                    await saveProfile({ username: username.trim() || null, location: location.trim() || null, is_public: isPublic });
-                    setEditingProfile(false);
-                  }}>
-                    {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                    <span className="ml-1">Save</span>
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => setEditingProfile(false)}>Cancel</Button>
-                </div>
-              </div>
-            )}
           </CardContent>
         </Card>
 
-        {/* Two-column layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-6">
+        {/* Tab Navigation */}
+        <div className="relative bg-card border-x border-b border-border">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-full rounded-none bg-gradient-to-r from-card to-transparent px-1 sm:hidden"
+            onClick={() => scrollTabs('left')}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+
+          <div
+            ref={tabsRef}
+            className="flex overflow-x-auto scrollbar-hide border-b border-border"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    'flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors relative shrink-0',
+                    isActive
+                      ? 'text-primary'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {tab.label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-full rounded-none bg-gradient-to-l from-card to-transparent px-1 sm:hidden"
+            onClick={() => scrollTabs('right')}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Tab Content */}
+        <div className="pt-6">
+          {/* Overview */}
+          {activeTab === 'overview' && (
+            <Card className="bg-card border-border">
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-foreground">Profile Details</h2>
+                  <Button variant="outline" size="sm" onClick={() => setEditingProfile(!editingProfile)} className="gap-1.5">
+                    <Pencil className="h-3.5 w-3.5" /> Edit
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Username</p>
+                    <p className="text-foreground font-medium">{username || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Location</p>
+                    <p className="text-foreground font-medium">{location || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Visibility</p>
+                    <p className="text-foreground font-medium">{isPublic ? 'Public' : 'Private'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Email</p>
+                    <p className="text-foreground font-medium">{user?.email || '—'}</p>
+                  </div>
+                </div>
+
+                {editingProfile && (
+                  <div className="pt-4 border-t border-border space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="username">Username</Label>
+                        <Input id="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username" className="bg-background border-border" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="location">Location</Label>
+                        <Input id="location" value={location} onChange={e => setLocation(e.target.value)} placeholder="e.g. India" className="bg-background border-border" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Visibility</Label>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant={isPublic ? 'default' : 'outline'} onClick={() => setIsPublic(true)}>
+                          <Globe className="h-3.5 w-3.5 mr-1" /> Public
+                        </Button>
+                        <Button size="sm" variant={!isPublic ? 'default' : 'outline'} onClick={() => setIsPublic(false)}>
+                          <Lock className="h-3.5 w-3.5 mr-1" /> Private
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" disabled={saving} onClick={async () => {
+                        await saveProfile({ username: username.trim() || null, location: location.trim() || null, is_public: isPublic });
+                        setEditingProfile(false);
+                      }}>
+                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                        <span className="ml-1">Save</span>
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEditingProfile(false)}>Cancel</Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Summary */}
+          {activeTab === 'summary' && (
             <ProfileSection title="Summary" placeholder="Tell the world about yourself..." isEmpty={!summary} addLabel="Add summary" isEditing={editingSummary} onEditToggle={setEditingSummary}
               editForm={
                 <div className="space-y-3">
@@ -224,41 +330,10 @@ const Profile = () => {
             >
               <p className="text-foreground text-sm whitespace-pre-wrap">{summary}</p>
             </ProfileSection>
+          )}
 
-            <ProfileSection title="Certifications" placeholder="Share your biggest achievements." isEmpty={certifications.length === 0} addLabel="Add certifications" isEditing={editingCerts} onEditToggle={setEditingCerts}
-              editForm={
-                <div className="space-y-3">
-                  <TagInput tags={certifications} onChange={setCertifications} placeholder="e.g. CEH, OSCP" suggestions={['CEH', 'OSCP', 'CISSP', 'CompTIA Security+', 'CompTIA Network+', 'CISM', 'CISA', 'GPEN', 'GCIH', 'GSEC', 'OSWE', 'OSCE', 'eJPT', 'eCPPT', 'AWS Security Specialty', 'Azure Security Engineer', 'CCNA Security', 'SSCP', 'CASP+', 'CySA+']} />
-                  <div className="flex gap-2">
-                    <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ certifications }); setEditingCerts(false); }}>Save</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setEditingCerts(false)}>Cancel</Button>
-                  </div>
-                </div>
-              }
-            >
-              <div className="flex flex-wrap gap-2">
-                {certifications.map(cert => <Badge key={cert} variant="secondary" className="px-3 py-1">{cert}</Badge>)}
-              </div>
-            </ProfileSection>
-
-            <ProfileSection title="Skills" placeholder="Show off your technical skills." isEmpty={skills.length === 0} addLabel="Add skills" isEditing={editingSkills} onEditToggle={setEditingSkills}
-              editForm={
-                <div className="space-y-3">
-                  <TagInput tags={skills} onChange={setSkills} placeholder="e.g. Penetration Testing, Python" suggestions={['Penetration Testing', 'Python', 'Network Security', 'Ethical Hacking', 'Malware Analysis', 'Reverse Engineering', 'Cryptography', 'Web Security', 'Cloud Security', 'Incident Response', 'Digital Forensics', 'OSINT', 'Social Engineering', 'Firewall Management', 'SIEM', 'Threat Modeling', 'Vulnerability Assessment', 'Linux', 'Bash Scripting', 'Wireshark']} />
-                  <div className="flex gap-2">
-                    <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ skills }); setEditingSkills(false); }}>Save</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setEditingSkills(false)}>Cancel</Button>
-                  </div>
-                </div>
-              }
-            >
-              <div className="flex flex-wrap gap-2">
-                {skills.map(skill => <Badge key={skill} className="bg-primary/10 text-primary border-primary/20 px-3 py-1">{skill}</Badge>)}
-              </div>
-            </ProfileSection>
-          </div>
-
-          <div className="space-y-6">
+          {/* Socials */}
+          {activeTab === 'socials' && (
             <ProfileSection title="Socials" placeholder="Add your social profiles." isEmpty={!hasSocials} addLabel="Add socials" isEditing={editingSocials} onEditToggle={setEditingSocials}
               editForm={
                 <div className="space-y-3">
@@ -292,7 +367,48 @@ const Profile = () => {
                 {socialLinks.website && <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"><Globe className="h-4 w-4" /> {socialLinks.website}</a>}
               </div>
             </ProfileSection>
+          )}
 
+          {/* Skills */}
+          {activeTab === 'skills' && (
+            <ProfileSection title="Skills" placeholder="Show off your technical skills." isEmpty={skills.length === 0} addLabel="Add skills" isEditing={editingSkills} onEditToggle={setEditingSkills}
+              editForm={
+                <div className="space-y-3">
+                  <TagInput tags={skills} onChange={setSkills} placeholder="e.g. Penetration Testing, Python" suggestions={['Penetration Testing', 'Python', 'Network Security', 'Ethical Hacking', 'Malware Analysis', 'Reverse Engineering', 'Cryptography', 'Web Security', 'Cloud Security', 'Incident Response', 'Digital Forensics', 'OSINT', 'Social Engineering', 'Firewall Management', 'SIEM', 'Threat Modeling', 'Vulnerability Assessment', 'Linux', 'Bash Scripting', 'Wireshark']} />
+                  <div className="flex gap-2">
+                    <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ skills }); setEditingSkills(false); }}>Save</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingSkills(false)}>Cancel</Button>
+                  </div>
+                </div>
+              }
+            >
+              <div className="flex flex-wrap gap-2">
+                {skills.map(skill => <Badge key={skill} className="bg-primary/10 text-primary border-primary/20 px-3 py-1">{skill}</Badge>)}
+              </div>
+            </ProfileSection>
+          )}
+
+          {/* Certifications */}
+          {activeTab === 'certifications' && (
+            <ProfileSection title="Certifications" placeholder="Share your biggest achievements." isEmpty={certifications.length === 0} addLabel="Add certifications" isEditing={editingCerts} onEditToggle={setEditingCerts}
+              editForm={
+                <div className="space-y-3">
+                  <TagInput tags={certifications} onChange={setCertifications} placeholder="e.g. CEH, OSCP" suggestions={['CEH', 'OSCP', 'CISSP', 'CompTIA Security+', 'CompTIA Network+', 'CISM', 'CISA', 'GPEN', 'GCIH', 'GSEC', 'OSWE', 'OSCE', 'eJPT', 'eCPPT', 'AWS Security Specialty', 'Azure Security Engineer', 'CCNA Security', 'SSCP', 'CASP+', 'CySA+']} />
+                  <div className="flex gap-2">
+                    <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ certifications }); setEditingCerts(false); }}>Save</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingCerts(false)}>Cancel</Button>
+                  </div>
+                </div>
+              }
+            >
+              <div className="flex flex-wrap gap-2">
+                {certifications.map(cert => <Badge key={cert} variant="secondary" className="px-3 py-1">{cert}</Badge>)}
+              </div>
+            </ProfileSection>
+          )}
+
+          {/* Interests */}
+          {activeTab === 'interests' && (
             <ProfileSection title="Top Interests" placeholder="Let us know your top interests." isEmpty={interests.length === 0} addLabel="Add interests" isEditing={editingInterests} onEditToggle={setEditingInterests}
               editForm={
                 <div className="space-y-3">
@@ -308,14 +424,14 @@ const Profile = () => {
                 {interests.map(interest => <Badge key={interest} variant="outline" className="border-primary/30 text-foreground px-3 py-1">{interest}</Badge>)}
               </div>
             </ProfileSection>
-          </div>
+          )}
+
+          {/* Yearly Activity */}
+          {activeTab === 'activity' && <ActivityHeatmap />}
+
+          {/* AI Tutor Avatar */}
+          {activeTab === 'avatar' && <AvatarCustomizer />}
         </div>
-
-        {/* Yearly Activity Heatmap */}
-        <ActivityHeatmap />
-
-        {/* AI Tutor Avatar */}
-        <AvatarCustomizer />
       </div>
     </DashboardLayout>
   );
