@@ -8,9 +8,10 @@ import { Slider } from '@/components/ui/slider';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { SlidersHorizontal, Loader2, Save, Bot, MapPin, ChevronDown, Palette, RotateCcw } from 'lucide-react';
+import { SlidersHorizontal, Loader2, Save, Bot, MapPin, ChevronDown, Palette, RotateCcw, Moon, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useThemeCustomization, THEME_PRESETS } from '@/hooks/useThemeCustomization';
+import { useTheme } from 'next-themes';
 
 const LOCATIONS = [
   'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda',
