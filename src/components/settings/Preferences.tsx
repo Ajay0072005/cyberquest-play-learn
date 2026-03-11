@@ -8,9 +8,10 @@ import { Slider } from '@/components/ui/slider';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { SlidersHorizontal, Loader2, Save, Bot, MapPin, ChevronDown, Palette, RotateCcw } from 'lucide-react';
+import { SlidersHorizontal, Loader2, Save, Bot, MapPin, ChevronDown, Palette, RotateCcw, Moon, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useThemeCustomization, THEME_PRESETS } from '@/hooks/useThemeCustomization';
+import { useTheme } from 'next-themes';
 
 const LOCATIONS = [
   'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda',
@@ -66,6 +67,7 @@ const Preferences = () => {
   const locationRef = useRef<HTMLDivElement>(null);
 
   const { currentPresetId, borderRadius, setPreset, setBorderRadius, resetToDefault } = useThemeCustomization();
+  const { theme, setTheme } = useTheme();
 
   const filteredLocations = LOCATIONS.filter(l =>
     l.toLowerCase().includes(locationInput.toLowerCase())
@@ -305,6 +307,28 @@ const Preferences = () => {
               <p className="text-sm text-muted-foreground">You can hide your profile from search, leaderboards, and other users.</p>
             </div>
             <Switch checked={isPrivate} onCheckedChange={handlePrivacyChange} disabled={saving} />
+          </div>
+
+          {/* Dark Mode */}
+          <div className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-3">
+              {theme === 'dark' ? (
+                <Moon className="h-4 w-4 text-primary" />
+              ) : (
+                <Sun className="h-4 w-4 text-primary" />
+              )}
+              <div>
+                <p className="font-semibold text-foreground">Dark Mode</p>
+                <p className="text-sm text-muted-foreground">Toggle between light and dark appearance.</p>
+              </div>
+            </div>
+            <Switch
+              checked={theme === 'dark'}
+              onCheckedChange={(checked) => {
+                setTheme(checked ? 'dark' : 'light');
+                toast({ title: 'Theme updated', description: checked ? 'Dark mode enabled' : 'Light mode enabled' });
+              }}
+            />
           </div>
         </CardContent>
       </Card>

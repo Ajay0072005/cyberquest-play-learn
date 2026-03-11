@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "next-themes";
 import { GameProvider } from "@/context/GameContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -42,101 +43,51 @@ const ThemeInitializer = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <GameProvider>
-        <ThemeInitializer>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <BottomNav />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<AboutUs />} />
-              <Route path="/roadmap" element={<Roadmap />} />
-              <Route path="/cyber-game" element={
-                <ProtectedRoute>
-                  <CyberGame />
-                </ProtectedRoute>
-              } />
-              <Route path="/path/:slug" element={<CareerPath />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/sql-game" element={
-                <ProtectedRoute>
-                  <SQLGame />
-                </ProtectedRoute>
-              } />
-              <Route path="/crypto-puzzles" element={
-                <ProtectedRoute>
-                  <CryptoPuzzles />
-                </ProtectedRoute>
-              } />
-              <Route path="/terminal" element={
-                <ProtectedRoute>
-                  <Terminal />
-                </ProtectedRoute>
-              } />
-              <Route path="/settings" element={
-                <ProtectedRoute>
-                  <ProfileSettings />
-                </ProtectedRoute>
-              } />
-              <Route path="/profile" element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              } />
-              <Route path="/leaderboard" element={<Leaderboard />} />
-              <Route path="/chat" element={
-                <ProtectedRoute>
-                  <Chat />
-                </ProtectedRoute>
-              } />
-              <Route path="/achievements" element={
-                <ProtectedRoute>
-                  <Achievements />
-                </ProtectedRoute>
-              } />
-              <Route path="/sherlock-course" element={
-                <ProtectedRoute>
-                  <SherlockCourse />
-                </ProtectedRoute>
-              } />
-              <Route path="/practical-labs" element={
-                <ProtectedRoute>
-                  <PracticalLabs />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/roles" element={
-                <ProtectedRoute>
-                  <AdminRoles />
-                </ProtectedRoute>
-              } />
-              <Route path="/moderator" element={
-                <ProtectedRoute>
-                  <ModeratorDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/cyber-news" element={<ProtectedRoute><CyberNews /></ProtectedRoute>} />
-              <Route path="/time-travel" element={<ProtectedRoute><CyberTimeTravel /></ProtectedRoute>} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-        </ThemeInitializer>
-      </GameProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+  <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="cyberquest-theme">
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <GameProvider>
+          <ThemeInitializer>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <BottomNav />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/about" element={<AboutUs />} />
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/sql-game" element={<ProtectedRoute><SQLGame /></ProtectedRoute>} />
+                <Route path="/crypto-puzzles" element={<ProtectedRoute><CryptoPuzzles /></ProtectedRoute>} />
+                <Route path="/terminal" element={<ProtectedRoute><Terminal /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+                <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+                <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
+                <Route path="/sherlock" element={<ProtectedRoute><SherlockCourse /></ProtectedRoute>} />
+                <Route path="/labs" element={<ProtectedRoute><PracticalLabs /></ProtectedRoute>} />
+                <Route path="/career-path" element={<ProtectedRoute><CareerPath /></ProtectedRoute>} />
+                <Route path="/admin/roles" element={<ProtectedRoute><AdminRoles /></ProtectedRoute>} />
+                <Route path="/moderator" element={<ProtectedRoute><ModeratorDashboard /></ProtectedRoute>} />
+                <Route path="/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />
+                <Route path="/cyber-game" element={<ProtectedRoute><CyberGame /></ProtectedRoute>} />
+                <Route path="/cyber-news" element={<ProtectedRoute><CyberNews /></ProtectedRoute>} />
+                <Route path="/time-travel" element={<ProtectedRoute><CyberTimeTravel /></ProtectedRoute>} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+          </ThemeInitializer>
+        </GameProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;
