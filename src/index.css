@@ -8,46 +8,103 @@
 
 @layer base {
   :root {
+    /* Light Theme */
+    --background: 0 0% 98%;
+    --foreground: 220 20% 16%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 16%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 16%;
+
+    --primary: 88 76% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 92%;
+    --secondary-foreground: 220 20% 16%;
+
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 220 14% 92%;
+    --accent-foreground: 220 20% 16%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 14% 88%;
+    --input: 220 14% 92%;
+    --ring: 88 76% 38%;
+
+    --radius: 0.5rem;
+
+    --cyber-green: 88 76% 38%;
+    --cyber-green-glow: 88 76% 48%;
+    --electric-blue: 200 80% 50%;
+    --neon-purple: 300 100% 60%;
+    --dark-void: 0 0% 98%;
+    --dark-surface: 0 0% 100%;
+    --terminal-green: 88 76% 38%;
+
+    --gradient-cyber: linear-gradient(135deg, hsl(88 76% 38%), hsl(88 76% 48%));
+    --gradient-void: linear-gradient(180deg, hsl(0 0% 98%), hsl(0 0% 100%));
+    --gradient-glow: radial-gradient(circle, hsl(88 76% 38% / 0.08), transparent);
+
+    --shadow-neon: 0 2px 8px hsl(0 0% 0% / 0.06);
+    --shadow-cyber: 0 4px 12px hsl(0 0% 0% / 0.05);
+    --glow-intense: 0 2px 8px hsl(0 0% 0% / 0.06);
+
+    --transition-cyber: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-glow: box-shadow 0.3s ease-in-out;
+
+    --font-cyber: 'Orbitron', monospace;
+    --font-terminal: 'Fira Code', monospace;
+
+    --sidebar-background: 0 0% 97%;
+    --sidebar-foreground: 220 20% 16%;
+    --sidebar-primary: 88 76% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 94%;
+    --sidebar-accent-foreground: 220 20% 16%;
+    --sidebar-border: 220 14% 88%;
+    --sidebar-ring: 88 76% 38%;
+    --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.04);
+    --shadow: 0 2px 4px hsl(0 0% 0% / 0.05);
+    --shadow-md: 0 4px 8px hsl(0 0% 0% / 0.06);
+    --shadow-lg: 0 8px 16px hsl(0 0% 0% / 0.08);
+  }
+
+  .dark {
     /* TryHackMe Dark Theme */
     --background: 220 26% 14%;
     --foreground: 0 0% 95%;
 
-    /* Card System */
     --card: 220 26% 17%;
     --card-foreground: 0 0% 95%;
 
-    /* Interactive Elements */
     --popover: 220 26% 17%;
     --popover-foreground: 0 0% 95%;
 
-    /* TryHackMe Green Primary */
     --primary: 88 76% 44%;
     --primary-foreground: 220 26% 10%;
 
-    /* Dark Secondary */
     --secondary: 220 26% 20%;
     --secondary-foreground: 0 0% 95%;
 
-    /* Muted Elements */
     --muted: 220 26% 20%;
     --muted-foreground: 220 10% 60%;
 
-    /* Accent */
     --accent: 220 26% 22%;
     --accent-foreground: 0 0% 95%;
 
-    /* Danger/Alert */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 95%;
 
-    /* Borders & Inputs */
     --border: 220 20% 22%;
     --input: 220 26% 17%;
     --ring: 88 76% 44%;
 
-    --radius: 0.5rem;
-
-    /* Cyber Colors - TryHackMe Green */
     --cyber-green: 88 76% 44%;
     --cyber-green-glow: 88 76% 55%;
     --electric-blue: 200 80% 50%;
@@ -56,21 +113,17 @@
     --dark-surface: 220 26% 17%;
     --terminal-green: 88 76% 44%;
 
-    /* TryHackMe Gradients */
     --gradient-cyber: linear-gradient(135deg, hsl(88 76% 44%), hsl(88 76% 55%));
     --gradient-void: linear-gradient(180deg, hsl(220 26% 14%), hsl(220 26% 17%));
     --gradient-glow: radial-gradient(circle, hsl(88 76% 44% / 0.15), transparent);
 
-    /* Subtle Shadows */
     --shadow-neon: 0 2px 8px hsl(0 0% 0% / 0.2);
     --shadow-cyber: 0 4px 12px hsl(0 0% 0% / 0.15);
     --glow-intense: 0 2px 8px hsl(0 0% 0% / 0.2);
 
-    /* Animations */
     --transition-cyber: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-glow: box-shadow 0.3s ease-in-out;
 
-    /* Typography */
     --font-cyber: 'Orbitron', monospace;
     --font-terminal: 'Fira Code', monospace;
 
@@ -86,49 +139,6 @@
     --shadow: 0 2px 4px hsl(0 0% 0% / 0.1);
     --shadow-md: 0 4px 8px hsl(0 0% 0% / 0.15);
     --shadow-lg: 0 8px 16px hsl(0 0% 0% / 0.2);
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-    --radius: 3rem;
-    --shadow-sm: -2px 1px 0px 10px hsla(0, 0%, 0%, 0);
-    --shadow: -2px 1px 0px 10px hsla(0, 0%, 0%, 0);
-    --shadow-md: -2px 1px 0px 10px hsla(0, 0%, 0%, 0);
-    --shadow-lg: -2px 1px 0px 10px hsla(0, 0%, 0%, 0);
   }
 }
 
