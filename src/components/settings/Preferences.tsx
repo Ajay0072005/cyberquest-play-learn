@@ -67,6 +67,7 @@ const Preferences = () => {
   const locationRef = useRef<HTMLDivElement>(null);
 
   const { currentPresetId, borderRadius, setPreset, setBorderRadius, resetToDefault } = useThemeCustomization();
+  const { theme, setTheme } = useTheme();
 
   const filteredLocations = LOCATIONS.filter(l =>
     l.toLowerCase().includes(locationInput.toLowerCase())
