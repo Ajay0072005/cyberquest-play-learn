@@ -308,6 +308,28 @@ const Preferences = () => {
             </div>
             <Switch checked={isPrivate} onCheckedChange={handlePrivacyChange} disabled={saving} />
           </div>
+
+          {/* Dark Mode */}
+          <div className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-3">
+              {theme === 'dark' ? (
+                <Moon className="h-4 w-4 text-primary" />
+              ) : (
+                <Sun className="h-4 w-4 text-primary" />
+              )}
+              <div>
+                <p className="font-semibold text-foreground">Dark Mode</p>
+                <p className="text-sm text-muted-foreground">Toggle between light and dark appearance.</p>
+              </div>
+            </div>
+            <Switch
+              checked={theme === 'dark'}
+              onCheckedChange={(checked) => {
+                setTheme(checked ? 'dark' : 'light');
+                toast({ title: 'Theme updated', description: checked ? 'Dark mode enabled' : 'Light mode enabled' });
+              }}
+            />
+          </div>
         </CardContent>
       </Card>
 
