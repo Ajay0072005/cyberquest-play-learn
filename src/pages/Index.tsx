@@ -18,7 +18,7 @@ const Index = () => {
       category: "Hands-on Training",
       challenges: 10,
       completed: 0,
-      link: "/practical-labs",
+      link: "/labs",
     },
     {
       title: "Sherlock Course",

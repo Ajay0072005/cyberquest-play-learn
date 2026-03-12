@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
   { to: "/dashboard", label: "Home", icon: Home },
-  { to: "/practical-labs", label: "Labs", icon: FlaskConical },
+  { to: "/labs", label: "Labs", icon: FlaskConical },
   { to: "/leaderboard", label: "Ranks", icon: Trophy },
   { to: "/settings", label: "Profile", icon: Settings },
 ];
