@@ -43,7 +43,7 @@ export default function Roadmap() {
             <p className="text-muted-foreground mb-6">
               Explore courses, challenges, and labs with new content added every week!
             </p>
-            <Button variant="outline" size="lg" onClick={() => navigate("/practical-labs")}>
+            <Button variant="outline" size="lg" onClick={() => navigate("/labs")}>
               Explore more
             </Button>
           </div>

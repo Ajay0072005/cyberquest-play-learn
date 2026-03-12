@@ -27,7 +27,7 @@ import { useState } from 'react';
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
   { icon: BookOpen, label: 'Sherlock Course', path: '/sherlock-course' },
-  { icon: FlaskConical, label: 'Practical Labs', path: '/practical-labs' },
+  { icon: FlaskConical, label: 'Practical Labs', path: '/labs' },
   { icon: Award, label: 'Achievements', path: '/achievements' },
   { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
   { icon: MessageSquare, label: 'AI Chat', path: '/chat' },
