@@ -405,7 +405,7 @@ export const careerPaths: CareerPathData[] = [
         type: "simulation",
         estimatedTime: "5 hours",
         points: 900,
-        link: "/sherlock-course"
+        link: "/sherlock"
       }
     ]
   }
