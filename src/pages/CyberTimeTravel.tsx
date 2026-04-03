@@ -20,7 +20,16 @@ import {
 } from '@/components/ui/select';
 import { cyberAttacks, CyberAttack } from '@/data/cyberAttacksData';
 
-const categories = ['All', 'Ransomware', 'Data Breach', 'Supply Chain', 'Zero-Day', 'Nation-State', 'Wiper', 'DDoS', 'Social Engineering', 'ICS', 'Espionage'];
+const categories = ['All', 'Ransomware', 'Data Breach', 'Supply Chain', 'Zero-Day', 'Nation-State', 'Wiper', 'DDoS', 'Social Engineering', 'ICS', 'Espionage', 'Worm', 'Malware', 'Vulnerability'];
+
+const eras = [
+  { id: 'all', label: 'All Eras', range: [0, 9999] as [number, number] },
+  { id: 'dawn', label: '🌅 Dawn of Hacking (1988–1999)', range: [1988, 1999] as [number, number], description: 'The internet was young and undefended. Early worms, viruses, and the first cyber espionage campaigns emerged.' },
+  { id: 'worm-wars', label: '🐛 Worm Wars (2000–2005)', range: [2000, 2005] as [number, number], description: 'Self-propagating worms ravaged the internet. Code Red, Nimda, SQL Slammer, and Blaster caused global disruption.' },
+  { id: 'apt-rise', label: '🕵️ Rise of APTs (2006–2012)', range: [2006, 2012] as [number, number], description: 'Nation-states weaponized cyberspace. Stuxnet, GhostNet, and Aurora ushered in state-sponsored cyber warfare.' },
+  { id: 'mega-breach', label: '💥 Mega Breach Era (2013–2018)', range: [2013, 2018] as [number, number], description: 'Massive data breaches exposed billions of records. Ransomware industrialized. NotPetya caused $10B+ in damages.' },
+  { id: 'modern', label: '🔮 Modern Threats (2019–2024)', range: [2019, 2024] as [number, number], description: 'Supply chain attacks, zero-days at scale, and AI-driven threats define the current landscape.' },
+];
 
 const severityColor: Record<string, string> = {
   Critical: 'bg-red-500/20 text-red-400 border-red-500/30',
@@ -31,19 +40,23 @@ const severityColor: Record<string, string> = {
 const CyberTimeTravel = () => {
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('All');
-  const [sortBy, setSortBy] = useState('latest');
+  const [eraFilter, setEraFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('year-asc');
   const [selectedAttack, setSelectedAttack] = useState<CyberAttack | null>(null);
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
 
+  const selectedEra = eras.find(e => e.id === eraFilter) || eras[0];
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
+    const [minYear, maxYear] = selectedEra.range;
     let result = cyberAttacks.filter(a => {
       const matchesCat = catFilter === 'All' || a.category.toLowerCase().includes(catFilter.toLowerCase());
       const matchesSearch = !q || a.name.toLowerCase().includes(q) || a.summary.toLowerCase().includes(q) || a.target.toLowerCase().includes(q) || a.attackVector.toLowerCase().includes(q) || String(a.year).includes(q);
-      return matchesCat && matchesSearch;
+      const matchesEra = eraFilter === 'all' || (a.year >= minYear && a.year <= maxYear);
+      return matchesCat && matchesSearch && matchesEra;
     });
 
-    // Apply sorting
     switch (sortBy) {
       case 'year-asc':
         result.sort((a, b) => a.year - b.year);
@@ -70,7 +83,15 @@ const CyberTimeTravel = () => {
     }
 
     return result;
-  }, [search, catFilter, sortBy]);
+  }, [search, catFilter, eraFilter, sortBy, selectedEra]);
+
+  // Group attacks by era for the timeline view
+  const groupedByEra = useMemo(() => {
+    return eras.slice(1).map(era => ({
+      ...era,
+      attacks: filtered.filter(a => a.year >= era.range[0] && a.year <= era.range[1]),
+    })).filter(era => era.attacks.length > 0);
+  }, [filtered]);
 
   const toggleAnswer = (idx: number) => {
     setRevealedAnswers(prev => {
@@ -95,9 +116,33 @@ const CyberTimeTravel = () => {
           </div>
           <div>
             <h1 className="text-2xl font-cyber font-bold text-foreground">Cyber Time Travel</h1>
-            <p className="text-sm text-muted-foreground">Investigate the top 50 cyber attacks in history</p>
+            <p className="text-sm text-muted-foreground">Investigate cyber attacks from 1988 to 2024 — categorized by evolution era</p>
           </div>
         </div>
+
+        {/* Era Selector */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+          {eras.map(era => (
+            <button
+              key={era.id}
+              onClick={() => setEraFilter(era.id)}
+              className={`px-3 py-2.5 rounded-lg text-xs font-medium text-left transition-all border ${
+                eraFilter === era.id
+                  ? 'bg-primary/20 border-primary/50 text-primary'
+                  : 'bg-card border-border/50 text-muted-foreground hover:border-primary/30 hover:text-foreground'
+              }`}
+            >
+              {era.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Era description */}
+        {selectedEra.description && (
+          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+            <p className="text-xs text-muted-foreground">{selectedEra.description}</p>
+          </div>
+        )}
 
         {/* Search + Category Filters */}
         <div className="space-y-3">
@@ -116,9 +161,9 @@ const CyberTimeTravel = () => {
             )}
           </div>
           <div className="flex gap-2 flex-wrap items-center justify-between">
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-1.5 flex-wrap">
               {categories.map(cat => (
-                <Button key={cat} variant={catFilter === cat ? 'default' : 'outline'} size="sm" onClick={() => setCatFilter(cat)}>
+                <Button key={cat} variant={catFilter === cat ? 'default' : 'outline'} size="sm" className="text-xs h-7" onClick={() => setCatFilter(cat)}>
                   {cat}
                 </Button>
               ))}
@@ -129,9 +174,9 @@ const CyberTimeTravel = () => {
                 <SelectValue placeholder="Sort by..." />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="year-asc">Year (Oldest First)</SelectItem>
+                <SelectItem value="year-desc">Year (Newest First)</SelectItem>
                 <SelectItem value="latest">Latest Year</SelectItem>
-                <SelectItem value="year-asc">Year (Oldest)</SelectItem>
-                <SelectItem value="year-desc">Year (Newest)</SelectItem>
                 <SelectItem value="severity">Critical Level</SelectItem>
                 <SelectItem value="name-asc">A - Z</SelectItem>
                 <SelectItem value="name-desc">Z - A</SelectItem>
@@ -147,49 +192,43 @@ const CyberTimeTravel = () => {
           <span>•</span>
           <span>{filtered.filter(a => a.severity === 'Critical').length} Critical</span>
           <span>•</span>
-          <span>Years {Math.min(...filtered.map(a => a.year))}–{Math.max(...filtered.map(a => a.year))}</span>
+          <span>Years {filtered.length > 0 ? `${Math.min(...filtered.map(a => a.year))}–${Math.max(...filtered.map(a => a.year))}` : 'N/A'}</span>
         </div>
 
-        {/* Attack Cards */}
-        <ScrollArea className="h-[calc(100vh-340px)]">
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 pr-4">
-            {filtered.map(attack => (
-              <Card
-                key={attack.id}
-                className="group cursor-pointer hover:border-primary/50 transition-all"
-                onClick={() => openAttack(attack)}
-              >
-                <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <CardTitle className="text-sm font-bold group-hover:text-primary transition-colors">
-                        {attack.name}
-                      </CardTitle>
-                      <CardDescription className="text-xs mt-0.5">{attack.year} • {attack.target}</CardDescription>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+        {/* Attack Cards — Grouped by Era when viewing "All Eras" */}
+        <ScrollArea className="h-[calc(100vh-480px)]">
+          {eraFilter === 'all' ? (
+            <div className="space-y-8 pr-4">
+              {groupedByEra.map(era => (
+                <div key={era.id}>
+                  <div className="flex items-center gap-3 mb-3 sticky top-0 bg-background/95 backdrop-blur-sm py-2 z-10">
+                    <div className="h-px flex-1 bg-primary/20" />
+                    <h2 className="text-sm font-bold text-primary whitespace-nowrap">{era.label}</h2>
+                    <div className="h-px flex-1 bg-primary/20" />
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex gap-1.5 flex-wrap">
-                    <Badge variant="outline" className={`text-[10px] ${severityColor[attack.severity]}`}>
-                      {attack.severity}
-                    </Badge>
-                    <Badge variant="outline" className="text-[10px]">{attack.category}</Badge>
+                  {era.description && (
+                    <p className="text-xs text-muted-foreground mb-3 text-center">{era.description}</p>
+                  )}
+                  <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                    {era.attacks.map(attack => (
+                      <AttackCard key={attack.id} attack={attack} onClick={() => openAttack(attack)} />
+                    ))}
                   </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2">{attack.impact}</p>
-                  <p className="text-[10px] text-muted-foreground/70 truncate">
-                    <span className="font-medium">Vector:</span> {attack.attackVector}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-            {filtered.length === 0 && (
-              <Card className="md:col-span-3">
-                <CardContent className="py-8 text-center text-muted-foreground">No attacks match your search.</CardContent>
-              </Card>
-            )}
-          </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 pr-4">
+              {filtered.map(attack => (
+                <AttackCard key={attack.id} attack={attack} onClick={() => openAttack(attack)} />
+              ))}
+            </div>
+          )}
+          {filtered.length === 0 && (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">No attacks match your filters.</CardContent>
+            </Card>
+          )}
         </ScrollArea>
       </div>
 
@@ -333,5 +372,36 @@ const CyberTimeTravel = () => {
     </DashboardLayout>
   );
 };
+
+const AttackCard = ({ attack, onClick }: { attack: CyberAttack; onClick: () => void }) => (
+  <Card
+    className="group cursor-pointer hover:border-primary/50 transition-all"
+    onClick={onClick}
+  >
+    <CardHeader className="pb-2">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <CardTitle className="text-sm font-bold group-hover:text-primary transition-colors">
+            {attack.name}
+          </CardTitle>
+          <CardDescription className="text-xs mt-0.5">{attack.year} • {attack.target}</CardDescription>
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+      </div>
+    </CardHeader>
+    <CardContent className="space-y-2">
+      <div className="flex gap-1.5 flex-wrap">
+        <Badge variant="outline" className={`text-[10px] ${severityColor[attack.severity]}`}>
+          {attack.severity}
+        </Badge>
+        <Badge variant="outline" className="text-[10px]">{attack.category}</Badge>
+      </div>
+      <p className="text-xs text-muted-foreground line-clamp-2">{attack.impact}</p>
+      <p className="text-[10px] text-muted-foreground/70 truncate">
+        <span className="font-medium">Vector:</span> {attack.attackVector}
+      </p>
+    </CardContent>
+  </Card>
+);
 
 export default CyberTimeTravel;
