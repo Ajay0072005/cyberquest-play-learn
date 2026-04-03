@@ -27,7 +27,7 @@ const Index = () => {
       category: "Interactive Learning",
       challenges: 5,
       completed: 0,
-      link: "/sherlock-course",
+      link: "/sherlock",
     },
   ];
 
