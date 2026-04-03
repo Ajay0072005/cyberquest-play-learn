@@ -71,9 +71,9 @@ export const useAchievements = () => {
     );
 
     for (const achievement of eligibleAchievements) {
-      const { error } = await supabase.from('user_achievements').insert({
-        user_id: userId,
-        achievement_id: achievement.id,
+      const { data, error } = await supabase.rpc('award_achievement' as any, {
+        _user_id: userId,
+        _achievement_id: achievement.id,
       });
 
       if (!error) {
