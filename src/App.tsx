@@ -80,6 +80,7 @@ const App = () => (
                 <Route path="/cyber-game" element={<ProtectedRoute><CyberGame /></ProtectedRoute>} />
                 <Route path="/cyber-news" element={<ProtectedRoute><CyberNews /></ProtectedRoute>} />
                 <Route path="/time-travel" element={<ProtectedRoute><CyberTimeTravel /></ProtectedRoute>} />
+                <Route path="/jobs" element={<ProtectedRoute><CyberJobs /></ProtectedRoute>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

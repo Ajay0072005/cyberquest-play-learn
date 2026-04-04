@@ -56,6 +56,7 @@ export const Navigation: React.FC = () => {
   const navLinks = [
     { to: "/dashboard", label: "Dashboard" },
     { to: "/roadmap", label: "Roadmap" },
+    { to: "/jobs", label: "Jobs" },
   ];
 
   const handleMobileNavClick = (to: string) => {
