@@ -14,7 +14,8 @@ import {
   ShieldCheck,
   Newspaper,
   Clock,
-  User
+  User,
+  Briefcase
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logo from '@/assets/logo-transparent.png';
@@ -33,6 +34,7 @@ const navItems = [
   { icon: MessageSquare, label: 'AI Chat', path: '/chat' },
   { icon: Newspaper, label: 'Cyber News', path: '/cyber-news' },
   { icon: Clock, label: 'Time Travel', path: '/time-travel' },
+  { icon: Briefcase, label: 'Jobs', path: '/jobs' },
 ];
 
 export const DashboardSidebar: React.FC = () => {
