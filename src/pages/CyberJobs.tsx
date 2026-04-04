@@ -187,14 +187,13 @@ const CyberJobs = () => {
     setLoading(true);
     setError(null);
     try {
-      const { data, error: fnError } = await supabase.functions.invoke("fetch-jobs", {
-        body: null,
-        headers: {},
-      });
-
-      // Use query params approach via URL
       const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-      const url = `https://${projectId}.supabase.co/functions/v1/fetch-jobs?query=${encodeURIComponent(query || "cyber security")}&country=${country}&results_per_page=30`;
+      const params = new URLSearchParams({
+        query: query || "cyber security",
+        country,
+        results_per_page: "30",
+      });
+      const url = `https://${projectId}.supabase.co/functions/v1/fetch-jobs?${params}`;
       
       const response = await fetch(url, {
         headers: {
