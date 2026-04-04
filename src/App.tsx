@@ -32,6 +32,7 @@ import Roadmap from "./pages/Roadmap";
 import CyberGame from "./pages/CyberGame";
 import CyberNews from "./pages/CyberNews";
 import CyberTimeTravel from "./pages/CyberTimeTravel";
+import CyberJobs from "./pages/CyberJobs";
 import AboutUs from "./pages/AboutUs";
 import { useThemeCustomization } from "./hooks/useThemeCustomization";
 
