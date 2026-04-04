@@ -14,7 +14,8 @@ import {
   ShieldCheck,
   Newspaper,
   Clock,
-  User
+  User,
+  Briefcase
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logo from '@/assets/logo-transparent.png';
