@@ -28,7 +28,6 @@ import {
   RefreshCw,
   AlertCircle,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface CyberJob {
   id: string;
