@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,8 +24,26 @@ import {
   ChevronDown,
   ChevronUp,
   Shield,
+  Loader2,
+  RefreshCw,
+  AlertCircle,
 } from "lucide-react";
-import { cyberJobs, jobCategories, type CyberJob } from "@/data/cyberJobsData";
+
+interface CyberJob {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  type: string;
+  remote: string;
+  salary: string | null;
+  postedAt: string;
+  category: string;
+  level: string;
+  description: string;
+  skills: string[];
+  applyUrl: string;
+}
 
 const levelColors: Record<string, string> = {
   Entry: "bg-green-500/20 text-green-400 border-green-500/30",
@@ -41,13 +59,22 @@ const remoteColors: Record<string, string> = {
   "On-site": "bg-sky-500/20 text-sky-400",
 };
 
-const popularSearches = [
+const searchSuggestions = [
   "Penetration Tester",
   "SOC Analyst",
   "Cloud Security",
   "Security Engineer",
-  "OSCP",
+  "CISO",
   "DevSecOps",
+];
+
+const countryOptions = [
+  { value: "us", label: "🇺🇸 United States" },
+  { value: "gb", label: "🇬🇧 United Kingdom" },
+  { value: "ca", label: "🇨🇦 Canada" },
+  { value: "de", label: "🇩🇪 Germany" },
+  { value: "au", label: "🇦🇺 Australia" },
+  { value: "in", label: "🇮🇳 India" },
 ];
 
 const JobCard = ({ job }: { job: CyberJob }) => {
@@ -78,7 +105,7 @@ const JobCard = ({ job }: { job: CyberJob }) => {
                   <Briefcase className="h-3.5 w-3.5" />
                   {job.type}
                 </span>
-                <Badge variant="outline" className={`text-xs ${remoteColors[job.remote]}`}>
+                <Badge variant="outline" className={`text-xs ${remoteColors[job.remote] || ""}`}>
                   <Globe className="h-3 w-3 mr-1" />
                   {job.remote}
                 </Badge>
@@ -109,31 +136,29 @@ const JobCard = ({ job }: { job: CyberJob }) => {
           <div className="mt-4 pt-4 border-t border-border/50 space-y-3 animate-in slide-in-from-top-2">
             <p className="text-sm text-muted-foreground leading-relaxed">{job.description}</p>
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className={`${levelColors[job.level]} text-xs`}>
+              <Badge variant="outline" className={`${levelColors[job.level] || ""} text-xs`}>
                 {job.level} Level
               </Badge>
               <Badge variant="outline" className="text-xs">
                 {job.category}
               </Badge>
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {job.skills.map((skill) => (
-                <Badge
-                  key={skill}
-                  variant="secondary"
-                  className="text-xs bg-muted/50"
-                >
-                  {skill}
-                </Badge>
-              ))}
-            </div>
+            {job.skills.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {job.skills.map((skill) => (
+                  <Badge key={skill} variant="secondary" className="text-xs bg-muted/50">
+                    {skill}
+                  </Badge>
+                ))}
+              </div>
+            )}
             <Button
               size="sm"
               variant="cyber"
               className="mt-2"
               onClick={(e) => {
                 e.stopPropagation();
-                window.open(job.applyUrl, "_blank");
+                window.open(job.applyUrl, "_blank", "noopener,noreferrer");
               }}
             >
               Apply Now
@@ -148,26 +173,66 @@ const JobCard = ({ job }: { job: CyberJob }) => {
 
 const CyberJobs = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchInput, setSearchInput] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("All");
   const [selectedRemote, setSelectedRemote] = useState("All");
+  const [selectedCountry, setSelectedCountry] = useState("us");
+  const [jobs, setJobs] = useState<CyberJob[]>([]);
+  const [totalJobs, setTotalJobs] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchJobs = async (query: string, country: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const params = new URLSearchParams({
+        query: query || "cyber security",
+        country,
+        results_per_page: "30",
+      });
+      const url = `https://${projectId}.supabase.co/functions/v1/fetch-jobs?${params}`;
+      
+      const response = await fetch(url, {
+        headers: {
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch jobs: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+      
+      setJobs(result.jobs || []);
+      setTotalJobs(result.total || 0);
+    } catch (err: any) {
+      console.error("Error fetching jobs:", err);
+      setError(err.message || "Failed to load jobs");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobs(searchQuery, selectedCountry);
+  }, [searchQuery, selectedCountry]);
+
+  const handleSearch = () => {
+    setSearchQuery(searchInput);
+  };
 
   const filteredJobs = useMemo(() => {
-    return cyberJobs.filter((job) => {
-      const matchesSearch =
-        !searchQuery ||
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.skills.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        job.category.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesCategory = selectedCategory === "All" || job.category === selectedCategory;
+    return jobs.filter((job) => {
       const matchesLevel = selectedLevel === "All" || job.level === selectedLevel;
       const matchesRemote = selectedRemote === "All" || job.remote === selectedRemote;
-
-      return matchesSearch && matchesCategory && matchesLevel && matchesRemote;
+      return matchesLevel && matchesRemote;
     });
-  }, [searchQuery, selectedCategory, selectedLevel, selectedRemote]);
+  }, [jobs, selectedLevel, selectedRemote]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -187,27 +252,36 @@ const CyberJobs = () => {
               <span className="text-primary cyber-glow">security</span> teams
             </h1>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Discover cybersecurity career opportunities from leading companies worldwide. From entry-level to executive roles.
+              Real-time cybersecurity jobs from top companies worldwide. Apply directly on the employer's site.
             </p>
           </div>
 
           {/* Search */}
           <div className="max-w-2xl mx-auto mt-8">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                placeholder="Search for job title, company, or skill..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-4 h-14 text-base bg-card/50 border-border/50 focus:border-primary"
-              />
+            <div className="relative flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  placeholder="Search cybersecurity jobs..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  className="pl-12 pr-4 h-14 text-base bg-card/50 border-border/50 focus:border-primary"
+                />
+              </div>
+              <Button onClick={handleSearch} className="h-14 px-6" variant="cyber">
+                Search
+              </Button>
             </div>
             <div className="flex flex-wrap items-center gap-2 mt-3">
-              <span className="text-xs text-muted-foreground">Popular:</span>
-              {popularSearches.map((term) => (
+              <span className="text-xs text-muted-foreground">Try:</span>
+              {searchSuggestions.map((term) => (
                 <button
                   key={term}
-                  onClick={() => setSearchQuery(term)}
+                  onClick={() => {
+                    setSearchInput(term);
+                    setSearchQuery(term);
+                  }}
                   className="text-xs px-2.5 py-1 rounded-full bg-muted/50 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
                 >
                   # {term}
@@ -221,14 +295,14 @@ const CyberJobs = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap items-center gap-3 mb-6">
             <Filter className="h-4 w-4 text-muted-foreground" />
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <Select value={selectedCountry} onValueChange={(v) => setSelectedCountry(v)}>
               <SelectTrigger className="w-[180px] bg-card/50">
-                <SelectValue placeholder="Category" />
+                <SelectValue placeholder="Country" />
               </SelectTrigger>
               <SelectContent>
-                {jobCategories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
+                {countryOptions.map((c) => (
+                  <SelectItem key={c.value} value={c.value}>
+                    {c.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -257,43 +331,63 @@ const CyberJobs = () => {
                 ))}
               </SelectContent>
             </Select>
-            {(selectedCategory !== "All" || selectedLevel !== "All" || selectedRemote !== "All" || searchQuery) && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setSelectedCategory("All");
-                  setSelectedLevel("All");
-                  setSelectedRemote("All");
-                  setSearchQuery("");
-                }}
-                className="text-xs text-muted-foreground"
-              >
-                Clear filters
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => fetchJobs(searchQuery, selectedCountry)}
+              className="text-xs text-muted-foreground"
+            >
+              <RefreshCw className="h-3.5 w-3.5 mr-1" />
+              Refresh
+            </Button>
           </div>
 
-          <p className="text-sm text-muted-foreground mb-4">
-            Showing <span className="text-foreground font-medium">{filteredJobs.length}</span> of{" "}
-            {cyberJobs.length} jobs
-          </p>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />
+              <p className="text-muted-foreground">Fetching live cybersecurity jobs...</p>
+            </div>
+          ) : error ? (
+            <Card className="border-destructive/50 bg-destructive/5 max-w-4xl">
+              <CardContent className="p-8 text-center">
+                <AlertCircle className="h-10 w-10 text-destructive mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">Failed to load jobs</h3>
+                <p className="text-muted-foreground text-sm mb-4">{error}</p>
+                <Button variant="outline" onClick={() => fetchJobs(searchQuery, selectedCountry)}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Try Again
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground mb-4">
+                Showing <span className="text-foreground font-medium">{filteredJobs.length}</span> jobs
+                {totalJobs > 0 && (
+                  <span> · {totalJobs.toLocaleString()} total found</span>
+                )}
+                {searchQuery && (
+                  <span> for "<span className="text-primary">{searchQuery}</span>"</span>
+                )}
+              </p>
 
-          <div className="space-y-3 max-w-4xl">
-            {filteredJobs.length > 0 ? (
-              filteredJobs.map((job) => <JobCard key={job.id} job={job} />)
-            ) : (
-              <Card className="border-border/50 bg-card/50">
-                <CardContent className="p-12 text-center">
-                  <Search className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">No jobs found</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Try adjusting your search or filters to find more opportunities.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+              <div className="space-y-3 max-w-4xl">
+                {filteredJobs.length > 0 ? (
+                  filteredJobs.map((job) => <JobCard key={job.id} job={job} />)
+                ) : (
+                  <Card className="border-border/50 bg-card/50">
+                    <CardContent className="p-12 text-center">
+                      <Search className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold text-foreground mb-2">No jobs found</h3>
+                      <p className="text-muted-foreground text-sm">
+                        Try adjusting your search or filters to find more opportunities.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
