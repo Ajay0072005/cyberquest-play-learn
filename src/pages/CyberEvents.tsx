@@ -234,12 +234,20 @@ const CyberEvents: React.FC = () => {
                       <a href={event.url} target="_blank" rel="noopener noreferrer">
                         <Button size="sm" className="w-full gap-2 text-xs">
                           <ExternalLink className="h-3.5 w-3.5" />
-                          View Details
+                          Visit Organizer Site
                         </Button>
                       </a>
                     ) : (
-                      <Button size="sm" variant="outline" className="w-full text-xs" disabled>
-                        Details coming soon
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full gap-2 text-xs"
+                        onClick={() => {
+                          window.open(`https://www.google.com/search?q=${encodeURIComponent(event.title + " " + event.organizer + " Tamil Nadu")}`, "_blank");
+                        }}
+                      >
+                        <Search className="h-3.5 w-3.5" />
+                        Search for Event
                       </Button>
                     )}
                   </CardContent>
