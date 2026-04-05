@@ -36,6 +36,7 @@ const navItems = [
   { icon: Newspaper, label: 'Cyber News', path: '/cyber-news' },
   { icon: Clock, label: 'Time Travel', path: '/time-travel' },
   { icon: Briefcase, label: 'Jobs', path: '/jobs' },
+  { icon: CalendarDays, label: 'Events', path: '/events' },
 ];
 
 export const DashboardSidebar: React.FC = () => {
