@@ -20,11 +20,11 @@ serve(async (req) => {
 
     const today = new Date().toISOString().split("T")[0];
 
-    const prompt = `Search the web for upcoming and recent cybersecurity events happening in Tamil Nadu, India${categoryFilter}. Today's date is ${today}.
+    const prompt = `List upcoming and recent cybersecurity events happening in Tamil Nadu, India${categoryFilter}. Today's date is ${today}.
 
-Look for: hackathons, Capture The Flag (CTF) competitions, cybersecurity seminars, workshops, conferences, community meetups, and training programs.
+Include: hackathons, Capture The Flag (CTF) competitions, cybersecurity seminars, workshops, conferences, community meetups, and training programs.
 
-Search sources like Eventbrite, Meetup, university websites (Anna University, IIT Madras, VIT, SRM, etc.), cybersecurity communities in Chennai, Coimbatore, Madurai, and other Tamil Nadu cities.
+Focus on events from well-known organizations: Anna University, IIT Madras, VIT, SRM, CDAC, ISACA Chennai, OWASP Chennai, IEEE chapters, etc.
 
 Return ONLY a valid JSON array of event objects. Each object must have these fields:
 - "title": string (event name)
@@ -33,11 +33,11 @@ Return ONLY a valid JSON array of event objects. Each object must have these fie
 - "type": string (one of: "hackathon", "ctf", "seminar", "workshop", "conference", "meetup", "training")
 - "organizer": string (who is organizing)
 - "description": string (2-3 sentence description)
-- "url": string (registration or info link, use "" if unknown)
+- "url": string (ONLY use real, verified homepage URLs of the organizing institution like "https://www.iitm.ac.in" or "https://www.vit.ac.in". If you are not 100% sure the URL exists, use an empty string "". NEVER make up or guess specific event page URLs.)
 - "is_free": boolean
 - "status": string (one of: "upcoming", "ongoing", "completed")
 
-Return 8-15 events. Include both confirmed real events and well-known recurring events in Tamil Nadu. If exact dates are unknown for recurring events, estimate based on their usual schedule. Respond with ONLY the JSON array, no markdown formatting.`;
+Return 8-15 events. For recurring events, estimate dates based on their usual schedule. Respond with ONLY the JSON array, no markdown formatting.`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
