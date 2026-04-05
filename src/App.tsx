@@ -34,6 +34,7 @@ import CyberNews from "./pages/CyberNews";
 import CyberTimeTravel from "./pages/CyberTimeTravel";
 import CyberJobs from "./pages/CyberJobs";
 import AboutUs from "./pages/AboutUs";
+import CyberEvents from "./pages/CyberEvents";
 import { useThemeCustomization } from "./hooks/useThemeCustomization";
 
 const queryClient = new QueryClient();
