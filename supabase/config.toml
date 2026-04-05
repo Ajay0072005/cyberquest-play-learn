@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.cyber-news]
 verify_jwt = false
+
+[functions.cyber-events]
+verify_jwt = false
