@@ -76,6 +76,7 @@ export const Navigation: React.FC = () => {
             CyberQuest
           </h1>
         </Link>
+        </div>
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6">
