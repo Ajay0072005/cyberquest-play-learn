@@ -116,7 +116,7 @@ const CyberEvents: React.FC = () => {
             🛡️ Cyber Events — Tamil Nadu
           </h1>
           <p className="text-muted-foreground">
-            Real-time hackathons, CTFs, seminars & community gatherings powered by AI search
+            Live hackathons, CTFs, seminars & community gatherings from Eventbrite
           </p>
         </div>
 
@@ -259,7 +259,7 @@ const CyberEvents: React.FC = () => {
 
         {/* Footer note */}
         <p className="text-center text-[11px] text-muted-foreground mt-8">
-          Events are fetched in real-time using AI search. Some details may need verification.
+          Events sourced from Eventbrite. Dates and details are provided by event organizers.
         </p>
       </div>
     </div>

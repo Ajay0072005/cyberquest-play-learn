@@ -6,6 +6,20 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const EVENTBRITE_BASE = "https://www.eventbriteapi.com/v3";
+
+// Eventbrite category IDs and subcategory mappings for cyber/tech
+const SEARCH_KEYWORDS: Record<string, string> = {
+  all: "cybersecurity",
+  hackathon: "hackathon cybersecurity",
+  ctf: "capture the flag CTF",
+  seminar: "cybersecurity seminar",
+  workshop: "cybersecurity workshop",
+  conference: "cybersecurity conference",
+  meetup: "cybersecurity meetup",
+  training: "cybersecurity training",
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -13,90 +27,117 @@ serve(async (req) => {
 
   try {
     const { category } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const EVENTBRITE_API_KEY = Deno.env.get("EVENTBRITE_API_KEY");
+    if (!EVENTBRITE_API_KEY) {
+      throw new Error("EVENTBRITE_API_KEY is not configured");
+    }
 
-    const categoryFilter = category && category !== "all" ? ` focusing on ${category}` : "";
+    const keyword = SEARCH_KEYWORDS[category] || SEARCH_KEYWORDS.all;
 
-    const today = new Date().toISOString().split("T")[0];
+    // Search Eventbrite for cybersecurity events in Tamil Nadu
+    const params = new URLSearchParams({
+      q: keyword,
+      "location.address": "Tamil Nadu, India",
+      "location.within": "200km",
+      expand: "venue,category,organizer",
+      sort_by: "date",
+    });
 
-    const prompt = `List upcoming and recent cybersecurity events happening in Tamil Nadu, India${categoryFilter}. Today's date is ${today}.
-
-Include: hackathons, Capture The Flag (CTF) competitions, cybersecurity seminars, workshops, conferences, community meetups, and training programs.
-
-Focus on events from well-known organizations: Anna University, IIT Madras, VIT, SRM, CDAC, ISACA Chennai, OWASP Chennai, IEEE chapters, etc.
-
-Return ONLY a valid JSON array of event objects. Each object must have these fields:
-- "title": string (event name)
-- "date": string (date or date range, e.g. "April 15, 2026" or "April 15-17, 2026")  
-- "location": string (venue and city)
-- "type": string (one of: "hackathon", "ctf", "seminar", "workshop", "conference", "meetup", "training")
-- "organizer": string (who is organizing)
-- "description": string (2-3 sentence description)
-- "url": string (ONLY use real, verified homepage URLs of the organizing institution like "https://www.iitm.ac.in" or "https://www.vit.ac.in". If you are not 100% sure the URL exists, use an empty string "". NEVER make up or guess specific event page URLs.)
-- "is_free": boolean
-- "status": string (one of: "upcoming", "ongoing", "completed")
-
-Return 8-15 events. For recurring events, estimate dates based on their usual schedule. Respond with ONLY the JSON array, no markdown formatting.`;
-
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a cybersecurity events researcher. Return only valid JSON arrays. No markdown code blocks. Search for real, current events.",
-            },
-            { role: "user", content: prompt },
-          ],
-        }),
-      }
-    );
+    const response = await fetch(`${EVENTBRITE_BASE}/events/search/?${params}`, {
+      headers: {
+        Authorization: `Bearer ${EVENTBRITE_API_KEY}`,
+      },
+    });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Eventbrite API error:", response.status, errorText);
+
+      if (response.status === 401) {
+        return new Response(
+          JSON.stringify({ error: "Invalid Eventbrite API key. Please check your credentials." }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Rate limited, please try again later." }),
+          JSON.stringify({ error: "Rate limited by Eventbrite. Please try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Credits exhausted. Please add funds in Settings > Workspace > Usage." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      throw new Error("AI gateway error");
+      throw new Error(`Eventbrite API error [${response.status}]: ${errorText}`);
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "[]";
+    const rawEvents = data.events || [];
 
-    // Clean markdown code blocks if present
-    let cleaned = content.trim();
-    if (cleaned.startsWith("```")) {
-      cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
-    }
+    // Map Eventbrite events to our format
+    const events = rawEvents.map((ev: any) => {
+      const startDate = ev.start?.local
+        ? new Date(ev.start.local).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : "TBA";
 
-    let events;
-    try {
-      events = JSON.parse(cleaned);
-    } catch {
-      console.error("Failed to parse AI response:", cleaned);
-      events = [];
-    }
+      const endDate = ev.end?.local
+        ? new Date(ev.end.local).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : "";
 
-    return new Response(JSON.stringify({ events }), {
+      const dateStr = endDate && endDate !== startDate ? `${startDate} - ${endDate}` : startDate;
+
+      const venue = ev.venue;
+      const location = venue
+        ? [venue.name, venue.address?.city, venue.address?.region]
+            .filter(Boolean)
+            .join(", ")
+        : ev.online_event
+        ? "Online"
+        : "TBA";
+
+      // Guess event type from name/description
+      const titleLower = (ev.name?.text || "").toLowerCase();
+      const descLower = (ev.description?.text || "").toLowerCase();
+      const combined = titleLower + " " + descLower;
+
+      let type = "conference";
+      if (combined.includes("hackathon")) type = "hackathon";
+      else if (combined.includes("ctf") || combined.includes("capture the flag")) type = "ctf";
+      else if (combined.includes("workshop")) type = "workshop";
+      else if (combined.includes("seminar")) type = "seminar";
+      else if (combined.includes("meetup") || combined.includes("meet-up")) type = "meetup";
+      else if (combined.includes("training") || combined.includes("bootcamp")) type = "training";
+
+      // Determine status
+      const now = new Date();
+      const start = ev.start?.utc ? new Date(ev.start.utc) : null;
+      const end = ev.end?.utc ? new Date(ev.end.utc) : null;
+      let status = "upcoming";
+      if (start && end) {
+        if (now > end) status = "completed";
+        else if (now >= start && now <= end) status = "ongoing";
+      }
+
+      return {
+        title: ev.name?.text || "Untitled Event",
+        date: dateStr,
+        location,
+        type,
+        organizer: ev.organizer?.name || "Unknown Organizer",
+        description: ev.description?.text?.substring(0, 200) || "No description available.",
+        url: ev.url || "",
+        is_free: ev.is_free === true,
+        status,
+        logo_url: ev.logo?.url || null,
+      };
+    });
+
+    return new Response(JSON.stringify({ events, total: data.pagination?.object_count || events.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
