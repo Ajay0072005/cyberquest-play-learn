@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { User, LogOut, Settings, Menu, X, ChevronDown } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
 import logo from "@/assets/logo-transparent.png";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -67,12 +68,15 @@ export const Navigation: React.FC = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="CyberQuest" className="h-12 w-12" />
+        <div className="flex items-center gap-1">
+          {location.pathname !== "/" && <BackButton fallback="/" />}
+          <Link to="/" className="flex items-center gap-2">
+            <img src={logo} alt="CyberQuest" className="h-12 w-12" />
           <h1 className="text-xl md:text-2xl font-cyber font-bold text-foreground">
             CyberQuest
           </h1>
         </Link>
+        </div>
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6">

@@ -1,5 +1,5 @@
 import { DashboardSidebar } from '@/components/DashboardSidebar';
-import { cn } from '@/lib/utils';
+import { BackButton } from '@/components/BackButton';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -11,6 +11,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
       <DashboardSidebar />
       <main className="flex-1 ml-16 md:ml-64 transition-all duration-300">
         <div className="container mx-auto px-4 py-6 max-w-7xl">
+          <div className="mb-4">
+            <BackButton />
+          </div>
           {children}
         </div>
       </main>
