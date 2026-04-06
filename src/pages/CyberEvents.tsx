@@ -116,7 +116,7 @@ const CyberEvents: React.FC = () => {
             🛡️ Cyber Events — Tamil Nadu
           </h1>
           <p className="text-muted-foreground">
-            Real-time hackathons, CTFs, seminars & community gatherings powered by AI search
+            Live hackathons, CTFs, seminars & community gatherings from Eventbrite
           </p>
         </div>
 
