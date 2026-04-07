@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,28 @@ import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import AvatarSVG from '@/components/avatar/AvatarSVG';
 import { AvatarConfig, defaultAvatarConfig } from '@/components/avatar/avatarOptions';
 
+const pageContextMap: Record<string, string> = {
+  '/': 'Homepage - cybersecurity career paths, challenges overview, and getting started',
+  '/dashboard': 'Dashboard - user progress, stats, quick access to labs/challenges/achievements',
+  '/labs': 'Practical Labs - hands-on cybersecurity labs with Identify → Exploit → Fix workflow',
+  '/sherlock': 'Sherlock Course - cryptography and security through Victorian-era detective adventures',
+  '/sql-game': 'SQL Injection Game - practice SQL injection attacks and defenses',
+  '/crypto-puzzles': 'Crypto Puzzles - cryptography challenges including ciphers and encryption',
+  '/terminal': 'Terminal Challenge - command-line security challenges and Linux terminal practice',
+  '/chat': 'AI Chat - dedicated cybersecurity Q&A with RAG-powered knowledge base',
+  '/achievements': 'Achievements - badges, milestones, and rewards earned through the platform',
+  '/leaderboard': 'Leaderboard - top performers and rankings across the platform',
+  '/profile': 'Profile - user profile, skills, certifications, and activity',
+  '/settings': 'Settings - account settings, preferences, and profile customization',
+  '/career-path': 'Career Path - detailed cybersecurity career progression and skill requirements',
+  '/roadmap': 'Roadmap - structured learning path from beginner to advanced cybersecurity',
+  '/cyber-game': 'Cyber City Game - interactive cybersecurity missions in a game environment',
+  '/cyber-news': 'Cyber News - latest cybersecurity news and threat intelligence',
+  '/time-travel': 'Cyber Time Travel - historical cybersecurity events and attacks timeline',
+  '/jobs': 'Cyber Jobs - cybersecurity job listings and career opportunities',
+  '/events': 'Cyber Events - upcoming cybersecurity conferences and events',
+  '/about': 'About Us - information about the CyberQuest platform',
+};
 interface Message {
   id: string;
   text: string;
@@ -19,6 +42,8 @@ interface Message {
 
 export const ChatBot: React.FC = () => {
   const { user } = useAuth();
+  const location = useLocation();
+  const currentPageContext = pageContextMap[location.pathname] || `Page: ${location.pathname}`;
   const [isOpen, setIsOpen] = useState(false);
   const [tutorAvatar, setTutorAvatar] = useState<AvatarConfig | null>(null);
   const [tutorName, setTutorName] = useState('CyberBot');
@@ -112,7 +137,7 @@ export const ChatBot: React.FC = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('chat-rag', {
-        body: { message: currentMessage }
+        body: { message: currentMessage, pageContext: currentPageContext }
       });
 
       if (error) {
