@@ -196,6 +196,8 @@ export const ChatBot: React.FC = () => {
     }
   };
 
+  if (isHidden) return null;
+
   return (
     <>
       {/* Chat Toggle Button */}
