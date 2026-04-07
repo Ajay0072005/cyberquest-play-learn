@@ -49,9 +49,9 @@ const App = () => (
   <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="cyberquest-theme">
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <AchievementNotificationProvider>
         <GameProvider>
           <ThemeInitializer>
-          <TooltipProvider>
             <Toaster />
             <Sonner />
             <BrowserRouter>
@@ -91,6 +91,7 @@ const App = () => (
           </TooltipProvider>
           </ThemeInitializer>
         </GameProvider>
+        </AchievementNotificationProvider>
       </AuthProvider>
     </QueryClientProvider>
   </ThemeProvider>
