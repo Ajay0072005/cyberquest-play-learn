@@ -45,11 +45,8 @@ const HIDDEN_ROUTES = ['/chat', '/settings', '/profile'];
 export const ChatBot: React.FC = () => {
   const { user } = useAuth();
   const location = useLocation();
-
-  if (HIDDEN_ROUTES.includes(location.pathname)) {
-    return null;
-  }
   const currentPageContext = pageContextMap[location.pathname] || `Page: ${location.pathname}`;
+  const isHidden = HIDDEN_ROUTES.includes(location.pathname);
   const [isOpen, setIsOpen] = useState(false);
   const [tutorAvatar, setTutorAvatar] = useState<AvatarConfig | null>(null);
   const [tutorName, setTutorName] = useState('CyberBot');
