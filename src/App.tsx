@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { GameProvider } from "@/context/GameContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { AchievementNotificationProvider } from "@/components/AchievementNotificationContainer";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { BottomNav } from "@/components/BottomNav";
 import Index from "./pages/Index";
@@ -48,6 +49,7 @@ const App = () => (
   <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="cyberquest-theme">
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <AchievementNotificationProvider>
         <GameProvider>
           <ThemeInitializer>
           <TooltipProvider>
@@ -83,13 +85,13 @@ const App = () => (
                 <Route path="/time-travel" element={<ProtectedRoute><CyberTimeTravel /></ProtectedRoute>} />
                 <Route path="/jobs" element={<ProtectedRoute><CyberJobs /></ProtectedRoute>} />
                 <Route path="/events" element={<ProtectedRoute><CyberEvents /></ProtectedRoute>} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
           </TooltipProvider>
           </ThemeInitializer>
         </GameProvider>
+        </AchievementNotificationProvider>
       </AuthProvider>
     </QueryClientProvider>
   </ThemeProvider>
