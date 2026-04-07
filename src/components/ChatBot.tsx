@@ -40,13 +40,16 @@ interface Message {
   timestamp: Date;
 }
 
-const HIDDEN_ROUTES = ['/chat', '/settings', '/profile'];
+const HIDDEN_ROUTE_PREFIXES = ['/chat', '/settings', '/profile'];
+
+const shouldHideChatBot = (pathname: string) =>
+  HIDDEN_ROUTE_PREFIXES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
 export const ChatBot: React.FC = () => {
   const { user } = useAuth();
   const location = useLocation();
   const currentPageContext = pageContextMap[location.pathname] || `Page: ${location.pathname}`;
-  const isHidden = HIDDEN_ROUTES.includes(location.pathname);
+  const isHidden = shouldHideChatBot(location.pathname);
   const [isOpen, setIsOpen] = useState(false);
   const [tutorAvatar, setTutorAvatar] = useState<AvatarConfig | null>(null);
   const [tutorName, setTutorName] = useState('CyberBot');
