@@ -9,6 +9,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { AchievementNotificationProvider } from "@/components/AchievementNotificationContainer";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { BottomNav } from "@/components/BottomNav";
+import { ChatBot } from "@/components/ChatBot";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -57,7 +58,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <BottomNav />
-              <Routes>
+              <ChatBot />
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
