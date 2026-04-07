@@ -180,12 +180,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     for (const achievement of eligible) {
-      const { error } = await supabase.from('user_achievements').insert({
-        user_id: user.id,
-        achievement_id: achievement.id,
+      const { data: awarded, error } = await supabase.rpc('award_achievement', {
+        _achievement_id: achievement.id,
       });
 
-      if (!error) {
+      if (!error && awarded) {
         setUserAchievementIds(prev => new Set([...prev, achievement.id]));
         showAchievement({
           id: achievement.id,
@@ -228,10 +227,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!user || points === 0) return;
 
       try {
-        await supabase
-          .from('profiles')
-          .update({ points })
-          .eq('user_id', user.id);
+        // Points are now managed server-side via add_user_points RPC
+        // The trigger on profiles prevents direct client-side points manipulation
+        // Points sync happens through lab_progress inserts which trigger server-side updates
       } catch (error) {
         console.error('Error saving points to database:', error);
       }
@@ -275,6 +273,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           lab_type: 'sql_level',
           points_earned: 100,
         });
+        // Award points server-side
+        await supabase.rpc('add_user_points', { _points: 100 });
       } catch (error: any) {
         if (error?.code !== '23505') {
           console.error('Error saving SQL level progress:', error);
@@ -305,6 +305,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           lab_type: 'crypto_puzzle',
           points_earned: 150,
         });
+        await supabase.rpc('add_user_points', { _points: 150 });
       } catch (error: any) {
         if (error?.code !== '23505') {
           console.error('Error saving crypto puzzle progress:', error);
@@ -335,6 +336,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           lab_type: 'terminal_flag',
           points_earned: 50,
         });
+        await supabase.rpc('add_user_points', { _points: 50 });
       } catch (error: any) {
         if (error?.code !== '23505') {
           console.error('Error saving terminal flag progress:', error);
