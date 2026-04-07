@@ -61,7 +61,7 @@ serve(async (req) => {
 
     // Parse and validate input
     const body = await req.json();
-    const { message } = body;
+    const { message, pageContext } = body;
     
     const validation = validateMessage(message);
     if (!validation.valid) {
@@ -130,13 +130,18 @@ serve(async (req) => {
     }
 
     // Generate response using Lovable AI with RAG context
+    const pageContextInfo = pageContext ? `\nThe user is currently on: ${pageContext}. Tailor your answers to be relevant to this page's content and purpose.` : '';
+    
     const systemPrompt = `You are a cybersecurity expert assistant. You answer questions about cybersecurity based on the knowledge base provided.
+${pageContextInfo}
 
 IMPORTANT: This is an educational platform. If users ask about malicious activities or exploits:
 1. Acknowledge it's from our educational dataset
 2. Explain the concept for defensive purposes
 3. Emphasize ethical use and legal boundaries
 4. Suggest defensive countermeasures
+
+When users ask about "this page" or "what can I do here", explain the features and purpose of the page they are on.
 
 Relevant knowledge from our database:
 ${context}

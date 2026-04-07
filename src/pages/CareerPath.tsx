@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
-import { ChatBot } from "@/components/ChatBot";
+
 import { getCareerPathBySlug, careerPaths } from "@/data/careerPathsData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -299,8 +299,6 @@ const CareerPath = () => {
           </p>
         </div>
       </footer>
-
-      <ChatBot />
     </div>
   );
 };
