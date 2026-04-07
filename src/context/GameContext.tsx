@@ -273,6 +273,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           lab_type: 'sql_level',
           points_earned: 100,
         });
+        // Award points server-side
+        await supabase.rpc('add_user_points', { _points: 100 });
       } catch (error: any) {
         if (error?.code !== '23505') {
           console.error('Error saving SQL level progress:', error);
@@ -303,6 +305,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           lab_type: 'crypto_puzzle',
           points_earned: 150,
         });
+        await supabase.rpc('add_user_points', { _points: 150 });
       } catch (error: any) {
         if (error?.code !== '23505') {
           console.error('Error saving crypto puzzle progress:', error);
@@ -333,6 +336,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           lab_type: 'terminal_flag',
           points_earned: 50,
         });
+        await supabase.rpc('add_user_points', { _points: 50 });
       } catch (error: any) {
         if (error?.code !== '23505') {
           console.error('Error saving terminal flag progress:', error);
