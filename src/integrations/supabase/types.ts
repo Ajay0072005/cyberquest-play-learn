@@ -243,6 +243,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_user_points: { Args: { _points: number }; Returns: undefined }
+      award_achievement: { Args: { _achievement_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
