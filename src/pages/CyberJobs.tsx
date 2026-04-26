@@ -264,9 +264,10 @@ const CyberJobs = () => {
     return jobs.filter((job) => {
       const matchesLevel = selectedLevel === "All" || job.level === selectedLevel;
       const matchesRemote = selectedRemote === "All" || job.remote === selectedRemote;
-      return matchesLevel && matchesRemote;
+      const matchesType = selectedType === "All" || job.type === selectedType;
+      return matchesLevel && matchesRemote && matchesType;
     });
-  }, [jobs, selectedLevel, selectedRemote]);
+  }, [jobs, selectedLevel, selectedRemote, selectedType]);
 
   return (
     <div className="min-h-screen bg-background">
