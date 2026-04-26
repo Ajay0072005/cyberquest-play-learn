@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
       title: r.title?.replace(/<\/?[^>]+(>|$)/g, '') || 'Untitled',
       company: r.company?.display_name || 'Unknown Company',
       location: r.location?.display_name || 'Unknown',
-      type: r.contract_time === 'part_time' ? 'Part time' : r.contract_type === 'contract' ? 'Contract' : 'Full time',
+      type: detectJobType(r),
       remote: r.title?.toLowerCase().includes('remote') || r.description?.toLowerCase().includes('remote') ? 'Remote' : r.title?.toLowerCase().includes('hybrid') || r.description?.toLowerCase().includes('hybrid') ? 'Hybrid' : 'On-site',
       salary: r.salary_min && r.salary_max
         ? `$${Math.round(r.salary_min / 1000)}K – $${Math.round(r.salary_max / 1000)}K/yr`
@@ -75,6 +75,14 @@ function getRelativeTime(dateStr: string): string {
   if (days < 14) return '1 week ago'
   if (days < 30) return `${Math.floor(days / 7)} weeks ago`
   return `${Math.floor(days / 30)} months ago`
+}
+
+function detectJobType(r: any): string {
+  const text = `${r.title || ''} ${r.description || ''}`.toLowerCase()
+  if (text.includes('intern') || text.includes('internship') || text.includes('trainee')) return 'Internship'
+  if (r.contract_time === 'part_time' || text.includes('part-time') || text.includes('part time')) return 'Part time'
+  if (r.contract_type === 'contract' || text.includes('contract')) return 'Contract'
+  return 'Full time'
 }
 
 function guessLevel(title: string, desc: string): string {

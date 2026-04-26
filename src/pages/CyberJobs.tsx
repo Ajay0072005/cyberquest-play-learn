@@ -211,6 +211,7 @@ const CyberJobs = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("All");
   const [selectedRemote, setSelectedRemote] = useState("All");
+  const [selectedType, setSelectedType] = useState("All");
   const [selectedCountry, setSelectedCountry] = useState("us");
   const [selectedJob, setSelectedJob] = useState<CyberJob | null>(null);
   const [jobs, setJobs] = useState<CyberJob[]>([]);
@@ -263,9 +264,10 @@ const CyberJobs = () => {
     return jobs.filter((job) => {
       const matchesLevel = selectedLevel === "All" || job.level === selectedLevel;
       const matchesRemote = selectedRemote === "All" || job.remote === selectedRemote;
-      return matchesLevel && matchesRemote;
+      const matchesType = selectedType === "All" || job.type === selectedType;
+      return matchesLevel && matchesRemote && matchesType;
     });
-  }, [jobs, selectedLevel, selectedRemote]);
+  }, [jobs, selectedLevel, selectedRemote, selectedType]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -328,6 +330,16 @@ const CyberJobs = () => {
                   <SelectContent>
                     {["All", "Remote", "Hybrid", "On-site"].map((r) => (
                       <SelectItem key={r} value={r}>{r}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={selectedType} onValueChange={setSelectedType}>
+                  <SelectTrigger className="w-[120px] h-9 text-xs bg-background/50">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["All", "Full time", "Part time", "Internship", "Contract"].map((t) => (
+                      <SelectItem key={t} value={t}>{t}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
