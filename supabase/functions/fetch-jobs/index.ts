@@ -77,6 +77,14 @@ function getRelativeTime(dateStr: string): string {
   return `${Math.floor(days / 30)} months ago`
 }
 
+function detectJobType(r: any): string {
+  const text = `${r.title || ''} ${r.description || ''}`.toLowerCase()
+  if (text.includes('intern') || text.includes('internship') || text.includes('trainee')) return 'Internship'
+  if (r.contract_time === 'part_time' || text.includes('part-time') || text.includes('part time')) return 'Part time'
+  if (r.contract_type === 'contract' || text.includes('contract')) return 'Contract'
+  return 'Full time'
+}
+
 function guessLevel(title: string, desc: string): string {
   const t = (title + ' ' + desc).toLowerCase()
   if (t.includes('intern') || t.includes('junior') || t.includes('entry') || t.includes('graduate')) return 'Entry'
