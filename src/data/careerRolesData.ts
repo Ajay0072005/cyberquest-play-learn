@@ -1,26 +1,30 @@
 import { LucideIcon, Shield, Swords, Server, Eye, Bug, Cloud } from "lucide-react";
 
 export type StageLevel = "Beginner" | "Intermediate" | "Advanced";
+export type Difficulty = "Beginner" | "Intermediate" | "Advanced" | "Expert";
 
-export interface RoleCourseRef {
-  // References a course id from careerPathsData (path slug + course id)
-  pathSlug: string;
-  courseId: string;
+export interface RoleCourse {
+  id: string;
+  title: string;
+  difficulty: Difficulty;
+  // Optional link to an existing path page that contains this course
+  pathSlug?: string;
 }
 
-export interface RoleLabRef {
-  // References either a mini-lab id (kind='minilab') or a built-in challenge page (kind='page')
+export interface RoleLab {
+  // 'minilab' = lives inside /labs (tracked via lab_progress lab_type=minilab)
+  // 'page'    = standalone challenge route (tracked via the page itself)
   kind: "minilab" | "page";
   id: string;
   title: string;
-  link?: string; // for kind=page
+  link?: string;
 }
 
 export interface RoleStage {
   level: StageLevel;
   summary: string;
-  courses: RoleCourseRef[];
-  labs: RoleLabRef[];
+  courses: RoleCourse[];
+  labs: RoleLab[];
   miniProjects?: { title: string; description: string }[];
 }
 
@@ -30,11 +34,13 @@ export interface CareerRole {
   description: string;
   icon: LucideIcon;
   color: string;
-  badge: string; // skill badge name awarded on completion
+  badge: string;
   skills: string[];
   stages: RoleStage[];
 }
 
+// All courses below reference existing course content already in the platform
+// (careerPathsData + roadmapData). No duplication of lessons.
 export const careerRoles: CareerRole[] = [
   {
     slug: "cybersecurity-analyst",
@@ -49,9 +55,9 @@ export const careerRoles: CareerRole[] = [
         level: "Beginner",
         summary: "Build the foundations: networking, Linux and core security concepts.",
         courses: [
-          { pathSlug: "script-kiddie", courseId: "security-concepts" },
-          { pathSlug: "script-kiddie", courseId: "networking-101" },
-          { pathSlug: "script-kiddie", courseId: "linux-basics" },
+          { id: "security-concepts", title: "Introduction to Cybersecurity", difficulty: "Beginner", pathSlug: "script-kiddie" },
+          { id: "networking-101", title: "Networking Fundamentals", difficulty: "Beginner", pathSlug: "script-kiddie" },
+          { id: "linux-basics", title: "Linux Command Line Essentials", difficulty: "Beginner", pathSlug: "script-kiddie" },
         ],
         labs: [
           { kind: "page", id: "terminal-basics", title: "Terminal Navigation Challenge", link: "/terminal" },
@@ -62,8 +68,8 @@ export const careerRoles: CareerRole[] = [
         level: "Intermediate",
         summary: "Learn how attacks work so you can detect and stop them.",
         courses: [
-          { pathSlug: "security-enthusiast", courseId: "owasp-top10" },
-          { pathSlug: "security-enthusiast", courseId: "web-attacks" },
+          { id: "owasp-top10", title: "OWASP Top 10 Deep Dive", difficulty: "Intermediate", pathSlug: "security-enthusiast" },
+          { id: "web-attacks", title: "Web Attack Fundamentals", difficulty: "Intermediate", pathSlug: "security-enthusiast" },
         ],
         labs: [
           { kind: "minilab", id: "sql-injection-login", title: "SQL Injection: Login Bypass" },
@@ -71,14 +77,15 @@ export const careerRoles: CareerRole[] = [
           { kind: "minilab", id: "broken-auth", title: "Broken Authentication" },
         ],
         miniProjects: [
-          { title: "Build a Phishing Triage Playbook", description: "Document a step-by-step IR runbook based on the phishing lab." },
+          { title: "Phishing Triage Playbook", description: "Document a step-by-step IR runbook based on the phishing lab." },
         ],
       },
       {
         level: "Advanced",
         summary: "Conduct full investigations and produce professional analysis reports.",
         courses: [
-          { pathSlug: "junior-pentester", courseId: "vuln-assessment" },
+          { id: "vuln-assessment", title: "Vulnerability Assessment & Reporting", difficulty: "Intermediate", pathSlug: "junior-pentester" },
+          { id: "malware-analysis", title: "Advanced Malware Analysis", difficulty: "Expert", pathSlug: "elite-hacker" },
         ],
         labs: [
           { kind: "page", id: "sherlock", title: "Sherlock DFIR Investigation", link: "/sherlock" },
@@ -102,8 +109,8 @@ export const careerRoles: CareerRole[] = [
         level: "Beginner",
         summary: "Pick up the fundamentals an attacker needs.",
         courses: [
-          { pathSlug: "script-kiddie", courseId: "linux-basics" },
-          { pathSlug: "script-kiddie", courseId: "networking-101" },
+          { id: "linux-basics", title: "Linux Command Line Essentials", difficulty: "Beginner", pathSlug: "script-kiddie" },
+          { id: "networking-101", title: "Networking Fundamentals", difficulty: "Beginner", pathSlug: "script-kiddie" },
         ],
         labs: [
           { kind: "page", id: "terminal-basics", title: "Terminal Challenge", link: "/terminal" },
@@ -114,10 +121,10 @@ export const careerRoles: CareerRole[] = [
         level: "Intermediate",
         summary: "Master common web vulnerabilities and tooling.",
         courses: [
-          { pathSlug: "security-enthusiast", courseId: "owasp-top10" },
-          { pathSlug: "security-enthusiast", courseId: "web-attacks" },
-          { pathSlug: "junior-pentester", courseId: "burp-suite" },
-          { pathSlug: "junior-pentester", courseId: "reconnaissance" },
+          { id: "owasp-top10", title: "OWASP Top 10 Deep Dive", difficulty: "Intermediate", pathSlug: "security-enthusiast" },
+          { id: "web-attacks", title: "Web Attack Fundamentals", difficulty: "Intermediate", pathSlug: "security-enthusiast" },
+          { id: "burp-suite", title: "Burp Suite Mastery", difficulty: "Intermediate", pathSlug: "junior-pentester" },
+          { id: "reconnaissance", title: "Advanced Reconnaissance", difficulty: "Intermediate", pathSlug: "junior-pentester" },
         ],
         labs: [
           { kind: "page", id: "sql-game", title: "SQL Injection Playground", link: "/sql-game" },
@@ -130,9 +137,9 @@ export const careerRoles: CareerRole[] = [
         level: "Advanced",
         summary: "Chain exploits and operate against hardened targets.",
         courses: [
-          { pathSlug: "penetration-tester", courseId: "exploit-dev" },
-          { pathSlug: "penetration-tester", courseId: "advanced-webapp" },
-          { pathSlug: "penetration-tester", courseId: "active-directory" },
+          { id: "exploit-dev", title: "Exploit Development Fundamentals", difficulty: "Advanced", pathSlug: "penetration-tester" },
+          { id: "advanced-webapp", title: "Advanced Web App Pentesting", difficulty: "Advanced", pathSlug: "penetration-tester" },
+          { id: "active-directory", title: "Active Directory Attacks", difficulty: "Advanced", pathSlug: "penetration-tester" },
         ],
         labs: [
           { kind: "minilab", id: "command-injection", title: "OS Command Injection" },
@@ -157,8 +164,8 @@ export const careerRoles: CareerRole[] = [
         level: "Beginner",
         summary: "Understand how systems and networks fit together.",
         courses: [
-          { pathSlug: "script-kiddie", courseId: "networking-101" },
-          { pathSlug: "script-kiddie", courseId: "security-concepts" },
+          { id: "networking-101", title: "Networking Fundamentals", difficulty: "Beginner", pathSlug: "script-kiddie" },
+          { id: "security-concepts", title: "Introduction to Cybersecurity", difficulty: "Beginner", pathSlug: "script-kiddie" },
         ],
         labs: [
           { kind: "minilab", id: "phishing-analysis", title: "Phishing Email Analysis" },
@@ -168,8 +175,8 @@ export const careerRoles: CareerRole[] = [
         level: "Intermediate",
         summary: "Learn to write and review secure code.",
         courses: [
-          { pathSlug: "security-enthusiast", courseId: "python-security" },
-          { pathSlug: "security-enthusiast", courseId: "owasp-top10" },
+          { id: "python-security", title: "Python for Security", difficulty: "Intermediate", pathSlug: "security-enthusiast" },
+          { id: "owasp-top10", title: "OWASP Top 10 Deep Dive", difficulty: "Intermediate", pathSlug: "security-enthusiast" },
         ],
         labs: [
           { kind: "minilab", id: "broken-auth", title: "Broken Authentication" },
@@ -181,7 +188,7 @@ export const careerRoles: CareerRole[] = [
         level: "Advanced",
         summary: "Architect end-to-end secure systems.",
         courses: [
-          { pathSlug: "elite-hacker", courseId: "security-architecture" },
+          { id: "security-architecture", title: "Security Architecture Design", difficulty: "Expert", pathSlug: "elite-hacker" },
         ],
         labs: [
           { kind: "minilab", id: "path-traversal", title: "Path Traversal" },
@@ -205,9 +212,9 @@ export const careerRoles: CareerRole[] = [
         level: "Beginner",
         summary: "Learn the building blocks of monitoring.",
         courses: [
-          { pathSlug: "script-kiddie", courseId: "linux-basics" },
-          { pathSlug: "script-kiddie", courseId: "networking-101" },
-          { pathSlug: "script-kiddie", courseId: "security-concepts" },
+          { id: "linux-basics", title: "Linux Command Line Essentials", difficulty: "Beginner", pathSlug: "script-kiddie" },
+          { id: "networking-101", title: "Networking Fundamentals", difficulty: "Beginner", pathSlug: "script-kiddie" },
+          { id: "security-concepts", title: "Introduction to Cybersecurity", difficulty: "Beginner", pathSlug: "script-kiddie" },
         ],
         labs: [
           { kind: "page", id: "terminal-basics", title: "Terminal Challenge", link: "/terminal" },
@@ -218,8 +225,8 @@ export const careerRoles: CareerRole[] = [
         level: "Intermediate",
         summary: "Recognize attacker techniques in real traffic and logs.",
         courses: [
-          { pathSlug: "security-enthusiast", courseId: "owasp-top10" },
-          { pathSlug: "junior-pentester", courseId: "vuln-assessment" },
+          { id: "owasp-top10", title: "OWASP Top 10 Deep Dive", difficulty: "Intermediate", pathSlug: "security-enthusiast" },
+          { id: "vuln-assessment", title: "Vulnerability Assessment & Reporting", difficulty: "Intermediate", pathSlug: "junior-pentester" },
         ],
         labs: [
           { kind: "minilab", id: "xss-stored", title: "Stored XSS Attack" },
@@ -231,13 +238,13 @@ export const careerRoles: CareerRole[] = [
         level: "Advanced",
         summary: "Lead investigations and run a forensic case.",
         courses: [
-          { pathSlug: "junior-pentester", courseId: "reconnaissance" },
+          { id: "reconnaissance", title: "Advanced Reconnaissance", difficulty: "Intermediate", pathSlug: "junior-pentester" },
         ],
         labs: [
           { kind: "page", id: "sherlock", title: "Sherlock DFIR Investigation", link: "/sherlock" },
         ],
         miniProjects: [
-          { title: "Build a Detection Rule", description: "Design a Sigma-style detection rule for one of the labs you completed." },
+          { title: "Build a Detection Rule", description: "Design a Sigma-style detection rule for a lab you completed." },
         ],
       },
     ],
@@ -255,8 +262,8 @@ export const careerRoles: CareerRole[] = [
         level: "Beginner",
         summary: "Get comfortable with the terminal and low-level concepts.",
         courses: [
-          { pathSlug: "script-kiddie", courseId: "linux-basics" },
-          { pathSlug: "script-kiddie", courseId: "security-concepts" },
+          { id: "linux-basics", title: "Linux Command Line Essentials", difficulty: "Beginner", pathSlug: "script-kiddie" },
+          { id: "security-concepts", title: "Introduction to Cybersecurity", difficulty: "Beginner", pathSlug: "script-kiddie" },
         ],
         labs: [
           { kind: "page", id: "terminal-basics", title: "Terminal Challenge", link: "/terminal" },
@@ -267,8 +274,8 @@ export const careerRoles: CareerRole[] = [
         level: "Intermediate",
         summary: "Learn scripting and how exploits are built.",
         courses: [
-          { pathSlug: "security-enthusiast", courseId: "python-security" },
-          { pathSlug: "penetration-tester", courseId: "exploit-dev" },
+          { id: "python-security", title: "Python for Security", difficulty: "Intermediate", pathSlug: "security-enthusiast" },
+          { id: "exploit-dev", title: "Exploit Development Fundamentals", difficulty: "Advanced", pathSlug: "penetration-tester" },
         ],
         labs: [
           { kind: "minilab", id: "command-injection", title: "OS Command Injection" },
@@ -279,8 +286,8 @@ export const careerRoles: CareerRole[] = [
         level: "Advanced",
         summary: "Reverse and analyze sophisticated malware samples.",
         courses: [
-          { pathSlug: "elite-hacker", courseId: "malware-analysis" },
-          { pathSlug: "elite-hacker", courseId: "zero-day-research" },
+          { id: "malware-analysis", title: "Advanced Malware Analysis", difficulty: "Expert", pathSlug: "elite-hacker" },
+          { id: "zero-day-research", title: "Zero-Day Vulnerability Research", difficulty: "Expert", pathSlug: "elite-hacker" },
         ],
         labs: [
           { kind: "page", id: "sherlock", title: "Sherlock DFIR Investigation", link: "/sherlock" },
@@ -304,9 +311,9 @@ export const careerRoles: CareerRole[] = [
         level: "Beginner",
         summary: "Networking, Linux and core security concepts.",
         courses: [
-          { pathSlug: "script-kiddie", courseId: "networking-101" },
-          { pathSlug: "script-kiddie", courseId: "linux-basics" },
-          { pathSlug: "script-kiddie", courseId: "security-concepts" },
+          { id: "networking-101", title: "Networking Fundamentals", difficulty: "Beginner", pathSlug: "script-kiddie" },
+          { id: "linux-basics", title: "Linux Command Line Essentials", difficulty: "Beginner", pathSlug: "script-kiddie" },
+          { id: "security-concepts", title: "Introduction to Cybersecurity", difficulty: "Beginner", pathSlug: "script-kiddie" },
         ],
         labs: [
           { kind: "minilab", id: "phishing-analysis", title: "Phishing Email Analysis" },
@@ -316,8 +323,8 @@ export const careerRoles: CareerRole[] = [
         level: "Intermediate",
         summary: "Identity, access and common cloud-app vulnerabilities.",
         courses: [
-          { pathSlug: "security-enthusiast", courseId: "python-security" },
-          { pathSlug: "security-enthusiast", courseId: "owasp-top10" },
+          { id: "python-security", title: "Python for Security", difficulty: "Intermediate", pathSlug: "security-enthusiast" },
+          { id: "owasp-top10", title: "OWASP Top 10 Deep Dive", difficulty: "Intermediate", pathSlug: "security-enthusiast" },
         ],
         labs: [
           { kind: "minilab", id: "broken-auth", title: "Broken Authentication" },
@@ -329,9 +336,7 @@ export const careerRoles: CareerRole[] = [
         level: "Advanced",
         summary: "Attack & defend cloud infrastructure.",
         courses: [
-          { pathSlug: "security-engineer", courseId: "attack-aws" },
-          { pathSlug: "security-engineer", courseId: "devsecops" },
-          { pathSlug: "elite-hacker", courseId: "security-architecture" },
+          { id: "security-architecture", title: "Security Architecture Design", difficulty: "Expert", pathSlug: "elite-hacker" },
         ],
         labs: [
           { kind: "minilab", id: "path-traversal", title: "Path Traversal" },
