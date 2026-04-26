@@ -18,10 +18,23 @@ import {
   Award,
   Lightbulb,
   Lock,
+  RotateCcw,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { careerRoles, getCareerRoleBySlug, RoleCourse, RoleLab, RoleStage, CareerRole } from "@/data/careerRolesData";
 import { useLabProgress } from "@/hooks/useLabProgress";
 import { useGame } from "@/context/GameContext";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 const COURSE_PROGRESS_KEY = "career-roles-course-progress";
@@ -74,8 +87,10 @@ const CareerRoles: React.FC = () => {
   });
   const [courseProgress, setCourseProgress] = useState<CourseProgressMap>(loadCourseProgress);
 
-  const { isLabCompleted } = useLabProgress();
+  const { isLabCompleted, resetLabProgress } = useLabProgress();
   const { sqlLevelsCompleted, cryptoPuzzlesSolved, terminalFlagsFound } = useGame();
+  const { toast } = useToast();
+  const [resetting, setResetting] = useState(false);
 
   // Sherlock completion is stored locally
   const sherlockCompleted = useMemo(() => {
@@ -120,6 +135,52 @@ const CareerRoles: React.FC = () => {
     const next = { ...courseProgress, [key]: !courseProgress[key] };
     setCourseProgress(next);
     saveCourseProgress(next);
+  };
+
+  const resetRoleProgress = async (role: CareerRole) => {
+    setResetting(true);
+    try {
+      // 1. Clear course progress for this role
+      const next = { ...courseProgress };
+      role.stages.forEach((s) => {
+        s.courses.forEach((c) => {
+          delete next[`${role.slug}:${c.id}`];
+        });
+      });
+      setCourseProgress(next);
+      saveCourseProgress(next);
+
+      // 2. Reset minilab completions tied to this role (DB-backed)
+      const minilabs = role.stages.flatMap((s) =>
+        s.labs.filter((l): l is RoleLab & { kind: "minilab" } => l.kind === "minilab")
+      );
+      for (const lab of minilabs) {
+        if (isLabCompleted(lab.id, "minilab")) {
+          await resetLabProgress(lab.id, "minilab");
+        }
+      }
+
+      // 3. Clear local sherlock keys if sherlock lab is part of this role
+      const hasSherlock = role.stages.some((s) => s.labs.some((l) => l.id === "sherlock"));
+      if (hasSherlock) {
+        localStorage.removeItem("sherlock-progress");
+        localStorage.removeItem("sherlock-escape-completed");
+      }
+
+      toast({
+        title: "Path Progress Reset",
+        description: `${role.title} progress has been cleared. Note: shared game stats (SQL, Crypto, Terminal) are kept.`,
+      });
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: "Error",
+        description: "Failed to reset some items.",
+        variant: "destructive",
+      });
+    } finally {
+      setResetting(false);
+    }
   };
 
   const computeRoleStats = (role: CareerRole) => {
@@ -224,10 +285,42 @@ const CareerRoles: React.FC = () => {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        <Button variant="ghost" size="sm" onClick={() => setSelectedSlug(null)} className="-ml-2">
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          All career paths
-        </Button>
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <Button variant="ghost" size="sm" onClick={() => setSelectedSlug(null)} className="-ml-2">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            All career paths
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={resetting || stats.done === 0}
+                className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              >
+                <RotateCcw className="h-4 w-4 mr-1" />
+                Reset path progress
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Reset {role.title} progress?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This clears your course completions and the mini-lab completions tied to this path. Shared game stats from SQL, Crypto, and Terminal challenges will be kept (they power other paths too). This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => resetRoleProgress(role)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Yes, reset
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
 
         {/* Hero */}
         <Card className="cyber-bg border-primary/20 overflow-hidden">
