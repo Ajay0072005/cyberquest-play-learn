@@ -16,7 +16,8 @@ import {
   Clock,
   User,
   Briefcase,
-  CalendarDays
+  CalendarDays,
+  Compass
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logo from '@/assets/logo-transparent.png';
@@ -28,6 +29,7 @@ import { useState } from 'react';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+  { icon: Compass, label: 'Career Paths', path: '/career-roles' },
   { icon: BookOpen, label: 'Sherlock Course', path: '/sherlock' },
   { icon: FlaskConical, label: 'Practical Labs', path: '/labs' },
   { icon: Award, label: 'Achievements', path: '/achievements' },
