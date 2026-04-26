@@ -211,6 +211,7 @@ const CyberJobs = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("All");
   const [selectedRemote, setSelectedRemote] = useState("All");
+  const [selectedType, setSelectedType] = useState("All");
   const [selectedCountry, setSelectedCountry] = useState("us");
   const [selectedJob, setSelectedJob] = useState<CyberJob | null>(null);
   const [jobs, setJobs] = useState<CyberJob[]>([]);
