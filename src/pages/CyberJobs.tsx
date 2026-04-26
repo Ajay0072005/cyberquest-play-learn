@@ -333,6 +333,16 @@ const CyberJobs = () => {
                     ))}
                   </SelectContent>
                 </Select>
+                <Select value={selectedType} onValueChange={setSelectedType}>
+                  <SelectTrigger className="w-[120px] h-9 text-xs bg-background/50">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["All", "Full time", "Part time", "Internship", "Contract"].map((t) => (
+                      <SelectItem key={t} value={t}>{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => fetchJobs(searchQuery, selectedCountry)}>
                   <RefreshCw className="h-3.5 w-3.5" />
                 </Button>
