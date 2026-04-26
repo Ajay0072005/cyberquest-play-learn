@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
       title: r.title?.replace(/<\/?[^>]+(>|$)/g, '') || 'Untitled',
       company: r.company?.display_name || 'Unknown Company',
       location: r.location?.display_name || 'Unknown',
-      type: r.contract_time === 'part_time' ? 'Part time' : r.contract_type === 'contract' ? 'Contract' : 'Full time',
+      type: detectJobType(r),
       remote: r.title?.toLowerCase().includes('remote') || r.description?.toLowerCase().includes('remote') ? 'Remote' : r.title?.toLowerCase().includes('hybrid') || r.description?.toLowerCase().includes('hybrid') ? 'Hybrid' : 'On-site',
       salary: r.salary_min && r.salary_max
         ? `$${Math.round(r.salary_min / 1000)}K – $${Math.round(r.salary_max / 1000)}K/yr`
