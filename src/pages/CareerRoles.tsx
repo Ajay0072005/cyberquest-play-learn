@@ -18,10 +18,23 @@ import {
   Award,
   Lightbulb,
   Lock,
+  RotateCcw,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { careerRoles, getCareerRoleBySlug, RoleCourse, RoleLab, RoleStage, CareerRole } from "@/data/careerRolesData";
 import { useLabProgress } from "@/hooks/useLabProgress";
 import { useGame } from "@/context/GameContext";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 const COURSE_PROGRESS_KEY = "career-roles-course-progress";
