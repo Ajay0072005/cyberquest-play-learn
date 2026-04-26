@@ -87,8 +87,10 @@ const CareerRoles: React.FC = () => {
   });
   const [courseProgress, setCourseProgress] = useState<CourseProgressMap>(loadCourseProgress);
 
-  const { isLabCompleted } = useLabProgress();
+  const { isLabCompleted, resetLabProgress } = useLabProgress();
   const { sqlLevelsCompleted, cryptoPuzzlesSolved, terminalFlagsFound } = useGame();
+  const { toast } = useToast();
+  const [resetting, setResetting] = useState(false);
 
   // Sherlock completion is stored locally
   const sherlockCompleted = useMemo(() => {
