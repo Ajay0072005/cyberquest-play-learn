@@ -137,6 +137,52 @@ const CareerRoles: React.FC = () => {
     saveCourseProgress(next);
   };
 
+  const resetRoleProgress = async (role: CareerRole) => {
+    setResetting(true);
+    try {
+      // 1. Clear course progress for this role
+      const next = { ...courseProgress };
+      role.stages.forEach((s) => {
+        s.courses.forEach((c) => {
+          delete next[`${role.slug}:${c.id}`];
+        });
+      });
+      setCourseProgress(next);
+      saveCourseProgress(next);
+
+      // 2. Reset minilab completions tied to this role (DB-backed)
+      const minilabs = role.stages.flatMap((s) =>
+        s.labs.filter((l): l is RoleLab & { kind: "minilab" } => l.kind === "minilab")
+      );
+      for (const lab of minilabs) {
+        if (isLabCompleted(lab.id, "minilab")) {
+          await resetLabProgress(lab.id, "minilab");
+        }
+      }
+
+      // 3. Clear local sherlock keys if sherlock lab is part of this role
+      const hasSherlock = role.stages.some((s) => s.labs.some((l) => l.id === "sherlock"));
+      if (hasSherlock) {
+        localStorage.removeItem("sherlock-progress");
+        localStorage.removeItem("sherlock-escape-completed");
+      }
+
+      toast({
+        title: "Path Progress Reset",
+        description: `${role.title} progress has been cleared. Note: shared game stats (SQL, Crypto, Terminal) are kept.`,
+      });
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: "Error",
+        description: "Failed to reset some items.",
+        variant: "destructive",
+      });
+    } finally {
+      setResetting(false);
+    }
+  };
+
   const computeRoleStats = (role: CareerRole) => {
     let totalCourses = 0;
     let doneCourses = 0;
