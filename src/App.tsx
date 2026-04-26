@@ -28,6 +28,7 @@ import Achievements from "./pages/Achievements";
 import SherlockCourse from "./pages/SherlockCourse";
 import PracticalLabs from "./pages/PracticalLabs";
 import CareerPath from "./pages/CareerPath";
+import CareerRoles from "./pages/CareerRoles";
 import AdminRoles from "./pages/AdminRoles";
 import ModeratorDashboard from "./pages/ModeratorDashboard";
 import Roadmap from "./pages/Roadmap";
@@ -79,6 +80,8 @@ const App = () => (
                 <Route path="/labs" element={<ProtectedRoute><PracticalLabs /></ProtectedRoute>} />
                 <Route path="/career-path" element={<ProtectedRoute><CareerPath /></ProtectedRoute>} />
                 <Route path="/path/:slug" element={<ProtectedRoute><CareerPath /></ProtectedRoute>} />
+                <Route path="/career-roles" element={<ProtectedRoute><CareerRoles /></ProtectedRoute>} />
+                <Route path="/career-roles/:slug" element={<ProtectedRoute><CareerRoles /></ProtectedRoute>} />
                 <Route path="/admin/roles" element={<ProtectedRoute><AdminRoles /></ProtectedRoute>} />
                 <Route path="/moderator" element={<ProtectedRoute><ModeratorDashboard /></ProtectedRoute>} />
                 <Route path="/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />

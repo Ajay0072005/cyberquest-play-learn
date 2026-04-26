@@ -264,6 +264,22 @@ const Dashboard: React.FC = () => {
         </Card>
       </div>
 
+      {/* Career Paths Banner */}
+      <Card className="mb-4 border-border bg-card overflow-hidden hover:border-primary/40 transition-colors cursor-pointer group" onClick={() => navigate('/career-roles')}>
+        <CardContent className="p-5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Target className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground">Career Paths</h3>
+              <p className="text-sm text-muted-foreground">Pick a role (Analyst, Pentester, SOC, Cloud…) and follow a structured roadmap</p>
+            </div>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+        </CardContent>
+      </Card>
+
       {/* CyberQuest 3D Banner */}
       <Card className="mb-8 border-border bg-card overflow-hidden hover:border-primary/40 transition-colors cursor-pointer group" onClick={() => navigate('/cyber-game')}>
         <CardContent className="p-5 flex items-center justify-between gap-4">
