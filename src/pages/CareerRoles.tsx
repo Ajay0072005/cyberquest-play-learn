@@ -285,10 +285,42 @@ const CareerRoles: React.FC = () => {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        <Button variant="ghost" size="sm" onClick={() => setSelectedSlug(null)} className="-ml-2">
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          All career paths
-        </Button>
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <Button variant="ghost" size="sm" onClick={() => setSelectedSlug(null)} className="-ml-2">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            All career paths
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={resetting || stats.done === 0}
+                className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              >
+                <RotateCcw className="h-4 w-4 mr-1" />
+                Reset path progress
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Reset {role.title} progress?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This clears your course completions and the mini-lab completions tied to this path. Shared game stats from SQL, Crypto, and Terminal challenges will be kept (they power other paths too). This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => resetRoleProgress(role)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Yes, reset
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
 
         {/* Hero */}
         <Card className="cyber-bg border-primary/20 overflow-hidden">
