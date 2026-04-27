@@ -324,9 +324,17 @@ const CareerRoles: React.FC = () => {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => resetRoleProgress(role)}
+                  disabled={resetting}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  Yes, reset
+                  {resetting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                      Resetting...
+                    </>
+                  ) : (
+                    "Yes, reset"
+                  )}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
