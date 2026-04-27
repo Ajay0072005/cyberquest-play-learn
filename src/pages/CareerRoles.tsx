@@ -19,6 +19,7 @@ import {
   Lightbulb,
   Lock,
   RotateCcw,
+  Loader2,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -86,13 +87,14 @@ const CareerRoles: React.FC = () => {
     return localStorage.getItem("career-roles-selected") || null;
   });
   const [courseProgress, setCourseProgress] = useState<CourseProgressMap>(loadCourseProgress);
+  const [refreshTick, setRefreshTick] = useState(0);
 
-  const { isLabCompleted, resetLabProgress } = useLabProgress();
+  const { isLabCompleted, resetLabProgress, refetch: refetchLabs } = useLabProgress();
   const { sqlLevelsCompleted, cryptoPuzzlesSolved, terminalFlagsFound } = useGame();
   const { toast } = useToast();
   const [resetting, setResetting] = useState(false);
 
-  // Sherlock completion is stored locally
+  // Sherlock completion is stored locally - re-read whenever role or refresh tick changes
   const sherlockCompleted = useMemo(() => {
     try {
       const progress = JSON.parse(localStorage.getItem("sherlock-progress") || "{}");
@@ -102,7 +104,8 @@ const CareerRoles: React.FC = () => {
     } catch {
       return false;
     }
-  }, [selectedSlug]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSlug, refreshTick]);
 
   useEffect(() => {
     if (selectedSlug) {
@@ -166,6 +169,10 @@ const CareerRoles: React.FC = () => {
         localStorage.removeItem("sherlock-progress");
         localStorage.removeItem("sherlock-escape-completed");
       }
+
+      // 4. Force a refresh of all derived progress (labs from DB + sherlock from localStorage)
+      await refetchLabs();
+      setRefreshTick((t) => t + 1);
 
       toast({
         title: "Path Progress Reset",
@@ -298,8 +305,12 @@ const CareerRoles: React.FC = () => {
                 disabled={resetting || stats.done === 0}
                 className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
               >
-                <RotateCcw className="h-4 w-4 mr-1" />
-                Reset path progress
+                {resetting ? (
+                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                ) : (
+                  <RotateCcw className="h-4 w-4 mr-1" />
+                )}
+                {resetting ? "Resetting..." : "Reset path progress"}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -313,9 +324,17 @@ const CareerRoles: React.FC = () => {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => resetRoleProgress(role)}
+                  disabled={resetting}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  Yes, reset
+                  {resetting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                      Resetting...
+                    </>
+                  ) : (
+                    "Yes, reset"
+                  )}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
