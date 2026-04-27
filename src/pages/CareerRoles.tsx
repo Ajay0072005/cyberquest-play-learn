@@ -170,6 +170,10 @@ const CareerRoles: React.FC = () => {
         localStorage.removeItem("sherlock-escape-completed");
       }
 
+      // 4. Force a refresh of all derived progress (labs from DB + sherlock from localStorage)
+      await refetchLabs();
+      setRefreshTick((t) => t + 1);
+
       toast({
         title: "Path Progress Reset",
         description: `${role.title} progress has been cleared. Note: shared game stats (SQL, Crypto, Terminal) are kept.`,
