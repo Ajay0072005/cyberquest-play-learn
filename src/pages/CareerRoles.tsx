@@ -305,8 +305,12 @@ const CareerRoles: React.FC = () => {
                 disabled={resetting || stats.done === 0}
                 className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
               >
-                <RotateCcw className="h-4 w-4 mr-1" />
-                Reset path progress
+                {resetting ? (
+                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                ) : (
+                  <RotateCcw className="h-4 w-4 mr-1" />
+                )}
+                {resetting ? "Resetting..." : "Reset path progress"}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
