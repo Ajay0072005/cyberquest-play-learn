@@ -87,13 +87,14 @@ const CareerRoles: React.FC = () => {
     return localStorage.getItem("career-roles-selected") || null;
   });
   const [courseProgress, setCourseProgress] = useState<CourseProgressMap>(loadCourseProgress);
+  const [refreshTick, setRefreshTick] = useState(0);
 
-  const { isLabCompleted, resetLabProgress } = useLabProgress();
+  const { isLabCompleted, resetLabProgress, refetch: refetchLabs } = useLabProgress();
   const { sqlLevelsCompleted, cryptoPuzzlesSolved, terminalFlagsFound } = useGame();
   const { toast } = useToast();
   const [resetting, setResetting] = useState(false);
 
-  // Sherlock completion is stored locally
+  // Sherlock completion is stored locally - re-read whenever role or refresh tick changes
   const sherlockCompleted = useMemo(() => {
     try {
       const progress = JSON.parse(localStorage.getItem("sherlock-progress") || "{}");
@@ -103,7 +104,8 @@ const CareerRoles: React.FC = () => {
     } catch {
       return false;
     }
-  }, [selectedSlug]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSlug, refreshTick]);
 
   useEffect(() => {
     if (selectedSlug) {
