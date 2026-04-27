@@ -19,6 +19,7 @@ import {
   Lightbulb,
   Lock,
   RotateCcw,
+  Loader2,
 } from "lucide-react";
 import {
   AlertDialog,
