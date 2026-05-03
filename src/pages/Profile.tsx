@@ -188,13 +188,18 @@ const Profile = () => {
                     <span className="text-lg font-bold text-foreground">{points}</span>
                   </div>
                 </div>
-                <div className="bg-secondary/50 rounded-lg px-4 py-2.5 text-center min-w-[100px]">
+                <button
+                  type="button"
+                  onClick={() => setBadgesOpen(true)}
+                  className="bg-secondary/50 rounded-lg px-4 py-2.5 text-center min-w-[100px] hover:bg-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+                  aria-label="View earned badges"
+                >
                   <p className="text-xs text-muted-foreground mb-0.5">Badges</p>
                   <div className="flex items-center justify-center gap-1.5">
                     <Award className="h-4 w-4 text-primary" />
                     <span className="text-lg font-bold text-foreground">{achievementCount}</span>
                   </div>
-                </div>
+                </button>
               </div>
             </div>
           </CardContent>
