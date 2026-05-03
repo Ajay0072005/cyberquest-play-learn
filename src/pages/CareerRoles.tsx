@@ -174,6 +174,7 @@ const CareerRoles: React.FC = () => {
       // 4. Force a refresh of all derived progress (labs from DB + sherlock from localStorage)
       await refetchLabs();
       setRefreshTick((t) => t + 1);
+      setLastUpdated(new Date());
 
       toast({
         title: "Path Progress Reset",
