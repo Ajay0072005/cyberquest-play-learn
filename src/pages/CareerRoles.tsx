@@ -36,6 +36,7 @@ import { careerRoles, getCareerRoleBySlug, RoleCourse, RoleLab, RoleStage, Caree
 import { useLabProgress } from "@/hooks/useLabProgress";
 import { useGame } from "@/context/GameContext";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 const COURSE_PROGRESS_KEY = "career-roles-course-progress";
