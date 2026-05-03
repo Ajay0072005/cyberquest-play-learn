@@ -391,7 +391,7 @@ const CareerRoles: React.FC = () => {
                   {resetting ? (
                     <Skeleton className="h-4 w-10" />
                   ) : (
-                    <span className="text-sm font-medium text-primary transition-opacity duration-300 animate-fade-in">{stats.pct}%</span>
+                    <AnimatedPercent value={stats.pct} className="text-sm font-medium text-primary" />
                   )}
                 </div>
                 {resetting ? (
