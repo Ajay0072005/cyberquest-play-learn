@@ -367,6 +367,11 @@ const CareerRoles: React.FC = () => {
                   <span><BookOpen className="h-3 w-3 inline mr-1" />{stats.doneCourses}/{stats.totalCourses} courses</span>
                   <span><Beaker className="h-3 w-3 inline mr-1" />{stats.doneLabs}/{stats.totalLabs} labs</span>
                   <span><Trophy className="h-3 w-3 inline mr-1 text-yellow-400" />{stats.done}/{stats.total} milestones</span>
+                  {lastUpdated && (
+                    <span className="ml-auto italic">
+                      Last updated: {lastUpdated.toLocaleTimeString()}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className={cn(
