@@ -444,6 +444,63 @@ const Profile = () => {
           {activeTab === 'avatar' && <AvatarCustomizer />}
         </div>
       </div>
+
+      <Dialog open={badgesOpen} onOpenChange={setBadgesOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Award className="h-5 w-5 text-primary" />
+              Your Badges
+            </DialogTitle>
+            <DialogDescription>
+              {achLoading
+                ? 'Loading badges...'
+                : `${earnedAchievements.length} of ${achievements.length} badges earned`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto -mx-2 px-2">
+            {achLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : earnedAchievements.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Award className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                <p className="text-sm">No badges earned yet.</p>
+                <p className="text-xs mt-1">Complete challenges to unlock badges!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {earnedAchievements.map((a) => {
+                  const earnedAt = getEarnedDate(a.id);
+                  return (
+                    <div
+                      key={a.id}
+                      className="flex items-start gap-3 p-3 rounded-lg border border-primary/20 bg-secondary/30"
+                    >
+                      <div className="h-10 w-10 rounded-lg bg-primary/15 flex items-center justify-center text-xl shrink-0">
+                        {a.icon || '🏆'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{a.name}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2">{a.description}</p>
+                        <div className="flex items-center justify-between mt-1.5 gap-2">
+                          <span className="text-[10px] text-primary font-medium">+{a.points} XP</span>
+                          {earnedAt && (
+                            <span className="text-[10px] text-muted-foreground">
+                              {format(new Date(earnedAt), 'MMM d, yyyy')}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };
