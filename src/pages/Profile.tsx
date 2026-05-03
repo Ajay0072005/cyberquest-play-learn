@@ -50,6 +50,9 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [achievementCount, setAchievementCount] = useState(0);
+  const [badgesOpen, setBadgesOpen] = useState(false);
+  const { achievements, userAchievements, loading: achLoading, isAchievementEarned, getEarnedDate } = useAchievements();
+  const earnedAchievements = achievements.filter(a => isAchievementEarned(a.id));
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const tabsRef = useRef<HTMLDivElement>(null);
 
