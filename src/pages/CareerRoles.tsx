@@ -361,17 +361,44 @@ const CareerRoles: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-muted-foreground">Overall Progress</span>
-                  <span className="text-sm font-medium text-primary">{stats.pct}%</span>
+                  {resetting ? (
+                    <Skeleton className="h-4 w-10" />
+                  ) : (
+                    <span className="text-sm font-medium text-primary transition-opacity duration-300 animate-fade-in">{stats.pct}%</span>
+                  )}
                 </div>
-                <Progress value={stats.pct} className="h-2" />
-                <div className="flex flex-wrap gap-4 text-xs text-muted-foreground mt-3">
-                  <span><BookOpen className="h-3 w-3 inline mr-1" />{stats.doneCourses}/{stats.totalCourses} courses</span>
-                  <span><Beaker className="h-3 w-3 inline mr-1" />{stats.doneLabs}/{stats.totalLabs} labs</span>
-                  <span><Trophy className="h-3 w-3 inline mr-1 text-yellow-400" />{stats.done}/{stats.total} milestones</span>
-                  {lastUpdated && (
-                    <span className="ml-auto italic">
-                      Last updated: {lastUpdated.toLocaleTimeString()}
-                    </span>
+                {resetting ? (
+                  <Skeleton className="h-2 w-full" />
+                ) : (
+                  <div className="animate-fade-in">
+                    <Progress value={stats.pct} className="h-2" />
+                  </div>
+                )}
+                <div className={cn(
+                  "flex flex-wrap gap-4 text-xs text-muted-foreground mt-3 transition-opacity duration-300",
+                  resetting && "opacity-50"
+                )}>
+                  {resetting ? (
+                    <>
+                      <Skeleton className="h-3 w-20" />
+                      <Skeleton className="h-3 w-20" />
+                      <Skeleton className="h-3 w-24" />
+                      <span className="ml-auto inline-flex items-center gap-1 italic text-primary">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        Refreshing stats…
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="animate-fade-in"><BookOpen className="h-3 w-3 inline mr-1" />{stats.doneCourses}/{stats.totalCourses} courses</span>
+                      <span className="animate-fade-in"><Beaker className="h-3 w-3 inline mr-1" />{stats.doneLabs}/{stats.totalLabs} labs</span>
+                      <span className="animate-fade-in"><Trophy className="h-3 w-3 inline mr-1 text-yellow-400" />{stats.done}/{stats.total} milestones</span>
+                      {lastUpdated && (
+                        <span className="ml-auto italic animate-fade-in">
+                          Last updated: {lastUpdated.toLocaleTimeString()}
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
