@@ -88,6 +88,7 @@ const CareerRoles: React.FC = () => {
   });
   const [courseProgress, setCourseProgress] = useState<CourseProgressMap>(loadCourseProgress);
   const [refreshTick, setRefreshTick] = useState(0);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const { isLabCompleted, resetLabProgress, refetch: refetchLabs } = useLabProgress();
   const { sqlLevelsCompleted, cryptoPuzzlesSolved, terminalFlagsFound } = useGame();
