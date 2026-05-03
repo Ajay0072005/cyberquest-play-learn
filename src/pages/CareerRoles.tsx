@@ -83,6 +83,33 @@ const stageOrderClass = (level: string) => {
   }
 };
 
+const AnimatedPercent: React.FC<{ value: number; className?: string }> = ({ value, className }) => {
+  const [display, setDisplay] = useState(value);
+  const prevRef = React.useRef(value);
+  useEffect(() => {
+    const from = prevRef.current;
+    const to = value;
+    if (from === to) return;
+    const duration = 600;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setDisplay(Math.round(from + (to - from) * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else prevRef.current = to;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return (
+    <span key={value} className={cn("inline-block animate-fade-in tabular-nums", className)}>
+      {display}%
+    </span>
+  );
+};
+
 const CareerRoles: React.FC = () => {
   const [selectedSlug, setSelectedSlug] = useState<string | null>(() => {
     return localStorage.getItem("career-roles-selected") || null;
