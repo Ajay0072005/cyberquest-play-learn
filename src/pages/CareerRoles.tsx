@@ -83,6 +83,33 @@ const stageOrderClass = (level: string) => {
   }
 };
 
+const AnimatedPercent: React.FC<{ value: number; className?: string }> = ({ value, className }) => {
+  const [display, setDisplay] = useState(value);
+  const prevRef = React.useRef(value);
+  useEffect(() => {
+    const from = prevRef.current;
+    const to = value;
+    if (from === to) return;
+    const duration = 600;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setDisplay(Math.round(from + (to - from) * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else prevRef.current = to;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return (
+    <span key={value} className={cn("inline-block animate-fade-in tabular-nums", className)}>
+      {display}%
+    </span>
+  );
+};
+
 const CareerRoles: React.FC = () => {
   const [selectedSlug, setSelectedSlug] = useState<string | null>(() => {
     return localStorage.getItem("career-roles-selected") || null;
@@ -254,7 +281,7 @@ const CareerRoles: React.FC = () => {
                     <div>
                       <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
                         <span>Path Progress</span>
-                        <span className="text-primary font-medium">{stats.pct}%</span>
+                        <AnimatedPercent value={stats.pct} className="text-primary font-medium" />
                       </div>
                       <Progress value={stats.pct} className="h-2" />
                       <div className="flex justify-between text-xs text-muted-foreground mt-2">
@@ -364,7 +391,7 @@ const CareerRoles: React.FC = () => {
                   {resetting ? (
                     <Skeleton className="h-4 w-10" />
                   ) : (
-                    <span className="text-sm font-medium text-primary transition-opacity duration-300 animate-fade-in">{stats.pct}%</span>
+                    <AnimatedPercent value={stats.pct} className="text-sm font-medium text-primary" />
                   )}
                 </div>
                 {resetting ? (
