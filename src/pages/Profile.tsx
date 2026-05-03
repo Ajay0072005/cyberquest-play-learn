@@ -19,6 +19,9 @@ import { TagInput } from '@/components/profile/TagInput';
 import AvatarCustomizer from '@/components/avatar/AvatarCustomizer';
 import ActivityHeatmap from '@/components/profile/ActivityHeatmap';
 import { cn } from '@/lib/utils';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useAchievements } from '@/hooks/useAchievements';
+import { format } from 'date-fns';
 
 interface SocialLinks {
   github?: string;
