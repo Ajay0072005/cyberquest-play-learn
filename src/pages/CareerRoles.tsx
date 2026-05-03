@@ -281,7 +281,7 @@ const CareerRoles: React.FC = () => {
                     <div>
                       <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
                         <span>Path Progress</span>
-                        <span className="text-primary font-medium">{stats.pct}%</span>
+                        <AnimatedPercent value={stats.pct} className="text-primary font-medium" />
                       </div>
                       <Progress value={stats.pct} className="h-2" />
                       <div className="flex justify-between text-xs text-muted-foreground mt-2">
