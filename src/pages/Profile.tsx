@@ -21,6 +21,8 @@ import ActivityHeatmap from '@/components/profile/ActivityHeatmap';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useAchievements } from '@/hooks/useAchievements';
+import { useGame } from '@/context/GameContext';
+import { Progress } from '@/components/ui/progress';
 import { format } from 'date-fns';
 
 interface SocialLinks {
@@ -52,7 +54,32 @@ const Profile = () => {
   const [achievementCount, setAchievementCount] = useState(0);
   const [badgesOpen, setBadgesOpen] = useState(false);
   const { achievements, userAchievements, loading: achLoading, isAchievementEarned, getEarnedDate } = useAchievements();
+  const { points: gamePoints, cryptoPuzzlesSolved, sqlLevelsCompleted, terminalFlagsFound, chatMessagesSent } = useGame();
   const earnedAchievements = achievements.filter(a => isAchievementEarned(a.id));
+  const lockedAchievements = achievements.filter(a => !isAchievementEarned(a.id));
+
+  const getCurrentValue = (type: string): number => {
+    switch (type) {
+      case 'points_earned': return gamePoints;
+      case 'crypto_puzzles': return cryptoPuzzlesSolved;
+      case 'sql_levels': return sqlLevelsCompleted;
+      case 'terminal_complete': return terminalFlagsFound >= 5 ? 1 : 0;
+      case 'chat_messages': return chatMessagesSent;
+      default: return 0;
+    }
+  };
+
+  const lockedWithProgress = lockedAchievements
+    .map(a => {
+      const current = getCurrentValue(a.requirement_type);
+      const remaining = Math.max(0, a.requirement_value - current);
+      const pct = Math.min(100, (current / a.requirement_value) * 100);
+      return { ...a, current, remaining, pct };
+    })
+    .sort((a, b) => b.pct - a.pct);
+
+  const claimable = lockedWithProgress.filter(a => a.remaining === 0);
+  const nearUnlock = lockedWithProgress.filter(a => a.remaining > 0).slice(0, 6);
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const tabsRef = useRef<HTMLDivElement>(null);
 
@@ -458,45 +485,114 @@ const Profile = () => {
                 : `${earnedAchievements.length} of ${achievements.length} badges earned`}
             </DialogDescription>
           </DialogHeader>
-          <div className="max-h-[60vh] overflow-y-auto -mx-2 px-2">
+          <div className="max-h-[60vh] overflow-y-auto -mx-2 px-2 space-y-5">
             {achLoading ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
               </div>
-            ) : earnedAchievements.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Award className="h-10 w-10 mx-auto mb-2 opacity-40" />
-                <p className="text-sm">No badges earned yet.</p>
-                <p className="text-xs mt-1">Complete challenges to unlock badges!</p>
-              </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {earnedAchievements.map((a) => {
-                  const earnedAt = getEarnedDate(a.id);
-                  return (
-                    <div
-                      key={a.id}
-                      className="flex items-start gap-3 p-3 rounded-lg border border-primary/20 bg-secondary/30"
-                    >
-                      <div className="h-10 w-10 rounded-lg bg-primary/15 flex items-center justify-center text-xl shrink-0">
-                        {a.icon || '🏆'}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{a.name}</p>
-                        <p className="text-xs text-muted-foreground line-clamp-2">{a.description}</p>
-                        <div className="flex items-center justify-between mt-1.5 gap-2">
-                          <span className="text-[10px] text-primary font-medium">+{a.points} XP</span>
-                          {earnedAt && (
-                            <span className="text-[10px] text-muted-foreground">
-                              {format(new Date(earnedAt), 'MMM d, yyyy')}
-                            </span>
-                          )}
-                        </div>
-                      </div>
+              <>
+                {/* Earned */}
+                <section>
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                    Earned ({earnedAchievements.length})
+                  </h3>
+                  {earnedAchievements.length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground border border-dashed border-border rounded-lg">
+                      <Award className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                      <p className="text-sm">No badges earned yet.</p>
                     </div>
-                  );
-                })}
-              </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {earnedAchievements.map((a) => {
+                        const earnedAt = getEarnedDate(a.id);
+                        return (
+                          <div key={a.id} className="flex items-start gap-3 p-3 rounded-lg border border-primary/20 bg-secondary/30">
+                            <div className="h-10 w-10 rounded-lg bg-primary/15 flex items-center justify-center text-xl shrink-0">
+                              {a.icon || '🏆'}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm truncate">{a.name}</p>
+                              <p className="text-xs text-muted-foreground line-clamp-2">{a.description}</p>
+                              <div className="flex items-center justify-between mt-1.5 gap-2">
+                                <span className="text-[10px] text-primary font-medium">+{a.points} XP</span>
+                                {earnedAt && (
+                                  <span className="text-[10px] text-muted-foreground">
+                                    {format(new Date(earnedAt), 'MMM d, yyyy')}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </section>
+
+                {/* Claimable */}
+                {claimable.length > 0 && (
+                  <section>
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-primary mb-2 flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5" /> Ready to claim ({claimable.length})
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {claimable.map((a) => (
+                        <div key={a.id} className="flex items-start gap-3 p-3 rounded-lg border border-primary/40 bg-primary/5">
+                          <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center text-xl shrink-0">
+                            {a.icon || '🏆'}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">{a.name}</p>
+                            <p className="text-xs text-muted-foreground line-clamp-2">{a.description}</p>
+                            <div className="flex items-center justify-between mt-1.5 gap-2">
+                              <span className="text-[10px] text-primary font-semibold">+{a.points} XP · Unlocking soon</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* Near unlock */}
+                {nearUnlock.length > 0 && (
+                  <section>
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                      Near unlock
+                    </h3>
+                    <div className="space-y-2">
+                      {nearUnlock.map((a) => {
+                        const isXp = a.requirement_type === 'points_earned';
+                        const unit = isXp
+                          ? `${a.remaining.toLocaleString()} XP to go`
+                          : `${a.remaining} more to go`;
+                        return (
+                          <div key={a.id} className="flex items-start gap-3 p-3 rounded-lg border border-border bg-muted/20">
+                            <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center text-xl shrink-0 opacity-70">
+                              {a.icon || '🔒'}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="font-medium text-sm truncate">{a.name}</p>
+                                <span className="text-[10px] text-primary font-medium shrink-0">+{a.points} XP</span>
+                              </div>
+                              <p className="text-xs text-muted-foreground line-clamp-1">{a.description}</p>
+                              <div className="mt-1.5 space-y-1">
+                                <Progress value={a.pct} className="h-1.5" />
+                                <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                                  <span>{a.current.toLocaleString()} / {a.requirement_value.toLocaleString()}</span>
+                                  <span className="text-foreground/80">{unit}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
+              </>
             )}
           </div>
         </DialogContent>
