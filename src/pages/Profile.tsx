@@ -54,7 +54,32 @@ const Profile = () => {
   const [achievementCount, setAchievementCount] = useState(0);
   const [badgesOpen, setBadgesOpen] = useState(false);
   const { achievements, userAchievements, loading: achLoading, isAchievementEarned, getEarnedDate } = useAchievements();
+  const { points: gamePoints, cryptoPuzzlesSolved, sqlLevelsCompleted, terminalFlagsFound, chatMessagesSent } = useGame();
   const earnedAchievements = achievements.filter(a => isAchievementEarned(a.id));
+  const lockedAchievements = achievements.filter(a => !isAchievementEarned(a.id));
+
+  const getCurrentValue = (type: string): number => {
+    switch (type) {
+      case 'points_earned': return gamePoints;
+      case 'crypto_puzzles': return cryptoPuzzlesSolved;
+      case 'sql_levels': return sqlLevelsCompleted;
+      case 'terminal_complete': return terminalFlagsFound >= 5 ? 1 : 0;
+      case 'chat_messages': return chatMessagesSent;
+      default: return 0;
+    }
+  };
+
+  const lockedWithProgress = lockedAchievements
+    .map(a => {
+      const current = getCurrentValue(a.requirement_type);
+      const remaining = Math.max(0, a.requirement_value - current);
+      const pct = Math.min(100, (current / a.requirement_value) * 100);
+      return { ...a, current, remaining, pct };
+    })
+    .sort((a, b) => b.pct - a.pct);
+
+  const claimable = lockedWithProgress.filter(a => a.remaining === 0);
+  const nearUnlock = lockedWithProgress.filter(a => a.remaining > 0).slice(0, 6);
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const tabsRef = useRef<HTMLDivElement>(null);
 
