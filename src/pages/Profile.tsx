@@ -567,20 +567,36 @@ const Profile = () => {
                       <Sparkles className="h-3.5 w-3.5" /> Ready to claim ({claimable.length})
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {claimable.map((a) => (
-                        <div key={a.id} className="flex items-start gap-3 p-3 rounded-lg border border-primary/40 bg-primary/5">
-                          <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center text-xl shrink-0">
-                            {a.icon || '🏆'}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm truncate">{a.name}</p>
-                            <p className="text-xs text-muted-foreground line-clamp-2">{a.description}</p>
-                            <div className="flex items-center justify-between mt-1.5 gap-2">
-                              <span className="text-[10px] text-primary font-semibold">+{a.points} XP · Unlocking soon</span>
+                      {claimable.map((a) => {
+                        const isClaiming = claimingIds.has(a.id);
+                        return (
+                          <div key={a.id} className="flex items-start gap-3 p-3 rounded-lg border border-primary/40 bg-primary/5">
+                            <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center text-xl shrink-0">
+                              {a.icon || '🏆'}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm truncate">{a.name}</p>
+                              <p className="text-xs text-muted-foreground line-clamp-2">{a.description}</p>
+                              <div className="flex items-center justify-between mt-1.5 gap-2">
+                                <span className="text-[10px] text-primary font-semibold">+{a.points} XP</span>
+                                <Button
+                                  size="sm"
+                                  className="h-6 text-[10px] px-2 py-0"
+                                  disabled={isClaiming}
+                                  onClick={() => handleClaim(a.id)}
+                                >
+                                  {isClaiming ? (
+                                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                                  ) : (
+                                    <Sparkles className="h-3 w-3 mr-1" />
+                                  )}
+                                  {isClaiming ? 'Claiming...' : 'Claim'}
+                                </Button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </section>
                 )}
