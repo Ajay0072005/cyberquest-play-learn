@@ -70,6 +70,35 @@ const Profile = () => {
     }
   };
 
+  const handleClaim = async (achievementId: string) => {
+    if (!user) return;
+    setClaimingIds(prev => new Set(prev).add(achievementId));
+    try {
+      const { error } = await supabase.rpc('award_achievement' as any, {
+        _user_id: user.id,
+        _achievement_id: achievementId,
+      });
+      if (error) throw error;
+      toast({ title: '🏆 Badge claimed!', description: 'Your new badge has been unlocked.' });
+      await refreshAchievements();
+      // Also refresh profile achievement count
+      const { count } = await supabase
+        .from('user_achievements')
+        .select('id', { count: 'exact' })
+        .eq('user_id', user.id);
+      setAchievementCount(count || 0);
+    } catch (err) {
+      console.error('Error claiming badge:', err);
+      toast({ title: 'Error', description: 'Failed to claim badge. Try again.', variant: 'destructive' });
+    } finally {
+      setClaimingIds(prev => {
+        const next = new Set(prev);
+        next.delete(achievementId);
+        return next;
+      });
+    }
+  };
+
   const lockedWithProgress = lockedAchievements
     .map(a => {
       const current = getCurrentValue(a.requirement_type);
