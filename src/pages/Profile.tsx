@@ -53,7 +53,8 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [achievementCount, setAchievementCount] = useState(0);
   const [badgesOpen, setBadgesOpen] = useState(false);
-  const { achievements, userAchievements, loading: achLoading, isAchievementEarned, getEarnedDate } = useAchievements();
+  const [claimingIds, setClaimingIds] = useState<Set<string>>(new Set());
+  const { achievements, userAchievements, loading: achLoading, isAchievementEarned, getEarnedDate, refresh: refreshAchievements } = useAchievements();
   const { points: gamePoints, cryptoPuzzlesSolved, sqlLevelsCompleted, terminalFlagsFound, chatMessagesSent } = useGame();
   const earnedAchievements = achievements.filter(a => isAchievementEarned(a.id));
   const lockedAchievements = achievements.filter(a => !isAchievementEarned(a.id));
@@ -66,6 +67,35 @@ const Profile = () => {
       case 'terminal_complete': return terminalFlagsFound >= 5 ? 1 : 0;
       case 'chat_messages': return chatMessagesSent;
       default: return 0;
+    }
+  };
+
+  const handleClaim = async (achievementId: string) => {
+    if (!user) return;
+    setClaimingIds(prev => new Set(prev).add(achievementId));
+    try {
+      const { error } = await supabase.rpc('award_achievement' as any, {
+        _user_id: user.id,
+        _achievement_id: achievementId,
+      });
+      if (error) throw error;
+      toast({ title: '🏆 Badge claimed!', description: 'Your new badge has been unlocked.' });
+      await refreshAchievements();
+      // Also refresh profile achievement count
+      const { count } = await supabase
+        .from('user_achievements')
+        .select('id', { count: 'exact' })
+        .eq('user_id', user.id);
+      setAchievementCount(count || 0);
+    } catch (err) {
+      console.error('Error claiming badge:', err);
+      toast({ title: 'Error', description: 'Failed to claim badge. Try again.', variant: 'destructive' });
+    } finally {
+      setClaimingIds(prev => {
+        const next = new Set(prev);
+        next.delete(achievementId);
+        return next;
+      });
     }
   };
 
@@ -537,20 +567,36 @@ const Profile = () => {
                       <Sparkles className="h-3.5 w-3.5" /> Ready to claim ({claimable.length})
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {claimable.map((a) => (
-                        <div key={a.id} className="flex items-start gap-3 p-3 rounded-lg border border-primary/40 bg-primary/5">
-                          <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center text-xl shrink-0">
-                            {a.icon || '🏆'}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm truncate">{a.name}</p>
-                            <p className="text-xs text-muted-foreground line-clamp-2">{a.description}</p>
-                            <div className="flex items-center justify-between mt-1.5 gap-2">
-                              <span className="text-[10px] text-primary font-semibold">+{a.points} XP · Unlocking soon</span>
+                      {claimable.map((a) => {
+                        const isClaiming = claimingIds.has(a.id);
+                        return (
+                          <div key={a.id} className="flex items-start gap-3 p-3 rounded-lg border border-primary/40 bg-primary/5">
+                            <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center text-xl shrink-0">
+                              {a.icon || '🏆'}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm truncate">{a.name}</p>
+                              <p className="text-xs text-muted-foreground line-clamp-2">{a.description}</p>
+                              <div className="flex items-center justify-between mt-1.5 gap-2">
+                                <span className="text-[10px] text-primary font-semibold">+{a.points} XP</span>
+                                <Button
+                                  size="sm"
+                                  className="h-6 text-[10px] px-2 py-0"
+                                  disabled={isClaiming}
+                                  onClick={() => handleClaim(a.id)}
+                                >
+                                  {isClaiming ? (
+                                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                                  ) : (
+                                    <Sparkles className="h-3 w-3 mr-1" />
+                                  )}
+                                  {isClaiming ? 'Claiming...' : 'Claim'}
+                                </Button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </section>
                 )}

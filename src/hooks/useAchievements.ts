@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -25,37 +25,43 @@ export const useAchievements = () => {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const { toast } = useToast();
+  const fetchedRef = useRef(false);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    setUserId(user?.id || null);
+
+    const { data: achievementsData } = await supabase
+      .from('achievements')
+      .select('*')
+      .order('points', { ascending: true });
+
+    if (achievementsData) {
+      setAchievements(achievementsData);
+    }
+
+    if (user) {
+      const { data: userAchievementsData } = await supabase
+        .from('user_achievements')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (userAchievementsData) {
+        setUserAchievements(userAchievementsData);
+      }
+    } else {
+      setUserAchievements([]);
+    }
+
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUserId(user?.id || null);
-
-      const { data: achievementsData } = await supabase
-        .from('achievements')
-        .select('*')
-        .order('points', { ascending: true });
-
-      if (achievementsData) {
-        setAchievements(achievementsData);
-      }
-
-      if (user) {
-        const { data: userAchievementsData } = await supabase
-          .from('user_achievements')
-          .select('*')
-          .eq('user_id', user.id);
-
-        if (userAchievementsData) {
-          setUserAchievements(userAchievementsData);
-        }
-      }
-
-      setLoading(false);
-    };
-
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const checkAndAwardAchievement = useCallback(async (
     requirementType: string,
@@ -119,5 +125,6 @@ export const useAchievements = () => {
     getEarnedDate,
     earnedCount,
     totalCount,
+    refresh: fetchData,
   };
 };
