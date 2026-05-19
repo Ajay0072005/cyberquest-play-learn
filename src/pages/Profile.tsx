@@ -53,7 +53,8 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [achievementCount, setAchievementCount] = useState(0);
   const [badgesOpen, setBadgesOpen] = useState(false);
-  const { achievements, userAchievements, loading: achLoading, isAchievementEarned, getEarnedDate } = useAchievements();
+  const [claimingIds, setClaimingIds] = useState<Set<string>>(new Set());
+  const { achievements, userAchievements, loading: achLoading, isAchievementEarned, getEarnedDate, refresh: refreshAchievements } = useAchievements();
   const { points: gamePoints, cryptoPuzzlesSolved, sqlLevelsCompleted, terminalFlagsFound, chatMessagesSent } = useGame();
   const earnedAchievements = achievements.filter(a => isAchievementEarned(a.id));
   const lockedAchievements = achievements.filter(a => !isAchievementEarned(a.id));
