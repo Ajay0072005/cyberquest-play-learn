@@ -125,5 +125,6 @@ export const useAchievements = () => {
     getEarnedDate,
     earnedCount,
     totalCount,
+    refresh: fetchData,
   };
 };
