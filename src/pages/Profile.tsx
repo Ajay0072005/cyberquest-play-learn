@@ -12,7 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
   Loader2, MapPin, Github, Linkedin, Twitter, Globe, Lock, Trophy, Award,
-  Pencil, Save, User, FileText, Link2, Wrench, ShieldCheck, Heart, Activity, Sparkles, ChevronLeft, ChevronRight
+  Pencil, Save, User, FileText, Link2, Wrench, ShieldCheck, Heart, Activity, Sparkles, ChevronLeft, ChevronRight, Check
 } from 'lucide-react';
 import { ProfileSection } from '@/components/profile/ProfileSection';
 import { TagInput } from '@/components/profile/TagInput';
@@ -54,6 +54,7 @@ const Profile = () => {
   const [achievementCount, setAchievementCount] = useState(0);
   const [badgesOpen, setBadgesOpen] = useState(false);
   const [claimingIds, setClaimingIds] = useState<Set<string>>(new Set());
+  const [justClaimedId, setJustClaimedId] = useState<string | null>(null);
   const { achievements, userAchievements, loading: achLoading, isAchievementEarned, getEarnedDate, refresh: refreshAchievements } = useAchievements();
   const { points: gamePoints, cryptoPuzzlesSolved, sqlLevelsCompleted, terminalFlagsFound, chatMessagesSent } = useGame();
   const earnedAchievements = achievements.filter(a => isAchievementEarned(a.id));
@@ -80,6 +81,10 @@ const Profile = () => {
       });
       if (error) throw error;
       toast({ title: '🏆 Badge claimed!', description: 'Your new badge has been unlocked.' });
+
+      setJustClaimedId(achievementId);
+      await new Promise(r => setTimeout(r, 350));
+
       await refreshAchievements();
       // Also refresh profile achievement count
       const { count } = await supabase
@@ -87,6 +92,8 @@ const Profile = () => {
         .select('id', { count: 'exact' })
         .eq('user_id', user.id);
       setAchievementCount(count || 0);
+
+      setTimeout(() => setJustClaimedId(null), 1200);
     } catch (err) {
       console.error('Error claiming badge:', err);
       toast({ title: 'Error', description: 'Failed to claim badge. Try again.', variant: 'destructive' });
@@ -536,8 +543,12 @@ const Profile = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {earnedAchievements.map((a) => {
                         const earnedAt = getEarnedDate(a.id);
+                        const isNew = justClaimedId === a.id;
                         return (
-                          <div key={a.id} className="flex items-start gap-3 p-3 rounded-lg border border-primary/20 bg-secondary/30">
+                          <div key={a.id} className={cn(
+                            "flex items-start gap-3 p-3 rounded-lg border border-primary/20 bg-secondary/30",
+                            isNew && "animate-enter ring-2 ring-primary/20"
+                          )}>
                             <div className="h-10 w-10 rounded-lg bg-primary/15 flex items-center justify-center text-xl shrink-0">
                               {a.icon || '🏆'}
                             </div>
@@ -569,10 +580,14 @@ const Profile = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {claimable.map((a) => {
                         const isClaiming = claimingIds.has(a.id);
+                        const isJustClaimed = justClaimedId === a.id;
                         return (
-                          <div key={a.id} className="flex items-start gap-3 p-3 rounded-lg border border-primary/40 bg-primary/5">
+                          <div key={a.id} className={cn(
+                            "flex items-start gap-3 p-3 rounded-lg border border-primary/40 bg-primary/5 transition-all duration-300",
+                            isJustClaimed && "opacity-0 scale-90 -translate-y-1"
+                          )}>
                             <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center text-xl shrink-0">
-                              {a.icon || '🏆'}
+                              {isJustClaimed ? <Check className="h-5 w-5 text-primary" /> : (a.icon || '🏆')}
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm truncate">{a.name}</p>
@@ -582,15 +597,17 @@ const Profile = () => {
                                 <Button
                                   size="sm"
                                   className="h-6 text-[10px] px-2 py-0"
-                                  disabled={isClaiming}
+                                  disabled={isClaiming || isJustClaimed}
                                   onClick={() => handleClaim(a.id)}
                                 >
-                                  {isClaiming ? (
+                                  {isJustClaimed ? (
+                                    <Check className="h-3 w-3 mr-1" />
+                                  ) : isClaiming ? (
                                     <Loader2 className="h-3 w-3 animate-spin mr-1" />
                                   ) : (
                                     <Sparkles className="h-3 w-3 mr-1" />
                                   )}
-                                  {isClaiming ? 'Claiming...' : 'Claim'}
+                                  {isJustClaimed ? 'Claimed!' : isClaiming ? 'Claiming...' : 'Claim'}
                                 </Button>
                               </div>
                             </div>
