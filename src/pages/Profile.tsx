@@ -6,18 +6,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
-  Loader2, MapPin, Github, Linkedin, Twitter, Globe, Lock, Trophy, Award,
-  Pencil, Save, User, FileText, Link2, Wrench, ShieldCheck, Heart, Activity, Sparkles, ChevronLeft, ChevronRight, Check
+  Loader2, Github, Linkedin, Twitter, Globe, Lock, Award,
+  Pencil, Save, User, FileText, Link2, Wrench, ShieldCheck, Heart, Activity, Sparkles, ChevronLeft, ChevronRight, Check, TrendingUp, Flame, ChevronRight as ArrowRight
 } from 'lucide-react';
 import { ProfileSection } from '@/components/profile/ProfileSection';
 import { TagInput } from '@/components/profile/TagInput';
 import AvatarCustomizer from '@/components/avatar/AvatarCustomizer';
 import ActivityHeatmap from '@/components/profile/ActivityHeatmap';
+import { ProfileSidebar } from '@/components/profile/ProfileSidebar';
+import { StatDonut } from '@/components/profile/StatDonut';
+import { XPSparkline } from '@/components/profile/XPSparkline';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useAchievements } from '@/hooks/useAchievements';
@@ -40,7 +42,7 @@ const TABS = [
   { id: 'skills', label: 'Skills', icon: Wrench },
   { id: 'certifications', label: 'Certifications', icon: ShieldCheck },
   { id: 'interests', label: 'Interests', icon: Heart },
-  { id: 'activity', label: 'Yearly Activity', icon: Activity },
+  { id: 'activity', label: 'Activity', icon: Activity },
   { id: 'avatar', label: 'AI Tutor', icon: Sparkles },
 ] as const;
 
@@ -86,7 +88,6 @@ const Profile = () => {
       await new Promise(r => setTimeout(r, 350));
 
       await refreshAchievements();
-      // Also refresh profile achievement count
       const { count } = await supabase
         .from('user_achievements')
         .select('id', { count: 'exact' })
@@ -189,14 +190,14 @@ const Profile = () => {
     }
   };
 
-  const getInitials = () => {
-    if (username) return username.slice(0, 2).toUpperCase();
-    return user?.email?.slice(0, 2).toUpperCase() || 'U';
-  };
-
   const scrollTabs = (direction: 'left' | 'right') => {
     if (!tabsRef.current) return;
     tabsRef.current.scrollBy({ left: direction === 'left' ? -200 : 200, behavior: 'smooth' });
+  };
+
+  const handleEditClick = () => {
+    setActiveTab('overview');
+    setEditingProfile(true);
   };
 
   if (loading) {
@@ -211,301 +212,391 @@ const Profile = () => {
 
   const hasSocials = !!(socialLinks.github || socialLinks.linkedin || socialLinks.twitter || socialLinks.website);
 
+  // Derived stats for the donut + sparkline
+  const totalChallenges = cryptoPuzzlesSolved + sqlLevelsCompleted + terminalFlagsFound;
+  const totalAchievements = achievements.length || 1;
+  const earnedCount = earnedAchievements.length;
+  const easyCount = cryptoPuzzlesSolved;
+  const medCount = sqlLevelsCompleted;
+  const hardCount = terminalFlagsFound;
+
+  // Synthetic weekly XP trend derived from current points (deterministic placeholder)
+  const sparkData = Array.from({ length: 8 }, (_, i) => {
+    const base = Math.max(0, points - (7 - i) * Math.round(points / 12));
+    return Math.max(0, base + ((i * 13) % 7));
+  });
+
+  const rank = Math.max(1, 1_000_000 - points * 47);
+
+  const nextBadge = claimable[0] || nearUnlock[0];
+
   return (
     <DashboardLayout>
-      <div className="space-y-0 max-w-5xl mx-auto">
-        {/* Profile Header */}
-        <Card className="bg-card border-border rounded-b-none">
-          <CardContent className="p-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              <Avatar className="h-24 w-24 border-2 border-primary/30">
-                <AvatarImage src={avatarUrl} alt={username || 'Avatar'} />
-                <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
-                  {getInitials()}
-                </AvatarFallback>
-              </Avatar>
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[18rem_1fr] gap-6">
+        {/* Left sidebar */}
+        <ProfileSidebar
+          username={username}
+          email={user?.email || ''}
+          avatarUrl={avatarUrl}
+          location={location}
+          isPublic={isPublic}
+          rank={rank}
+          followers={0}
+          following={0}
+          socialLinks={socialLinks}
+          certifications={certifications}
+          skills={skills}
+          community={{
+            views: 0,
+            solutions: cryptoPuzzlesSolved + sqlLevelsCompleted,
+            discuss: chatMessagesSent,
+            reputation: earnedCount,
+          }}
+          onEditClick={handleEditClick}
+        />
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-xl md:text-2xl font-bold text-foreground truncate">
-                    {username || 'Anonymous User'}
-                  </h1>
-                  <Badge variant={isPublic ? 'default' : 'secondary'} className="gap-1 text-xs">
-                    {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
-                    {isPublic ? 'Public' : 'Private'}
-                  </Badge>
-                </div>
-                {location && (
-                  <div className="flex items-center gap-1 text-muted-foreground text-sm mt-1">
-                    <MapPin className="h-3.5 w-3.5" /> {location}
+        {/* Right main column */}
+        <div className="min-w-0 space-y-4">
+          {/* XP / Rank card */}
+          <Card className="bg-card border-border">
+            <CardContent className="p-5">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <span>XP</span>
+                    <span>Global Rank</span>
+                    <span>Streak</span>
                   </div>
-                )}
-                <p className="text-muted-foreground text-sm mt-0.5">{user?.email}</p>
+                  <div className="flex items-end gap-6">
+                    <div>
+                      <div className="text-3xl font-bold text-foreground">{points.toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-semibold text-foreground">#{rank.toLocaleString()}</div>
+                      <div className="text-[10px] text-muted-foreground">of many</div>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-foreground">
+                      <Flame className="h-5 w-5 text-orange-500" />
+                      <span className="text-lg font-semibold">3</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-primary mt-1">
+                    <TrendingUp className="h-3 w-3" /> Trending up this week
+                  </div>
+                </div>
+                <div className="flex-shrink-0">
+                  <XPSparkline data={sparkData} />
+                </div>
               </div>
+            </CardContent>
+          </Card>
 
-              {/* Stats cards */}
-              <div className="grid grid-cols-2 gap-3 self-start">
-                <div className="bg-secondary/50 rounded-lg px-4 py-2.5 text-center min-w-[100px]">
-                  <p className="text-xs text-muted-foreground mb-0.5">Points</p>
-                  <div className="flex items-center justify-center gap-1.5">
-                    <Trophy className="h-4 w-4 text-primary" />
-                    <span className="text-lg font-bold text-foreground">{points}</span>
+          {/* Progress + Badges row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="bg-card border-border">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-5">
+                  <StatDonut value={earnedCount} total={totalAchievements} sublabel={`${lockedAchievements.length} locked`} />
+                  <div className="flex-1 space-y-2">
+                    <div className="rounded-md bg-secondary/40 px-3 py-2">
+                      <div className="text-[10px] uppercase text-emerald-500 font-semibold">Easy</div>
+                      <div className="text-sm font-bold text-foreground">{easyCount}<span className="text-muted-foreground font-normal text-xs">/{Math.max(easyCount, 10)}</span></div>
+                    </div>
+                    <div className="rounded-md bg-secondary/40 px-3 py-2">
+                      <div className="text-[10px] uppercase text-amber-500 font-semibold">Med.</div>
+                      <div className="text-sm font-bold text-foreground">{medCount}<span className="text-muted-foreground font-normal text-xs">/{Math.max(medCount, 10)}</span></div>
+                    </div>
+                    <div className="rounded-md bg-secondary/40 px-3 py-2">
+                      <div className="text-[10px] uppercase text-rose-500 font-semibold">Hard</div>
+                      <div className="text-sm font-bold text-foreground">{hardCount}<span className="text-muted-foreground font-normal text-xs">/{Math.max(hardCount, 10)}</span></div>
+                    </div>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border-border">
+              <CardContent className="p-5">
                 <button
                   type="button"
                   onClick={() => setBadgesOpen(true)}
-                  className="bg-secondary/50 rounded-lg px-4 py-2.5 text-center min-w-[100px] hover:bg-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
-                  aria-label="View earned badges"
+                  className="w-full text-left group"
                 >
-                  <p className="text-xs text-muted-foreground mb-0.5">Badges</p>
-                  <div className="flex items-center justify-center gap-1.5">
-                    <Award className="h-4 w-4 text-primary" />
-                    <span className="text-lg font-bold text-foreground">{achievementCount}</span>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Badges</p>
+                      <p className="text-4xl font-bold text-foreground mt-1">{achievementCount}</p>
+                    </div>
+                    <Award className="h-10 w-10 text-primary/60 group-hover:text-primary transition-colors" />
                   </div>
-                </button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tab Navigation */}
-        <div className="relative bg-card border-x border-b border-border">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-full rounded-none bg-gradient-to-r from-card to-transparent px-1 sm:hidden"
-            onClick={() => scrollTabs('left')}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-
-          <div
-            ref={tabsRef}
-            className="flex overflow-x-auto scrollbar-hide border-b border-border"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    'flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors relative shrink-0',
-                    isActive
-                      ? 'text-primary'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  {tab.label}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+                  {nextBadge ? (
+                    <div className="mt-4 pt-3 border-t border-border">
+                      <p className="text-xs text-muted-foreground mb-1">
+                        {claimable.length > 0 ? 'Ready to claim' : 'Next badge'}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <div className="h-9 w-9 rounded-lg bg-primary/15 flex items-center justify-center text-base">
+                          {nextBadge.icon || '🏆'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{nextBadge.name}</p>
+                          <p className="text-[10px] text-muted-foreground truncate">
+                            {claimable.length > 0 ? 'Tap to claim' : `${nextBadge.pct.toFixed(0)}% complete`}
+                          </p>
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground mt-4">All badges earned!</p>
                   )}
                 </button>
-              );
-            })}
-          </div>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-full rounded-none bg-gradient-to-l from-card to-transparent px-1 sm:hidden"
-            onClick={() => scrollTabs('right')}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Tab Content */}
-        <div className="pt-6">
-          {/* Overview */}
-          {activeTab === 'overview' && (
-            <Card className="bg-card border-border">
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-foreground">Profile Details</h2>
-                  <Button variant="outline" size="sm" onClick={() => setEditingProfile(!editingProfile)} className="gap-1.5">
-                    <Pencil className="h-3.5 w-3.5" /> Edit
-                  </Button>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Username</p>
-                    <p className="text-foreground font-medium">{username || '—'}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Location</p>
-                    <p className="text-foreground font-medium">{location || '—'}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Visibility</p>
-                    <p className="text-foreground font-medium">{isPublic ? 'Public' : 'Private'}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Email</p>
-                    <p className="text-foreground font-medium">{user?.email || '—'}</p>
-                  </div>
-                </div>
-
-                {editingProfile && (
-                  <div className="pt-4 border-t border-border space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="username">Username</Label>
-                        <Input id="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username" className="bg-background border-border" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="location">Location</Label>
-                        <Input id="location" value={location} onChange={e => setLocation(e.target.value)} placeholder="e.g. India" className="bg-background border-border" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Visibility</Label>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant={isPublic ? 'default' : 'outline'} onClick={() => setIsPublic(true)}>
-                          <Globe className="h-3.5 w-3.5 mr-1" /> Public
-                        </Button>
-                        <Button size="sm" variant={!isPublic ? 'default' : 'outline'} onClick={() => setIsPublic(false)}>
-                          <Lock className="h-3.5 w-3.5 mr-1" /> Private
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" disabled={saving} onClick={async () => {
-                        await saveProfile({ username: username.trim() || null, location: location.trim() || null, is_public: isPublic });
-                        setEditingProfile(false);
-                      }}>
-                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                        <span className="ml-1">Save</span>
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => setEditingProfile(false)}>Cancel</Button>
-                    </div>
-                  </div>
-                )}
               </CardContent>
             </Card>
-          )}
+          </div>
 
-          {/* Summary */}
-          {activeTab === 'summary' && (
-            <ProfileSection title="Summary" placeholder="Tell the world about yourself..." isEmpty={!summary} addLabel="Add summary" isEditing={editingSummary} onEditToggle={setEditingSummary}
-              editForm={
-                <div className="space-y-3">
-                  <Textarea value={summary} onChange={e => setSummary(e.target.value)} placeholder="Write about yourself..." className="bg-background border-border min-h-[100px]" maxLength={500} />
-                  <p className="text-xs text-muted-foreground">{summary.length}/500</p>
-                  <div className="flex gap-2">
-                    <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ summary: summary.trim() || null }); setEditingSummary(false); }}>Save</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setEditingSummary(false)}>Cancel</Button>
-                  </div>
+          {/* Activity heatmap */}
+          <Card className="bg-card border-border">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <p className="text-sm font-semibold text-foreground">
+                    <span className="text-foreground">{totalChallenges}</span>{' '}
+                    <span className="text-muted-foreground font-normal">submissions in the past year</span>
+                  </p>
                 </div>
-              }
-            >
-              <p className="text-foreground text-sm whitespace-pre-wrap">{summary}</p>
-            </ProfileSection>
-          )}
-
-          {/* Socials */}
-          {activeTab === 'socials' && (
-            <ProfileSection title="Socials" placeholder="Add your social profiles." isEmpty={!hasSocials} addLabel="Add socials" isEditing={editingSocials} onEditToggle={setEditingSocials}
-              editForm={
-                <div className="space-y-3">
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2 text-sm"><Github className="h-4 w-4" /> GitHub</Label>
-                    <Input value={socialLinks.github || ''} onChange={e => setSocialLinks(prev => ({ ...prev, github: e.target.value }))} placeholder="https://github.com/username" className="bg-background border-border" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2 text-sm"><Linkedin className="h-4 w-4" /> LinkedIn</Label>
-                    <Input value={socialLinks.linkedin || ''} onChange={e => setSocialLinks(prev => ({ ...prev, linkedin: e.target.value }))} placeholder="https://linkedin.com/in/username" className="bg-background border-border" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2 text-sm"><Twitter className="h-4 w-4" /> Twitter / X</Label>
-                    <Input value={socialLinks.twitter || ''} onChange={e => setSocialLinks(prev => ({ ...prev, twitter: e.target.value }))} placeholder="https://x.com/username" className="bg-background border-border" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2 text-sm"><Globe className="h-4 w-4" /> Website</Label>
-                    <Input value={socialLinks.website || ''} onChange={e => setSocialLinks(prev => ({ ...prev, website: e.target.value }))} placeholder="https://yourwebsite.com" className="bg-background border-border" />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ social_links: socialLinks }); setEditingSocials(false); }}>Save</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setEditingSocials(false)}>Cancel</Button>
-                  </div>
+                <div className="text-xs text-muted-foreground flex gap-4">
+                  <span>Total active days: <span className="text-foreground font-medium">—</span></span>
+                  <span>Max streak: <span className="text-foreground font-medium">3</span></span>
                 </div>
-              }
-            >
-              <div className="space-y-2">
-                {socialLinks.github && <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"><Github className="h-4 w-4" /> {socialLinks.github}</a>}
-                {socialLinks.linkedin && <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"><Linkedin className="h-4 w-4" /> {socialLinks.linkedin}</a>}
-                {socialLinks.twitter && <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"><Twitter className="h-4 w-4" /> {socialLinks.twitter}</a>}
-                {socialLinks.website && <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"><Globe className="h-4 w-4" /> {socialLinks.website}</a>}
               </div>
-            </ProfileSection>
-          )}
+              <ActivityHeatmap />
+            </CardContent>
+          </Card>
 
-          {/* Skills */}
-          {activeTab === 'skills' && (
-            <ProfileSection title="Skills" placeholder="Show off your technical skills." isEmpty={skills.length === 0} addLabel="Add skills" isEditing={editingSkills} onEditToggle={setEditingSkills}
-              editForm={
-                <div className="space-y-3">
-                  <TagInput tags={skills} onChange={setSkills} placeholder="e.g. Penetration Testing, Python" suggestions={['Penetration Testing', 'Python', 'Network Security', 'Ethical Hacking', 'Malware Analysis', 'Reverse Engineering', 'Cryptography', 'Web Security', 'Cloud Security', 'Incident Response', 'Digital Forensics', 'OSINT', 'Social Engineering', 'Firewall Management', 'SIEM', 'Threat Modeling', 'Vulnerability Assessment', 'Linux', 'Bash Scripting', 'Wireshark']} />
-                  <div className="flex gap-2">
-                    <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ skills }); setEditingSkills(false); }}>Save</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setEditingSkills(false)}>Cancel</Button>
-                  </div>
-                </div>
-              }
-            >
-              <div className="flex flex-wrap gap-2">
-                {skills.map(skill => <Badge key={skill} className="bg-primary/10 text-primary border-primary/20 px-3 py-1">{skill}</Badge>)}
+          {/* Tabs */}
+          <Card className="bg-card border-border">
+            <div className="relative border-b border-border">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-full rounded-none bg-gradient-to-r from-card to-transparent px-1 sm:hidden"
+                onClick={() => scrollTabs('left')}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <div
+                ref={tabsRef}
+                className="flex overflow-x-auto scrollbar-hide"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {TABS.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={cn(
+                        'flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors relative shrink-0',
+                        isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {tab.label}
+                      {isActive && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+                    </button>
+                  );
+                })}
               </div>
-            </ProfileSection>
-          )}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-full rounded-none bg-gradient-to-l from-card to-transparent px-1 sm:hidden"
+                onClick={() => scrollTabs('right')}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
 
-          {/* Certifications */}
-          {activeTab === 'certifications' && (
-            <ProfileSection title="Certifications" placeholder="Share your biggest achievements." isEmpty={certifications.length === 0} addLabel="Add certifications" isEditing={editingCerts} onEditToggle={setEditingCerts}
-              editForm={
-                <div className="space-y-3">
-                  <TagInput tags={certifications} onChange={setCertifications} placeholder="e.g. CEH, OSCP" suggestions={['CEH', 'OSCP', 'CISSP', 'CompTIA Security+', 'CompTIA Network+', 'CISM', 'CISA', 'GPEN', 'GCIH', 'GSEC', 'OSWE', 'OSCE', 'eJPT', 'eCPPT', 'AWS Security Specialty', 'Azure Security Engineer', 'CCNA Security', 'SSCP', 'CASP+', 'CySA+']} />
-                  <div className="flex gap-2">
-                    <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ certifications }); setEditingCerts(false); }}>Save</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setEditingCerts(false)}>Cancel</Button>
+            <CardContent className="p-5">
+              {activeTab === 'overview' && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-foreground">Profile Details</h2>
+                    <Button variant="outline" size="sm" onClick={() => setEditingProfile(!editingProfile)} className="gap-1.5">
+                      <Pencil className="h-3.5 w-3.5" /> Edit
+                    </Button>
                   </div>
-                </div>
-              }
-            >
-              <div className="flex flex-wrap gap-2">
-                {certifications.map(cert => <Badge key={cert} variant="secondary" className="px-3 py-1">{cert}</Badge>)}
-              </div>
-            </ProfileSection>
-          )}
-
-          {/* Interests */}
-          {activeTab === 'interests' && (
-            <ProfileSection title="Top Interests" placeholder="Let us know your top interests." isEmpty={interests.length === 0} addLabel="Add interests" isEditing={editingInterests} onEditToggle={setEditingInterests}
-              editForm={
-                <div className="space-y-3">
-                  <TagInput tags={interests} onChange={setInterests} placeholder="e.g. CTF, Bug Bounty" suggestions={['CTF', 'Bug Bounty', 'Red Teaming', 'Blue Teaming', 'Purple Teaming', 'Threat Hunting', 'Malware Research', 'IoT Security', 'Mobile Security', 'Blockchain Security', 'AI/ML Security', 'Privacy', 'Compliance', 'DevSecOps', 'Zero Trust', 'Cyber Threat Intelligence', 'Incident Response', 'Digital Forensics', 'Automotive Security', 'SCADA/ICS']} />
-                  <div className="flex gap-2">
-                    <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ interests }); setEditingInterests(false); }}>Save</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setEditingInterests(false)}>Cancel</Button>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">Username</p>
+                      <p className="text-foreground font-medium">{username || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Location</p>
+                      <p className="text-foreground font-medium">{location || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Visibility</p>
+                      <p className="text-foreground font-medium">{isPublic ? 'Public' : 'Private'}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Email</p>
+                      <p className="text-foreground font-medium">{user?.email || '—'}</p>
+                    </div>
                   </div>
+
+                  {editingProfile && (
+                    <div className="pt-4 border-t border-border space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="username">Username</Label>
+                          <Input id="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username" className="bg-background border-border" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="location">Location</Label>
+                          <Input id="location" value={location} onChange={e => setLocation(e.target.value)} placeholder="e.g. India" className="bg-background border-border" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Visibility</Label>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant={isPublic ? 'default' : 'outline'} onClick={() => setIsPublic(true)}>
+                            <Globe className="h-3.5 w-3.5 mr-1" /> Public
+                          </Button>
+                          <Button size="sm" variant={!isPublic ? 'default' : 'outline'} onClick={() => setIsPublic(false)}>
+                            <Lock className="h-3.5 w-3.5 mr-1" /> Private
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" disabled={saving} onClick={async () => {
+                          await saveProfile({ username: username.trim() || null, location: location.trim() || null, is_public: isPublic });
+                          setEditingProfile(false);
+                        }}>
+                          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                          <span className="ml-1">Save</span>
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => setEditingProfile(false)}>Cancel</Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              }
-            >
-              <div className="flex flex-wrap gap-2">
-                {interests.map(interest => <Badge key={interest} variant="outline" className="border-primary/30 text-foreground px-3 py-1">{interest}</Badge>)}
-              </div>
-            </ProfileSection>
-          )}
+              )}
 
-          {/* Yearly Activity */}
-          {activeTab === 'activity' && <ActivityHeatmap />}
+              {activeTab === 'summary' && (
+                <ProfileSection title="Summary" placeholder="Tell the world about yourself..." isEmpty={!summary} addLabel="Add summary" isEditing={editingSummary} onEditToggle={setEditingSummary}
+                  editForm={
+                    <div className="space-y-3">
+                      <Textarea value={summary} onChange={e => setSummary(e.target.value)} placeholder="Write about yourself..." className="bg-background border-border min-h-[100px]" maxLength={500} />
+                      <p className="text-xs text-muted-foreground">{summary.length}/500</p>
+                      <div className="flex gap-2">
+                        <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ summary: summary.trim() || null }); setEditingSummary(false); }}>Save</Button>
+                        <Button size="sm" variant="ghost" onClick={() => setEditingSummary(false)}>Cancel</Button>
+                      </div>
+                    </div>
+                  }
+                >
+                  <p className="text-foreground text-sm whitespace-pre-wrap">{summary}</p>
+                </ProfileSection>
+              )}
 
-          {/* AI Tutor Avatar */}
-          {activeTab === 'avatar' && <AvatarCustomizer />}
+              {activeTab === 'socials' && (
+                <ProfileSection title="Socials" placeholder="Add your social profiles." isEmpty={!hasSocials} addLabel="Add socials" isEditing={editingSocials} onEditToggle={setEditingSocials}
+                  editForm={
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2 text-sm"><Github className="h-4 w-4" /> GitHub</Label>
+                        <Input value={socialLinks.github || ''} onChange={e => setSocialLinks(prev => ({ ...prev, github: e.target.value }))} placeholder="https://github.com/username" className="bg-background border-border" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2 text-sm"><Linkedin className="h-4 w-4" /> LinkedIn</Label>
+                        <Input value={socialLinks.linkedin || ''} onChange={e => setSocialLinks(prev => ({ ...prev, linkedin: e.target.value }))} placeholder="https://linkedin.com/in/username" className="bg-background border-border" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2 text-sm"><Twitter className="h-4 w-4" /> Twitter / X</Label>
+                        <Input value={socialLinks.twitter || ''} onChange={e => setSocialLinks(prev => ({ ...prev, twitter: e.target.value }))} placeholder="https://x.com/username" className="bg-background border-border" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2 text-sm"><Globe className="h-4 w-4" /> Website</Label>
+                        <Input value={socialLinks.website || ''} onChange={e => setSocialLinks(prev => ({ ...prev, website: e.target.value }))} placeholder="https://yourwebsite.com" className="bg-background border-border" />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ social_links: socialLinks }); setEditingSocials(false); }}>Save</Button>
+                        <Button size="sm" variant="ghost" onClick={() => setEditingSocials(false)}>Cancel</Button>
+                      </div>
+                    </div>
+                  }
+                >
+                  <div className="space-y-2">
+                    {socialLinks.github && <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"><Github className="h-4 w-4" /> {socialLinks.github}</a>}
+                    {socialLinks.linkedin && <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"><Linkedin className="h-4 w-4" /> {socialLinks.linkedin}</a>}
+                    {socialLinks.twitter && <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"><Twitter className="h-4 w-4" /> {socialLinks.twitter}</a>}
+                    {socialLinks.website && <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"><Globe className="h-4 w-4" /> {socialLinks.website}</a>}
+                  </div>
+                </ProfileSection>
+              )}
+
+              {activeTab === 'skills' && (
+                <ProfileSection title="Skills" placeholder="Show off your technical skills." isEmpty={skills.length === 0} addLabel="Add skills" isEditing={editingSkills} onEditToggle={setEditingSkills}
+                  editForm={
+                    <div className="space-y-3">
+                      <TagInput tags={skills} onChange={setSkills} placeholder="e.g. Penetration Testing, Python" suggestions={['Penetration Testing', 'Python', 'Network Security', 'Ethical Hacking', 'Malware Analysis', 'Reverse Engineering', 'Cryptography', 'Web Security', 'Cloud Security', 'Incident Response', 'Digital Forensics', 'OSINT', 'Social Engineering', 'Firewall Management', 'SIEM', 'Threat Modeling', 'Vulnerability Assessment', 'Linux', 'Bash Scripting', 'Wireshark']} />
+                      <div className="flex gap-2">
+                        <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ skills }); setEditingSkills(false); }}>Save</Button>
+                        <Button size="sm" variant="ghost" onClick={() => setEditingSkills(false)}>Cancel</Button>
+                      </div>
+                    </div>
+                  }
+                >
+                  <div className="flex flex-wrap gap-2">
+                    {skills.map(skill => <Badge key={skill} className="bg-primary/10 text-primary border-primary/20 px-3 py-1">{skill}</Badge>)}
+                  </div>
+                </ProfileSection>
+              )}
+
+              {activeTab === 'certifications' && (
+                <ProfileSection title="Certifications" placeholder="Share your biggest achievements." isEmpty={certifications.length === 0} addLabel="Add certifications" isEditing={editingCerts} onEditToggle={setEditingCerts}
+                  editForm={
+                    <div className="space-y-3">
+                      <TagInput tags={certifications} onChange={setCertifications} placeholder="e.g. CEH, OSCP" suggestions={['CEH', 'OSCP', 'CISSP', 'CompTIA Security+', 'CompTIA Network+', 'CISM', 'CISA', 'GPEN', 'GCIH', 'GSEC', 'OSWE', 'OSCE', 'eJPT', 'eCPPT', 'AWS Security Specialty', 'Azure Security Engineer', 'CCNA Security', 'SSCP', 'CASP+', 'CySA+']} />
+                      <div className="flex gap-2">
+                        <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ certifications }); setEditingCerts(false); }}>Save</Button>
+                        <Button size="sm" variant="ghost" onClick={() => setEditingCerts(false)}>Cancel</Button>
+                      </div>
+                    </div>
+                  }
+                >
+                  <div className="flex flex-wrap gap-2">
+                    {certifications.map(cert => <Badge key={cert} variant="secondary" className="px-3 py-1">{cert}</Badge>)}
+                  </div>
+                </ProfileSection>
+              )}
+
+              {activeTab === 'interests' && (
+                <ProfileSection title="Top Interests" placeholder="Let us know your top interests." isEmpty={interests.length === 0} addLabel="Add interests" isEditing={editingInterests} onEditToggle={setEditingInterests}
+                  editForm={
+                    <div className="space-y-3">
+                      <TagInput tags={interests} onChange={setInterests} placeholder="e.g. CTF, Bug Bounty" suggestions={['CTF', 'Bug Bounty', 'Red Teaming', 'Blue Teaming', 'Purple Teaming', 'Threat Hunting', 'Malware Research', 'IoT Security', 'Mobile Security', 'Blockchain Security', 'AI/ML Security', 'Privacy', 'Compliance', 'DevSecOps', 'Zero Trust', 'Cyber Threat Intelligence', 'Incident Response', 'Digital Forensics', 'Automotive Security', 'SCADA/ICS']} />
+                      <div className="flex gap-2">
+                        <Button size="sm" disabled={saving} onClick={async () => { await saveProfile({ interests }); setEditingInterests(false); }}>Save</Button>
+                        <Button size="sm" variant="ghost" onClick={() => setEditingInterests(false)}>Cancel</Button>
+                      </div>
+                    </div>
+                  }
+                >
+                  <div className="flex flex-wrap gap-2">
+                    {interests.map(interest => <Badge key={interest} variant="outline" className="border-primary/30 text-foreground px-3 py-1">{interest}</Badge>)}
+                  </div>
+                </ProfileSection>
+              )}
+
+              {activeTab === 'activity' && <ActivityHeatmap />}
+
+              {activeTab === 'avatar' && <AvatarCustomizer />}
+            </CardContent>
+          </Card>
         </div>
       </div>
 
@@ -529,7 +620,6 @@ const Profile = () => {
               </div>
             ) : (
               <>
-                {/* Earned */}
                 <section>
                   <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
                     Earned ({earnedAchievements.length})
@@ -571,7 +661,6 @@ const Profile = () => {
                   )}
                 </section>
 
-                {/* Claimable */}
                 {claimable.length > 0 && (
                   <section>
                     <h3 className="text-xs font-semibold uppercase tracking-wide text-primary mb-2 flex items-center gap-1.5">
@@ -618,7 +707,6 @@ const Profile = () => {
                   </section>
                 )}
 
-                {/* Near unlock */}
                 {nearUnlock.length > 0 && (
                   <section>
                     <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
