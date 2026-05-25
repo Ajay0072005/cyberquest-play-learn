@@ -54,6 +54,10 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [achievementCount, setAchievementCount] = useState(0);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [profileViews, setProfileViews] = useState(0);
+  const [solutionsCount, setSolutionsCount] = useState(0);
   const [badgesOpen, setBadgesOpen] = useState(false);
   const [claimingIds, setClaimingIds] = useState<Set<string>>(new Set());
   const [justClaimedId, setJustClaimedId] = useState<string | null>(null);
@@ -61,6 +65,7 @@ const Profile = () => {
   const { points: gamePoints, cryptoPuzzlesSolved, sqlLevelsCompleted, terminalFlagsFound, chatMessagesSent } = useGame();
   const earnedAchievements = achievements.filter(a => isAchievementEarned(a.id));
   const lockedAchievements = achievements.filter(a => !isAchievementEarned(a.id));
+
 
   const getCurrentValue = (type: string): number => {
     switch (type) {
@@ -145,9 +150,13 @@ const Profile = () => {
     const fetchData = async () => {
       if (!user) return;
       try {
-        const [profileRes, achievementsRes] = await Promise.all([
+        const [profileRes, achievementsRes, followersRes, followingRes, viewsRes, solutionsRes] = await Promise.all([
           supabase.from('profiles').select('*').eq('user_id', user.id).single(),
-          supabase.from('user_achievements').select('id', { count: 'exact' }).eq('user_id', user.id),
+          supabase.from('user_achievements').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+          (supabase as any).from('user_follows').select('id', { count: 'exact', head: true }).eq('following_id', user.id),
+          (supabase as any).from('user_follows').select('id', { count: 'exact', head: true }).eq('follower_id', user.id),
+          (supabase as any).from('profile_views').select('id', { count: 'exact', head: true }).eq('profile_user_id', user.id),
+          supabase.from('lab_progress').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         ]);
         if (profileRes.error && profileRes.error.code !== 'PGRST116') throw profileRes.error;
         if (profileRes.data) {
@@ -164,6 +173,10 @@ const Profile = () => {
           setPoints(d.points || 0);
         }
         setAchievementCount(achievementsRes.count || 0);
+        setFollowersCount(followersRes.count || 0);
+        setFollowingCount(followingRes.count || 0);
+        setProfileViews(viewsRes.count || 0);
+        setSolutionsCount(solutionsRes.count || 0);
       } catch (error) {
         console.error('Error fetching profile:', error);
       } finally {
@@ -172,6 +185,7 @@ const Profile = () => {
     };
     fetchData();
   }, [user]);
+
 
   const saveProfile = async (fields: Record<string, any>) => {
     if (!user) return;
@@ -241,19 +255,20 @@ const Profile = () => {
           location={location}
           isPublic={isPublic}
           rank={rank}
-          followers={0}
-          following={0}
+          followers={followersCount}
+          following={followingCount}
           socialLinks={socialLinks}
           certifications={certifications}
           skills={skills}
           community={{
-            views: 0,
-            solutions: cryptoPuzzlesSolved + sqlLevelsCompleted,
+            views: profileViews,
+            solutions: solutionsCount,
             discuss: chatMessagesSent,
-            reputation: earnedCount,
+            reputation: earnedCount * 10 + Math.floor(points / 10),
           }}
           onEditClick={handleEditClick}
         />
+
 
         {/* Right main column */}
         <div className="min-w-0 space-y-4">
