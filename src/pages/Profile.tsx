@@ -255,19 +255,20 @@ const Profile = () => {
           location={location}
           isPublic={isPublic}
           rank={rank}
-          followers={0}
-          following={0}
+          followers={followersCount}
+          following={followingCount}
           socialLinks={socialLinks}
           certifications={certifications}
           skills={skills}
           community={{
-            views: 0,
-            solutions: cryptoPuzzlesSolved + sqlLevelsCompleted,
+            views: profileViews,
+            solutions: solutionsCount,
             discuss: chatMessagesSent,
-            reputation: earnedCount,
+            reputation: earnedCount * 10 + Math.floor(points / 10),
           }}
           onEditClick={handleEditClick}
         />
+
 
         {/* Right main column */}
         <div className="min-w-0 space-y-4">
