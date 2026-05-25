@@ -54,6 +54,10 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [achievementCount, setAchievementCount] = useState(0);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [profileViews, setProfileViews] = useState(0);
+  const [solutionsCount, setSolutionsCount] = useState(0);
   const [badgesOpen, setBadgesOpen] = useState(false);
   const [claimingIds, setClaimingIds] = useState<Set<string>>(new Set());
   const [justClaimedId, setJustClaimedId] = useState<string | null>(null);
@@ -61,6 +65,7 @@ const Profile = () => {
   const { points: gamePoints, cryptoPuzzlesSolved, sqlLevelsCompleted, terminalFlagsFound, chatMessagesSent } = useGame();
   const earnedAchievements = achievements.filter(a => isAchievementEarned(a.id));
   const lockedAchievements = achievements.filter(a => !isAchievementEarned(a.id));
+
 
   const getCurrentValue = (type: string): number => {
     switch (type) {
