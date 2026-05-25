@@ -232,7 +232,7 @@ const Profile = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[18rem_1fr] gap-6">
+      <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)] gap-6">
         {/* Left sidebar */}
         <ProfileSidebar
           username={username}
