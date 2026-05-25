@@ -267,6 +267,8 @@ const Profile = () => {
             reputation: earnedCount * 10 + Math.floor(points / 10),
           }}
           onEditClick={handleEditClick}
+          profileUserId={user?.id}
+          currentUserId={user?.id}
         />
 
 

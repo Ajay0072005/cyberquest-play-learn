@@ -1,8 +1,11 @@
+import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Github, Linkedin, Twitter, Globe, GraduationCap, Lock } from 'lucide-react';
+import { MapPin, Github, Linkedin, Twitter, Globe, GraduationCap, Lock, UserPlus, UserCheck, Loader2 } from 'lucide-react';
 import { CommunityStats } from './CommunityStats';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface SocialLinks {
   github?: string;
@@ -25,6 +28,8 @@ interface ProfileSidebarProps {
   skills: string[];
   community: { views: number; solutions: number; discuss: number; reputation: number };
   onEditClick: () => void;
+  profileUserId?: string;
+  currentUserId?: string;
 }
 
 const initials = (name: string, email: string) => {
@@ -46,7 +51,66 @@ const handleFromUrl = (url?: string) => {
 export const ProfileSidebar = ({
   username, email, avatarUrl, location, isPublic, rank, followers = 0, following = 0,
   socialLinks, certifications, skills, community, onEditClick,
+  profileUserId, currentUserId,
 }: ProfileSidebarProps) => {
+  const { toast } = useToast();
+  const isOwnProfile = !profileUserId || !currentUserId || profileUserId === currentUserId;
+
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followerCount, setFollowerCount] = useState(followers);
+  const [busy, setBusy] = useState(false);
+  const [checking, setChecking] = useState(false);
+
+  useEffect(() => setFollowerCount(followers), [followers]);
+
+  useEffect(() => {
+    if (isOwnProfile || !currentUserId || !profileUserId) return;
+    let cancelled = false;
+    setChecking(true);
+    supabase
+      .from('user_follows')
+      .select('id')
+      .eq('follower_id', currentUserId)
+      .eq('following_id', profileUserId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled) setIsFollowing(!!data);
+      })
+      .then(() => !cancelled && setChecking(false));
+    return () => { cancelled = true; };
+  }, [isOwnProfile, currentUserId, profileUserId]);
+
+  const handleToggleFollow = async () => {
+    if (!currentUserId || !profileUserId || busy) return;
+    setBusy(true);
+    const wasFollowing = isFollowing;
+    // Optimistic update
+    setIsFollowing(!wasFollowing);
+    setFollowerCount((c) => c + (wasFollowing ? -1 : 1));
+    try {
+      if (wasFollowing) {
+        const { error } = await supabase
+          .from('user_follows')
+          .delete()
+          .eq('follower_id', currentUserId)
+          .eq('following_id', profileUserId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('user_follows')
+          .insert({ follower_id: currentUserId, following_id: profileUserId });
+        if (error) throw error;
+      }
+    } catch (e: any) {
+      // Rollback
+      setIsFollowing(wasFollowing);
+      setFollowerCount((c) => c + (wasFollowing ? 1 : -1));
+      toast({ title: 'Action failed', description: e.message || 'Could not update follow', variant: 'destructive' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <aside className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:pr-2 space-y-5 min-w-0">
       <div className="space-y-3">
@@ -69,12 +133,30 @@ export const ProfileSidebar = ({
         <div className="text-xs text-muted-foreground">
           <span className="text-foreground font-medium">{following}</span> Following
           <span className="mx-2 opacity-50">|</span>
-          <span className="text-foreground font-medium">{followers}</span> Followers
+          <span className="text-foreground font-medium">{followerCount}</span> Followers
         </div>
 
-        <Button variant="secondary" className="w-full" onClick={onEditClick}>
-          Edit Profile
-        </Button>
+        {isOwnProfile ? (
+          <Button variant="secondary" className="w-full" onClick={onEditClick}>
+            Edit Profile
+          </Button>
+        ) : (
+          <Button
+            variant={isFollowing ? 'secondary' : 'default'}
+            className="w-full gap-2 transition-all"
+            onClick={handleToggleFollow}
+            disabled={busy || checking || !currentUserId}
+          >
+            {busy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : isFollowing ? (
+              <UserCheck className="h-4 w-4" />
+            ) : (
+              <UserPlus className="h-4 w-4" />
+            )}
+            {isFollowing ? 'Following' : 'Follow'}
+          </Button>
+        )}
       </div>
 
       <ul className="space-y-2 text-sm">
