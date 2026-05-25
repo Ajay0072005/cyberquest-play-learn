@@ -284,7 +284,7 @@ const Profile = () => {
                     <TrendingUp className="h-3 w-3" /> Trending up this week
                   </div>
                 </div>
-                <div className="flex-shrink-0">
+                <div className="w-full sm:w-auto sm:flex-shrink-0 min-w-0">
                   <XPSparkline data={sparkData} />
                 </div>
               </div>
