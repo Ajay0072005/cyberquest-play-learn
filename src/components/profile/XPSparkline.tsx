@@ -24,8 +24,13 @@ export const XPSparkline = ({ data, width = 280, height = 60 }: XPSparklineProps
   const lastY = height - ((last - min) / range) * height;
 
   return (
-    <svg width={width} height={height} className="overflow-visible">
-      <path d={path} fill="none" stroke="hsl(var(--primary))" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="none"
+      className="w-full max-w-[280px] h-[60px] overflow-visible"
+      aria-hidden="true"
+    >
+      <path d={path} fill="none" stroke="hsl(var(--primary))" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
       <circle cx={lastX} cy={lastY} r={3.5} fill="hsl(var(--primary))" />
     </svg>
   );

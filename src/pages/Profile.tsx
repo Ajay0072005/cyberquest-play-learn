@@ -232,7 +232,7 @@ const Profile = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[18rem_1fr] gap-6">
+      <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)] gap-6">
         {/* Left sidebar */}
         <ProfileSidebar
           username={username}
@@ -284,7 +284,7 @@ const Profile = () => {
                     <TrendingUp className="h-3 w-3" /> Trending up this week
                   </div>
                 </div>
-                <div className="flex-shrink-0">
+                <div className="w-full sm:w-auto sm:flex-shrink-0 min-w-0">
                   <XPSparkline data={sparkData} />
                 </div>
               </div>
@@ -375,20 +375,21 @@ const Profile = () => {
           </Card>
 
           {/* Tabs */}
-          <Card className="bg-card border-border">
+          <Card className="bg-card border-border overflow-hidden">
             <div className="relative border-b border-border">
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-full rounded-none bg-gradient-to-r from-card to-transparent px-1 sm:hidden"
+                aria-label="Scroll tabs left"
+                className="hidden max-sm:flex absolute left-0 top-0 bottom-0 z-10 h-auto w-8 rounded-none bg-gradient-to-r from-card via-card/80 to-transparent"
                 onClick={() => scrollTabs('left')}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <div
                 ref={tabsRef}
-                className="flex overflow-x-auto scrollbar-hide"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                className="flex overflow-x-auto overscroll-x-contain scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden max-sm:px-8"
+                style={{ WebkitOverflowScrolling: 'touch' }}
               >
                 {TABS.map((tab) => {
                   const Icon = tab.icon;
@@ -398,7 +399,7 @@ const Profile = () => {
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
                       className={cn(
-                        'flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors relative shrink-0',
+                        'flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors relative shrink-0 snap-start',
                         isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
                       )}
                     >
@@ -412,12 +413,14 @@ const Profile = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-full rounded-none bg-gradient-to-l from-card to-transparent px-1 sm:hidden"
+                aria-label="Scroll tabs right"
+                className="hidden max-sm:flex absolute right-0 top-0 bottom-0 z-10 h-auto w-8 rounded-none bg-gradient-to-l from-card via-card/80 to-transparent"
                 onClick={() => scrollTabs('right')}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
+
 
             <CardContent className="p-5">
               {activeTab === 'overview' && (

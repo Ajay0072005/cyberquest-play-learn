@@ -48,7 +48,7 @@ export const ProfileSidebar = ({
   socialLinks, certifications, skills, community, onEditClick,
 }: ProfileSidebarProps) => {
   return (
-    <aside className="lg:sticky lg:top-4 space-y-5">
+    <aside className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:pr-2 space-y-5 min-w-0">
       <div className="space-y-3">
         <div className="flex items-start gap-3">
           <Avatar className="h-20 w-20 rounded-lg border border-border">
