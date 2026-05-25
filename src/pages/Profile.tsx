@@ -150,9 +150,13 @@ const Profile = () => {
     const fetchData = async () => {
       if (!user) return;
       try {
-        const [profileRes, achievementsRes] = await Promise.all([
+        const [profileRes, achievementsRes, followersRes, followingRes, viewsRes, solutionsRes] = await Promise.all([
           supabase.from('profiles').select('*').eq('user_id', user.id).single(),
-          supabase.from('user_achievements').select('id', { count: 'exact' }).eq('user_id', user.id),
+          supabase.from('user_achievements').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+          (supabase as any).from('user_follows').select('id', { count: 'exact', head: true }).eq('following_id', user.id),
+          (supabase as any).from('user_follows').select('id', { count: 'exact', head: true }).eq('follower_id', user.id),
+          (supabase as any).from('profile_views').select('id', { count: 'exact', head: true }).eq('profile_user_id', user.id),
+          supabase.from('lab_progress').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         ]);
         if (profileRes.error && profileRes.error.code !== 'PGRST116') throw profileRes.error;
         if (profileRes.data) {
@@ -169,6 +173,10 @@ const Profile = () => {
           setPoints(d.points || 0);
         }
         setAchievementCount(achievementsRes.count || 0);
+        setFollowersCount(followersRes.count || 0);
+        setFollowingCount(followingRes.count || 0);
+        setProfileViews(viewsRes.count || 0);
+        setSolutionsCount(solutionsRes.count || 0);
       } catch (error) {
         console.error('Error fetching profile:', error);
       } finally {
@@ -177,6 +185,7 @@ const Profile = () => {
     };
     fetchData();
   }, [user]);
+
 
   const saveProfile = async (fields: Record<string, any>) => {
     if (!user) return;
