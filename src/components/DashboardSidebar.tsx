@@ -17,7 +17,8 @@ import {
   User,
   Briefcase,
   CalendarDays,
-  Compass
+  Compass,
+  Rss
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logo from '@/assets/logo-transparent.png';
@@ -35,6 +36,7 @@ const navItems = [
   { icon: Award, label: 'Achievements', path: '/achievements' },
   { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
   { icon: MessageSquare, label: 'AI Chat', path: '/chat' },
+  { icon: Rss, label: 'Cyber Feeds', path: '/cyber-feeds' },
   { icon: Newspaper, label: 'Cyber News', path: '/cyber-news' },
   { icon: Clock, label: 'Time Travel', path: '/time-travel' },
   { icon: Briefcase, label: 'Jobs', path: '/jobs' },
