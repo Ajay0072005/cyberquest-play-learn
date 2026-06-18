@@ -38,6 +38,7 @@ import CyberTimeTravel from "./pages/CyberTimeTravel";
 import CyberJobs from "./pages/CyberJobs";
 import AboutUs from "./pages/AboutUs";
 import CyberEvents from "./pages/CyberEvents";
+import CyberFeeds from "./pages/CyberFeeds";
 import { useThemeCustomization } from "./hooks/useThemeCustomization";
 
 const queryClient = new QueryClient();
@@ -86,6 +87,7 @@ const App = () => (
                 <Route path="/moderator" element={<ProtectedRoute><ModeratorDashboard /></ProtectedRoute>} />
                 <Route path="/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />
                 <Route path="/cyber-game" element={<ProtectedRoute><CyberGame /></ProtectedRoute>} />
+                <Route path="/cyber-feeds" element={<ProtectedRoute><CyberFeeds /></ProtectedRoute>} />
                 <Route path="/cyber-news" element={<ProtectedRoute><CyberNews /></ProtectedRoute>} />
                 <Route path="/time-travel" element={<ProtectedRoute><CyberTimeTravel /></ProtectedRoute>} />
                 <Route path="/jobs" element={<ProtectedRoute><CyberJobs /></ProtectedRoute>} />
