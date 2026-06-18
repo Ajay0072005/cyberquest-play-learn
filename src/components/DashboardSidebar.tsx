@@ -37,10 +37,6 @@ const navItems = [
   { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
   { icon: MessageSquare, label: 'AI Chat', path: '/chat' },
   { icon: Rss, label: 'Cyber Feeds', path: '/cyber-feeds' },
-  { icon: Newspaper, label: 'Cyber News', path: '/cyber-news' },
-  { icon: Clock, label: 'Time Travel', path: '/time-travel' },
-  { icon: Briefcase, label: 'Jobs', path: '/jobs' },
-  { icon: CalendarDays, label: 'Events', path: '/events' },
 ];
 
 export const DashboardSidebar: React.FC = () => {
