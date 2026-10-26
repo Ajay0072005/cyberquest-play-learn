@@ -326,7 +326,8 @@ export const TopNav: React.FC = () => {
                             isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
                           )}
                         >
-                          <div className="overflow-hidden">
+                          <div className="overflow-hidden min-h-0">
+
                             {entry.items.map((item) => {
                               const ItemIcon = item.icon;
                               const active = isActivePath(item.path);
