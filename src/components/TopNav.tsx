@@ -40,7 +40,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 
 type NavLeaf = { label: string; path: string; icon: React.ComponentType<{ className?: string }>; description?: string };
 type NavGroup = { label: string; icon: React.ComponentType<{ className?: string }>; items: NavLeaf[] };
@@ -89,6 +89,7 @@ export const TopNav: React.FC = () => {
   const { isAdmin } = useAdminRole();
   const { isModerator } = useModeratorRole();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
   const isActivePath = (path: string) => location.pathname === path;
   const isActiveGroup = (group: NavGroup) =>
@@ -114,77 +115,89 @@ export const TopNav: React.FC = () => {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-1 flex-1 justify-center">
-            {navEntries.map((entry) => {
+          <nav className="hidden lg:flex items-center gap-1 flex-1 justify-center" aria-label="Main navigation">
+            {navEntries.map((entry, idx) => {
+              const separatorBefore = idx === 1 || idx === 4;
               if (!isGroup(entry)) {
                 const active = isActivePath(entry.path);
                 const Icon = entry.icon;
                 return (
-                  <Link
-                    key={entry.path}
-                    to={entry.path}
-                    className={cn(
-                      'flex flex-col items-center justify-center gap-0.5 px-4 py-2 rounded-md transition-colors min-w-[72px] relative',
-                      active
-                        ? 'text-primary'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  <Fragment key={entry.path}>
+                    {separatorBefore && (
+                      <div aria-hidden="true" className="h-7 w-px bg-border/60 mx-1.5 flex-shrink-0" />
                     )}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span className="text-xs font-medium">{entry.label}</span>
-                    {active && (
-                      <span className="absolute -bottom-[1px] left-1/2 -translate-x-1/2 h-0.5 w-8 bg-primary rounded-full" />
-                    )}
-                  </Link>
-                );
-              }
-
-              const active = isActiveGroup(entry);
-              const Icon = entry.icon;
-              return (
-                <DropdownMenu key={entry.label}>
-                  <DropdownMenuTrigger asChild>
-                    <button
+                    <Link
+                      to={entry.path}
+                      aria-current={active ? 'page' : undefined}
                       className={cn(
-                        'flex flex-col items-center justify-center gap-0.5 px-4 py-2 rounded-md transition-colors min-w-[72px] relative outline-none',
+                        'flex flex-col items-center justify-center gap-0.5 px-4 py-2 rounded-md transition-colors min-w-[72px] relative outline-none focus-visible:ring-2 focus-visible:ring-ring',
                         active
                           ? 'text-primary'
                           : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                       )}
                     >
                       <Icon className="h-5 w-5" />
-                      <span className="text-xs font-medium flex items-center gap-0.5">
-                        {entry.label}
-                        <ChevronDown className="h-3 w-3 opacity-60" />
-                      </span>
+                      <span className="text-xs font-medium">{entry.label}</span>
                       {active && (
                         <span className="absolute -bottom-[1px] left-1/2 -translate-x-1/2 h-0.5 w-8 bg-primary rounded-full" />
                       )}
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="w-64">
-                    <DropdownMenuLabel>{entry.label}</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {entry.items.map((item) => {
-                      const ItemIcon = item.icon;
-                      return (
-                        <DropdownMenuItem
-                          key={item.path}
-                          onSelect={() => navigate(item.path)}
-                          className="gap-3 py-2 cursor-pointer"
-                        >
-                          <ItemIcon className="h-4 w-4 text-primary flex-shrink-0" />
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium">{item.label}</span>
-                            {item.description && (
-                              <span className="text-xs text-muted-foreground">{item.description}</span>
-                            )}
-                          </div>
-                        </DropdownMenuItem>
-                      );
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    </Link>
+                  </Fragment>
+                );
+              }
+
+              const active = isActiveGroup(entry);
+              const Icon = entry.icon;
+              return (
+                <Fragment key={entry.label}>
+                  {separatorBefore && (
+                    <div aria-hidden="true" className="h-7 w-px bg-border/60 mx-1.5 flex-shrink-0" />
+                  )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className={cn(
+                          'flex flex-col items-center justify-center gap-0.5 px-4 py-2 rounded-md transition-colors min-w-[72px] relative outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                          active
+                            ? 'text-primary'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                        )}
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span className="text-xs font-medium flex items-center gap-0.5">
+                          {entry.label}
+                          <ChevronDown className="h-3 w-3 opacity-60" />
+                        </span>
+                        {active && (
+                          <span className="absolute -bottom-[1px] left-1/2 -translate-x-1/2 h-0.5 w-8 bg-primary rounded-full" />
+                        )}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="center" className="w-64">
+                      <DropdownMenuLabel>{entry.label}</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {entry.items.map((item) => {
+                        const ItemIcon = item.icon;
+                        return (
+                          <DropdownMenuItem
+                            key={item.path}
+                            onSelect={() => navigate(item.path)}
+                            className="gap-3 py-2 cursor-pointer"
+                          >
+                            <ItemIcon className="h-4 w-4 text-primary flex-shrink-0" />
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium">{item.label}</span>
+                              {item.description && (
+                                <span className="text-xs text-muted-foreground">{item.description}</span>
+                              )}
+                            </div>
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </Fragment>
               );
             })}
           </nav>
@@ -221,7 +234,7 @@ export const TopNav: React.FC = () => {
             {/* Profile menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 rounded-full border border-border bg-background hover:bg-muted/50 transition-colors pl-1 pr-3 py-1">
+                <button aria-label="Open profile menu" className="flex items-center gap-2 rounded-full border border-border bg-background hover:bg-muted/50 transition-colors pl-1 pr-3 py-1">
                   <div className="h-7 w-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
                     <User className="h-4 w-4 text-primary" />
                   </div>
@@ -254,7 +267,7 @@ export const TopNav: React.FC = () => {
             {/* Mobile menu */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden">
+                <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open navigation menu">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
@@ -273,6 +286,7 @@ export const TopNav: React.FC = () => {
                           key={entry.path}
                           to={entry.path}
                           onClick={() => setMobileOpen(false)}
+                          aria-current={active ? 'page' : undefined}
                           className={cn(
                             'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm',
                             active
@@ -286,31 +300,56 @@ export const TopNav: React.FC = () => {
                       );
                     }
                     const Icon = entry.icon;
+                    const isOpen = openGroups[entry.label] ?? isActiveGroup(entry);
                     return (
                       <div key={entry.label} className="pt-2">
-                        <div className="flex items-center gap-2 px-3 py-1 text-xs uppercase tracking-wide text-muted-foreground">
-                          <Icon className="h-3.5 w-3.5" /> {entry.label}
+                        <button
+                          type="button"
+                          aria-expanded={isOpen}
+                          aria-controls={`mobile-group-${entry.label}`}
+                          onClick={() => setOpenGroups((prev) => ({ ...prev, [entry.label]: !isOpen }))}
+                          className={cn(
+                            'w-full flex items-center gap-2 px-3 py-2 rounded-md text-xs uppercase tracking-wide text-muted-foreground hover:bg-muted hover:text-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                            isOpen && 'text-primary'
+                          )}
+                        >
+                          <Icon className="h-3.5 w-3.5" />
+                          <span className="flex-1 text-left">{entry.label}</span>
+                          <ChevronDown
+                            className={cn('h-3.5 w-3.5 transition-transform duration-200', isOpen && 'rotate-180')}
+                          />
+                        </button>
+                        <div
+                          id={`mobile-group-${entry.label}`}
+                          className={cn(
+                            'grid transition-[grid-template-rows] duration-200 ease-out',
+                            isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                          )}
+                        >
+                          <div className="overflow-hidden">
+                            {entry.items.map((item) => {
+                              const ItemIcon = item.icon;
+                              const active = isActivePath(item.path);
+                              return (
+                                <Link
+                                  key={item.path}
+                                  to={item.path}
+                                  onClick={() => setMobileOpen(false)}
+                                  aria-current={active ? 'page' : undefined}
+                                  className={cn(
+                                    'flex items-center gap-3 px-5 py-2 rounded-md text-sm',
+                                    active
+                                      ? 'bg-primary/15 text-primary'
+                                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                  )}
+                                >
+                                  <ItemIcon className="h-4 w-4" />
+                                  {item.label}
+                                </Link>
+                              );
+                            })}
+                          </div>
                         </div>
-                        {entry.items.map((item) => {
-                          const ItemIcon = item.icon;
-                          const active = isActivePath(item.path);
-                          return (
-                            <Link
-                              key={item.path}
-                              to={item.path}
-                              onClick={() => setMobileOpen(false)}
-                              className={cn(
-                                'flex items-center gap-3 px-5 py-2 rounded-md text-sm',
-                                active
-                                  ? 'bg-primary/15 text-primary'
-                                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                              )}
-                            >
-                              <ItemIcon className="h-4 w-4" />
-                              {item.label}
-                            </Link>
-                          );
-                        })}
                       </div>
                     );
                   })}
