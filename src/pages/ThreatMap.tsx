@@ -64,9 +64,11 @@ const ThreatMap: React.FC = () => {
 
       <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_340px] gap-4">
         <Card className="relative overflow-hidden h-[460px] md:h-[600px]">
+          <div className="absolute inset-0">
           <Suspense fallback={<div className="h-full flex items-center justify-center text-muted-foreground text-sm">Loading globe…</div>}>
             <ThreatGlobe attacks={active} autoRotate={rotate} onSelect={setSelected} />
           </Suspense>
+          </div>
           <div className="absolute top-3 left-3 rounded-md bg-background/80 backdrop-blur px-3 py-2 border border-border">
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Attacks tracked</div>
             <div className="text-2xl font-mono font-bold text-primary">{total.toLocaleString()}</div>
