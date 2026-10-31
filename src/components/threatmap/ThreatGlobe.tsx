@@ -22,22 +22,26 @@ function EarthSurface() {
     const loader = new THREE.TextureLoader();
     const day = loader.load(earthDay);
     day.colorSpace = THREE.SRGBColorSpace;
+    day.anisotropy = 8;
+    day.wrapS = THREE.RepeatWrapping;
     const lights = loader.load(earthLights);
     lights.colorSpace = THREE.SRGBColorSpace;
+    lights.anisotropy = 8;
+    lights.wrapS = THREE.RepeatWrapping;
     return { day, lights };
   }, []);
 
   return (
     <mesh>
-      <sphereGeometry args={[R, 96, 64]} />
+      <sphereGeometry args={[R, 128, 96]} />
       <meshStandardMaterial
         map={day}
-        color="#8a93a6"
+        color="#9aa3b5"
         emissiveMap={lights}
         emissive="#ffc078"
-        emissiveIntensity={0.5}
-        roughness={0.85}
-        metalness={0.05}
+        emissiveIntensity={0.55}
+        roughness={0.9}
+        metalness={0}
       />
     </mesh>
   );
