@@ -3,6 +3,8 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { Attack, ATTACK_INFO, CITIES } from './threatData';
+import earthDay from '@/assets/threatmap/earth_atmos_2048.jpg';
+import earthLights from '@/assets/threatmap/earth_lights_2048.png';
 
 const R = 2;
 const ARC_LIFE = 3.2; // seconds per attack arc
@@ -13,19 +15,32 @@ function toVec(lat: number, lon: number, r = R) {
   return new THREE.Vector3(-r * Math.sin(phi) * Math.cos(theta), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(theta));
 }
 
-// Dotted-sphere "landmass" look generated procedurally (fibonacci distribution).
-function DotSphere() {
-  const geo = useMemo(() => {
-    const n = 2600, pts: number[] = [];
-    for (let i = 0; i < n; i++) {
-      const y = 1 - (i / (n - 1)) * 2, rad = Math.sqrt(1 - y * y), t = i * 2.39996;
-      pts.push(Math.cos(t) * rad * R * 1.001, y * R * 1.001, Math.sin(t) * rad * R * 1.001);
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-    return g;
+// Realistic Earth: NASA-style day texture, darkened to fit the navy theme,
+// with faint city lights as an emissive layer.
+function EarthSurface() {
+  const { day, lights } = useMemo(() => {
+    const loader = new THREE.TextureLoader();
+    const day = loader.load(earthDay);
+    day.colorSpace = THREE.SRGBColorSpace;
+    const lights = loader.load(earthLights);
+    lights.colorSpace = THREE.SRGBColorSpace;
+    return { day, lights };
   }, []);
-  return <points geometry={geo}><pointsMaterial color="#5b6b85" size={0.018} transparent opacity={0.7} /></points>;
+
+  return (
+    <mesh>
+      <sphereGeometry args={[R, 96, 64]} />
+      <meshStandardMaterial
+        map={day}
+        color="#8a93a6"
+        emissiveMap={lights}
+        emissive="#ffc078"
+        emissiveIntensity={0.5}
+        roughness={0.85}
+        metalness={0.05}
+      />
+    </mesh>
+  );
 }
 
 function ArcLine({ attack, onSelect }: { attack: Attack; onSelect: (a: Attack) => void }) {
