@@ -296,6 +296,12 @@ const Dashboard: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Cyber War Room widget */}
+      <div className="mb-8">
+        <WarRoomWidget />
+      </div>
+
+
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
