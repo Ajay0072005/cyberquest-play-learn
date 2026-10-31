@@ -18,6 +18,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { AchievementBadge } from '@/components/AchievementBadge';
+import { WarRoomWidget } from '@/components/threatmap/WarRoomWidget';
 import { useNavigate } from 'react-router-dom';
 
 const securityTools = [
