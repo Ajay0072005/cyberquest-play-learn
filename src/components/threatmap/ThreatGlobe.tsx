@@ -114,9 +114,9 @@ export function ThreatGlobe({ attacks, autoRotate, onSelect, compact }: {
         </mesh>
         <mesh>
           <sphereGeometry args={[R * 1.06, 48, 48]} />
-          <meshBasicMaterial color="#3b5bdb" transparent opacity={0.06} side={THREE.BackSide} />
+          <meshBasicMaterial color="#3b5bdb" transparent opacity={0.08} side={THREE.BackSide} />
         </mesh>
-        <DotSphere />
+        <EarthSurface />
         <CityNodes />
         {attacks.map((a) => <ArcLine key={a.id} attack={a} onSelect={onSelect} />)}
       </group>
