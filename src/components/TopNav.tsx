@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   Rss,
+  Globe2,
   User,
   Compass,
   Menu,
