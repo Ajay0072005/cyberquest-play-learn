@@ -18,6 +18,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { AchievementBadge } from '@/components/AchievementBadge';
+import { WarRoomWidget } from '@/components/threatmap/WarRoomWidget';
 import { useNavigate } from 'react-router-dom';
 
 const securityTools = [
@@ -295,6 +296,12 @@ const Dashboard: React.FC = () => {
           <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
         </CardContent>
       </Card>
+
+      {/* Cyber War Room widget */}
+      <div className="mb-8">
+        <WarRoomWidget />
+      </div>
+
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-6">

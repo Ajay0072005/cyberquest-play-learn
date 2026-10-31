@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   Rss,
+  Globe2,
   User,
   Compass,
   Menu,
@@ -79,6 +80,7 @@ const navEntries: NavEntry[] = [
     ],
   },
   { label: 'Cyber Feeds', path: '/cyber-feeds', icon: Rss },
+  { label: 'War Room', path: '/threat-map', icon: Globe2 },
   { label: 'AI Chat', path: '/chat', icon: MessageSquare },
 ];
 
