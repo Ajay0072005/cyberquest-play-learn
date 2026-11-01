@@ -50,6 +50,157 @@ export type Database = {
         }
         Relationships: []
       }
+      incident_activity: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json | null
+          id: string
+          incident_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          incident_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          incident_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_activity_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_notes: {
+        Row: {
+          author_id: string | null
+          created_at: string
+          id: string
+          incident_id: string
+          note: string
+        }
+        Insert: {
+          author_id?: string | null
+          created_at?: string
+          id?: string
+          incident_id: string
+          note: string
+        }
+        Update: {
+          author_id?: string | null
+          created_at?: string
+          id?: string
+          incident_id?: string
+          note?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_notes_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incidents: {
+        Row: {
+          assigned_analyst: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          severity: string
+          status: string
+          team_id: string | null
+          threat_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_analyst?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          severity?: string
+          status?: string
+          team_id?: string | null
+          threat_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_analyst?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          severity?: string
+          status?: string
+          team_id?: string | null
+          threat_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incidents_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "security_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incidents_threat_id_fkey"
+            columns: ["threat_id"]
+            isOneToOne: false
+            referencedRelation: "threat_indicators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      intelligence_sync_logs: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          provider: string
+          records_imported: number
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          provider: string
+          records_imported?: number
+          status: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          provider?: string
+          records_imported?: number
+          status?: string
+        }
+        Relationships: []
+      }
       knowledge_base: {
         Row: {
           category: string
@@ -209,6 +360,175 @@ export type Database = {
         }
         Relationships: []
       }
+      security_teams: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      threat_flags: {
+        Row: {
+          created_at: string
+          flagged_by: string
+          id: string
+          reason: string | null
+          threat_id: string
+        }
+        Insert: {
+          created_at?: string
+          flagged_by: string
+          id?: string
+          reason?: string | null
+          threat_id: string
+        }
+        Update: {
+          created_at?: string
+          flagged_by?: string
+          id?: string
+          reason?: string | null
+          threat_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "threat_flags_threat_id_fkey"
+            columns: ["threat_id"]
+            isOneToOne: false
+            referencedRelation: "threat_indicators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      threat_geo_cache: {
+        Row: {
+          city: string | null
+          country: string | null
+          fetched_at: string
+          ip: string
+          latitude: number | null
+          longitude: number | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          fetched_at?: string
+          ip: string
+          latitude?: number | null
+          longitude?: number | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          fetched_at?: string
+          ip?: string
+          latitude?: number | null
+          longitude?: number | null
+        }
+        Relationships: []
+      }
+      threat_indicators: {
+        Row: {
+          city: string | null
+          confidence: number | null
+          country: string | null
+          created_at: string
+          dest_ip: string | null
+          dest_port: number | null
+          first_seen: string | null
+          flagged_at: string | null
+          flagged_by: string | null
+          id: string
+          incident_id: string | null
+          indicator_value: string
+          is_flagged: boolean
+          last_seen: string | null
+          latitude: number | null
+          longitude: number | null
+          protocol: string | null
+          provider: string
+          provider_event_id: string
+          severity: string
+          source_ip: string | null
+          source_reference: string | null
+          threat_type: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          confidence?: number | null
+          country?: string | null
+          created_at?: string
+          dest_ip?: string | null
+          dest_port?: number | null
+          first_seen?: string | null
+          flagged_at?: string | null
+          flagged_by?: string | null
+          id?: string
+          incident_id?: string | null
+          indicator_value: string
+          is_flagged?: boolean
+          last_seen?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          protocol?: string | null
+          provider: string
+          provider_event_id: string
+          severity?: string
+          source_ip?: string | null
+          source_reference?: string | null
+          threat_type: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          confidence?: number | null
+          country?: string | null
+          created_at?: string
+          dest_ip?: string | null
+          dest_port?: number | null
+          first_seen?: string | null
+          flagged_at?: string | null
+          flagged_by?: string | null
+          id?: string
+          incident_id?: string | null
+          indicator_value?: string
+          is_flagged?: boolean
+          last_seen?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          protocol?: string | null
+          provider?: string
+          provider_event_id?: string
+          severity?: string
+          source_ip?: string | null
+          source_reference?: string | null
+          threat_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_threat_incident"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_achievements: {
         Row: {
           achievement_id: string
@@ -306,6 +626,10 @@ export type Database = {
           prompt: string
           similarity: number
         }[]
+      }
+      toggle_threat_flag: {
+        Args: { _reason?: string; _threat_id: string }
+        Returns: boolean
       }
     }
     Enums: {
