@@ -447,6 +447,8 @@ export type Database = {
           country: string | null
           created_at: string
           dest_ip: string | null
+          dest_latitude: number | null
+          dest_longitude: number | null
           dest_port: number | null
           first_seen: string | null
           flagged_at: string | null
@@ -473,6 +475,8 @@ export type Database = {
           country?: string | null
           created_at?: string
           dest_ip?: string | null
+          dest_latitude?: number | null
+          dest_longitude?: number | null
           dest_port?: number | null
           first_seen?: string | null
           flagged_at?: string | null
@@ -499,6 +503,8 @@ export type Database = {
           country?: string | null
           created_at?: string
           dest_ip?: string | null
+          dest_latitude?: number | null
+          dest_longitude?: number | null
           dest_port?: number | null
           first_seen?: string | null
           flagged_at?: string | null

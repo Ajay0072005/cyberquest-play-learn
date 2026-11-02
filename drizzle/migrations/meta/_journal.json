@@ -15,6 +15,13 @@
       "when": 1793516793941,
       "tag": "0001_threat_realtime",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793595698339,
+      "tag": "0002_threat_dest_coords",
+      "breakpoints": true
     }
   ]
 }
