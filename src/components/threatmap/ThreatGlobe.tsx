@@ -1,8 +1,8 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
-import { Attack, ATTACK_INFO, CITIES } from './threatData';
+import { ThreatRow, SEVERITY_COLORS, Severity } from '@/services/threatIntel';
 import earthDay from '@/assets/threatmap/earth_atmos_2048.jpg';
 import earthLights from '@/assets/threatmap/earth_lights_2048.png';
 
@@ -16,7 +16,7 @@ function toVec(lat: number, lon: number, r = R) {
 }
 
 // Realistic Earth: NASA-style day texture, darkened to fit the navy theme,
-// with faint city lights as an emissive layer.
+// with faint city lights as an emissive layer. (unchanged visual foundation)
 function EarthSurface() {
   const { day, lights } = useMemo(() => {
     const loader = new THREE.TextureLoader();
@@ -47,20 +47,27 @@ function EarthSurface() {
   );
 }
 
-function ArcLine({ attack, onSelect }: { attack: Attack; onSelect: (a: Attack) => void }) {
+/**
+ * Attack arc — rendered ONLY when a record genuinely carries both a source and
+ * a destination position (e.g. authorized network telemetry). Public
+ * intelligence feeds report malicious sources, never victims, so most records
+ * show as markers instead of arcs.
+ */
+function ArcLine({ threat, onSelect }: { threat: ThreatRow; onSelect: (t: ThreatRow) => void }) {
   const { curve, geom } = useMemo(() => {
-    const a = toVec(attack.from.lat, attack.from.lon), b = toVec(attack.to.lat, attack.to.lon);
+    const a = toVec(threat.latitude!, threat.longitude!);
+    const b = toVec(threat.dest_latitude!, threat.dest_longitude!);
     const mid = a.clone().add(b).multiplyScalar(0.5);
     mid.normalize().multiplyScalar(R + a.distanceTo(b) * 0.45);
     const c = new THREE.QuadraticBezierCurve3(a, mid, b);
     return { curve: c, geom: new THREE.TubeGeometry(c, 48, 0.008, 6, false) };
-  }, [attack]);
+  }, [threat]);
   const head = useRef<THREE.Mesh>(null);
   const ring = useRef<THREE.Mesh>(null);
   const mat = useRef<THREE.MeshBasicMaterial>(null);
   const born = useRef<number | null>(null);
-  const color = ATTACK_INFO[attack.type].color;
-  const target = useMemo(() => toVec(attack.to.lat, attack.to.lon, R * 1.002), [attack]);
+  const color = SEVERITY_COLORS[(threat.severity as Severity) ?? 'Unknown'];
+  const target = useMemo(() => toVec(threat.dest_latitude!, threat.dest_longitude!, R * 1.002), [threat]);
 
   useFrame(({ clock }) => {
     if (born.current === null) born.current = clock.elapsedTime;
@@ -77,7 +84,7 @@ function ArcLine({ attack, onSelect }: { attack: Attack; onSelect: (a: Attack) =
 
   return (
     <group>
-      <mesh geometry={geom} onClick={(e) => { e.stopPropagation(); onSelect(attack); }}>
+      <mesh geometry={geom} onClick={(e) => { e.stopPropagation(); onSelect(threat); }}>
         <meshBasicMaterial ref={mat} color={color} transparent opacity={0.85} />
       </mesh>
       <mesh ref={head}><sphereGeometry args={[0.03, 8, 8]} /><meshBasicMaterial color={color} /></mesh>
@@ -89,22 +96,87 @@ function ArcLine({ attack, onSelect }: { attack: Attack; onSelect: (a: Attack) =
   );
 }
 
-function CityNodes() {
+const SEVERITY_SIZE: Record<string, number> = {
+  Critical: 0.034,
+  High: 0.028,
+  Medium: 0.022,
+  Low: 0.018,
+  Informational: 0.016,
+  Unknown: 0.016,
+};
+
+/** Persistent clickable marker for one real intelligence record. */
+function ThreatMarker({ threat, selected, onSelect }: {
+  threat: ThreatRow; selected: boolean; onSelect: (t: ThreatRow) => void;
+}) {
+  const [hovered, setHovered] = useState(false);
+  const mesh = useRef<THREE.Mesh>(null);
+  const halo = useRef<THREE.Mesh>(null);
+  const color = SEVERITY_COLORS[(threat.severity as Severity) ?? 'Unknown'];
+  const base = SEVERITY_SIZE[(threat.severity as Severity) ?? 'Unknown'] ?? 0.016;
+  const position = useMemo(() => toVec(threat.latitude!, threat.longitude!, R * 1.006), [threat]);
+
+  useFrame(({ clock }) => {
+    const target = hovered || selected ? 1.9 : 1;
+    if (mesh.current) mesh.current.scale.lerp(new THREE.Vector3(target, target, target), 0.2);
+    if (halo.current) {
+      const pulse = threat.is_flagged
+        ? 1 + Math.sin(clock.elapsedTime * 3) * 0.25
+        : 1;
+      halo.current.scale.setScalar(pulse);
+      (halo.current.material as THREE.MeshBasicMaterial).opacity = hovered || selected || threat.is_flagged ? 0.4 : 0;
+    }
+  });
+
   return (
-    <>
-      {CITIES.map((c) => (
-        <mesh key={c.name} position={toVec(c.lat, c.lon, R * 1.004)}>
-          <sphereGeometry args={[0.022, 8, 8]} />
-          <meshBasicMaterial color="#a3e635" />
+    <group position={position}>
+      <mesh
+        ref={mesh}
+        onPointerOver={(e) => { e.stopPropagation(); setHovered(true); }}
+        onPointerOut={() => setHovered(false)}
+        onClick={(e) => { e.stopPropagation(); onSelect(threat); }}
+        onUpdate={(m) => m.lookAt(0, 0, 0)}
+      >
+        <circleGeometry args={[base, 16]} />
+        <meshBasicMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+      {/* highlight halo for flagged threats / active incidents / hover */}
+      <mesh ref={halo} onUpdate={(m) => m.lookAt(0, 0, 0)}>
+        <circleGeometry args={[base * 2.4, 24]} />
+        <meshBasicMaterial color={threat.is_flagged ? '#a3e635' : color} transparent opacity={0} side={THREE.DoubleSide} />
+      </mesh>
+      {selected && (
+        <mesh onUpdate={(m) => m.lookAt(0, 0, 0)}>
+          <ringGeometry args={[base * 3, base * 3.6, 24]} />
+          <meshBasicMaterial color="#a3e635" side={THREE.DoubleSide} />
         </mesh>
-      ))}
-    </>
+      )}
+    </group>
   );
 }
 
-export function ThreatGlobe({ attacks, autoRotate, onSelect, compact }: {
-  attacks: Attack[]; autoRotate: boolean; onSelect: (a: Attack) => void; compact?: boolean;
+export function ThreatGlobe({ threats, autoRotate, onSelect, compact }: {
+  /** Real threat records; only those with coordinates become markers. */
+  threats: ThreatRow[];
+  autoRotate: boolean;
+  onSelect: (t: ThreatRow) => void;
+  compact?: boolean;
 }) {
+  const markers = useMemo(
+    () => threats.filter((t) => t.latitude != null && t.longitude != null),
+    [threats],
+  );
+  const arcs = useMemo(
+    () => markers.filter((t) => t.dest_latitude != null && t.dest_longitude != null),
+    [markers],
+  );
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const handleSelect = (t: ThreatRow) => {
+    setSelectedId(t.id);
+    onSelect(t);
+  };
+
   return (
     <Canvas camera={{ position: [0, 1.2, compact ? 6.2 : 5.4], fov: 45 }} dpr={[1, 1.75]}>
       <color attach="background" args={['#0f1522']} />
@@ -121,8 +193,10 @@ export function ThreatGlobe({ attacks, autoRotate, onSelect, compact }: {
           <meshBasicMaterial color="#3b5bdb" transparent opacity={0.08} side={THREE.BackSide} />
         </mesh>
         <EarthSurface />
-        <CityNodes />
-        {attacks.map((a) => <ArcLine key={a.id} attack={a} onSelect={onSelect} />)}
+        {markers.map((t) => (
+          <ThreatMarker key={t.id} threat={t} selected={t.id === selectedId} onSelect={handleSelect} />
+        ))}
+        {arcs.map((t) => <ArcLine key={`arc-${t.id}`} threat={t} onSelect={handleSelect} />)}
       </group>
       <OrbitControls enablePan={false} minDistance={3.4} maxDistance={9} autoRotate={autoRotate} autoRotateSpeed={0.6} enableZoom={!compact} />
     </Canvas>
