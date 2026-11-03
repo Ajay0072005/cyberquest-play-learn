@@ -34,8 +34,8 @@ export const THREAT_TYPE_LABELS: Record<string, string> = {
 
 export const NOT_AVAILABLE = 'Not Available';
 
-export const notAvail = (v: string | number | null | undefined) =>
-  v === null || v === undefined || v === '' ? NOT_AVAILABLE : v;
+export const notAvail = (v: string | number | null | undefined): string =>
+  v === null || v === undefined || v === '' ? NOT_AVAILABLE : String(v);
 
 export const incidentStatuses = [
   'New', 'Under Investigation', 'Assigned', 'Contained', 'Mitigated', 'Resolved', 'Closed',
