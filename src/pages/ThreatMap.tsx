@@ -1,5 +1,6 @@
 import { lazy, Suspense, useMemo, useState } from 'react';
-import { Globe2, Pause, Play, RotateCw, RefreshCw, X, ArrowRight, Flag, ShieldAlert, Database, Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Globe2, RotateCw, RefreshCw, X, ArrowRight, Flag, ShieldAlert, Database, Loader2 } from 'lucide-react';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -100,9 +101,6 @@ const ThreatMap: React.FC = () => {
     if (!selected?.incident_id) return null;
     return incidents.find((i) => i.id === selected.incident_id) ?? null;
   }, [selected, incidents]);
-
-  // Load notes + activity for the selected threat's incident
-  useMemo(() => { /* placeholder to satisfy lint ordering */ }, []);
 
   const loadIncidentDetail = async (incidentId: string) => {
     const [n, a] = await Promise.all([fetchIncidentNotes(incidentId), fetchIncidentActivity(incidentId)]);
@@ -362,7 +360,7 @@ const ThreatMap: React.FC = () => {
                 </div>
               )}
               <Button asChild size="sm" variant="outline" className="w-full text-xs">
-                <a href="/security-labs" onClick={(e) => { e.preventDefault(); window.location.hash = '#'; }}>Practice defending: Security Labs<ArrowRight className="h-3.5 w-3.5 ml-1" /></a>
+                <Link to="/security-labs">Practice defending: Security Labs<ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
               </Button>
             </div>
           )}
@@ -439,8 +437,7 @@ const ThreatMap: React.FC = () => {
           </Card>
         </div>
       </div>
-      <p className="mt-3 text-xs text-muted-foreground flex items-center gap-2">
-        <Pause className="hidden" /><Play className="hidden" />
+      <p className="mt-3 text-xs text-muted-foreground">
         Data shown is real threat intelligence (reported malicious indicators and historical threat data) — not a live network attack stream.
       </p>
     </DashboardLayout>
