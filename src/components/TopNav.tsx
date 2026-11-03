@@ -8,6 +8,7 @@ import {
   Award,
   BookOpen,
   FlaskConical,
+  ShieldOff as SecurityLabIcon,
   ShieldAlert,
   ShieldCheck,
   Rss,
@@ -65,6 +66,7 @@ const navEntries: NavEntry[] = [
     icon: FlaskConical,
     items: [
       { label: 'Practical Labs', path: '/labs', icon: FlaskConical, description: 'Hands-on mini labs' },
+      { label: 'Security Labs', path: '/security-labs', icon: SecurityLabIcon, description: 'Guided attack & defence labs' },
       { label: 'Terminal', path: '/terminal', icon: TerminalIcon, description: 'Linux terminal challenges' },
       { label: 'SQL Injection', path: '/sql-game', icon: Database, description: 'SQLi training game' },
       { label: 'Crypto Puzzles', path: '/crypto-puzzles', icon: KeyRound, description: 'Cipher and crypto challenges' },
