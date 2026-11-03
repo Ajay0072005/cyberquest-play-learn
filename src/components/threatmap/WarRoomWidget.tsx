@@ -1,35 +1,44 @@
 import { lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Globe2, ArrowUpRight, Radio } from 'lucide-react';
+import { Globe2, ArrowUpRight, Radio, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useThreatFeed } from '@/hooks/useThreatFeed';
-import { ATTACK_TYPES } from '@/components/threatmap/threatData';
+import { useThreatIntel } from '@/hooks/useThreatIntel';
 
 const ThreatGlobe = lazy(() => import('@/components/threatmap/ThreatGlobe'));
 
-/** Compact Cyber War Room globe for the Dashboard. Click anything to open the full view. */
+/**
+ * Compact Cyber War Room globe for the Dashboard / homepage.
+ * Shows the same real intelligence records as the full War Room page.
+ * Click anything to open the full view.
+ */
 export const WarRoomWidget: React.FC = () => {
   const navigate = useNavigate();
-  const { active, total } = useThreatFeed(ATTACK_TYPES);
+  const { threats, loading, syncing, lastSyncAt } = useThreatIntel();
+
+  const markerCount = threats.filter((t) => t.latitude != null).length;
 
   return (
     <Card className="relative overflow-hidden h-[340px] md:h-[380px] border-border group">
       <div className="absolute inset-0">
-        <Suspense
-          fallback={
-            <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
-              Loading globe…
-            </div>
-          }
-        >
-          <ThreatGlobe
-            attacks={active}
-            autoRotate
-            compact
-            onSelect={() => navigate('/threat-map')}
-          />
-        </Suspense>
+        {loading ? (
+          <div className="h-full flex items-center justify-center text-muted-foreground text-sm">Loading intelligence…</div>
+        ) : (
+          <Suspense
+            fallback={
+              <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
+                Loading globe…
+              </div>
+            }
+          >
+            <ThreatGlobe
+              threats={threats}
+              autoRotate
+              compact
+              onSelect={() => navigate('/threat-map')}
+            />
+          </Suspense>
+        )}
       </div>
 
       {/* Header overlay */}
@@ -40,10 +49,15 @@ export const WarRoomWidget: React.FC = () => {
             Cyber War Room
           </div>
           <div className="text-lg font-mono font-bold text-primary leading-tight">
-            {total.toLocaleString()}
-            <span className="text-xs text-muted-foreground font-sans font-medium ml-1">attacks tracked</span>
+            {threats.length.toLocaleString()}
+            <span className="text-xs text-muted-foreground font-sans font-medium ml-1">threat indicators</span>
+          </div>
+          <div className="text-[10px] text-muted-foreground">
+            {syncing ? 'Syncing now…' : lastSyncAt ? `Last sync ${new Date(lastSyncAt).toLocaleTimeString([], { hour12: false })}` : 'Not synced yet'}
+            {' · '}{markerCount} geolocated
           </div>
         </div>
+        {syncing && <Loader2 className="h-4 w-4 text-primary animate-spin" />}
       </div>
 
       {/* Open full view */}

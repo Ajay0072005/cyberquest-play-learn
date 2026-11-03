@@ -40,6 +40,7 @@ import AboutUs from "./pages/AboutUs";
 import CyberEvents from "./pages/CyberEvents";
 import CyberFeeds from "./pages/CyberFeeds";
 import ThreatMap from "./pages/ThreatMap";
+import SecurityLabs from "./pages/SecurityLabs";
 import { useThemeCustomization } from "./hooks/useThemeCustomization";
 
 const queryClient = new QueryClient();
@@ -90,6 +91,7 @@ const App = () => (
                 <Route path="/cyber-game" element={<ProtectedRoute><CyberGame /></ProtectedRoute>} />
                 <Route path="/cyber-feeds" element={<ProtectedRoute><CyberFeeds /></ProtectedRoute>} />
                 <Route path="/threat-map" element={<ProtectedRoute><ThreatMap /></ProtectedRoute>} />
+                <Route path="/security-labs" element={<ProtectedRoute><SecurityLabs /></ProtectedRoute>} />
                 <Route path="/cyber-news" element={<ProtectedRoute><CyberNews /></ProtectedRoute>} />
                 <Route path="/time-travel" element={<ProtectedRoute><CyberTimeTravel /></ProtectedRoute>} />
                 <Route path="/jobs" element={<ProtectedRoute><CyberJobs /></ProtectedRoute>} />
