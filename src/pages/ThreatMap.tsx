@@ -418,13 +418,13 @@ const ThreatMap: React.FC = () => {
               <h2 className="text-sm font-semibold mb-3">Live feed</h2>
               <ul className="space-y-1.5 max-h-[380px] overflow-y-auto font-mono text-[11px]">
                 {filtered.slice(0, 60).map((t) => {
-                  const ts = t.last_seen ?? t.first_seen ?? t.created_at;
+                  const ts = t.first_seen ?? t.last_seen ?? t.created_at;
                   const sev = (t.severity as Severity) ?? 'Unknown';
                   return (
                     <li key={t.id}>
                       <button onClick={() => { setSelected(t); if (t.incident_id) loadIncidentDetail(t.incident_id); }} className="w-full text-left flex gap-2 hover:bg-muted/50 rounded px-1 py-0.5 items-center">
                         <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ background: SEVERITY_COLORS[sev] }} title={sev} />
-                        <span className="text-muted-foreground">{ts ? new Date(ts).toLocaleTimeString([], { hour12: false }) : '--:--'}</span>
+                        <span className="text-muted-foreground">{ts ? new Date(ts).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }) : '--:--'}</span>
                         <span className="text-foreground truncate flex-1">{t.indicator_value}</span>
                         <span className="text-muted-foreground flex-shrink-0">{t.country ?? t.provider}</span>
                       </button>
