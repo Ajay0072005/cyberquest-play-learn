@@ -460,6 +460,7 @@ export type Database = {
           last_seen: string | null
           latitude: number | null
           longitude: number | null
+          malware_family: string | null
           protocol: string | null
           provider: string
           provider_event_id: string
@@ -488,6 +489,7 @@ export type Database = {
           last_seen?: string | null
           latitude?: number | null
           longitude?: number | null
+          malware_family?: string | null
           protocol?: string | null
           provider: string
           provider_event_id: string
@@ -516,6 +518,7 @@ export type Database = {
           last_seen?: string | null
           latitude?: number | null
           longitude?: number | null
+          malware_family?: string | null
           protocol?: string | null
           provider?: string
           provider_event_id?: string
