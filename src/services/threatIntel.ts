@@ -145,8 +145,13 @@ export async function createIncident(input: {
     action: 'created',
     details: { title: input.title, severity: input.severity ?? 'Unknown' },
   });
-  // link the indicator back to its incident
-  await supabase.from('threat_indicators').update({ incident_id: data.id }).eq('id', input.threat_id);
+  // link the indicator back to its incident (server-side RPC — the
+  // threat_indicators table itself is SELECT-only for end users)
+  const { error: linkError } = await supabase.rpc('link_threat_incident', {
+    _threat_id: input.threat_id,
+    _incident_id: data.id,
+  });
+  if (linkError) throw linkError;
   return data as IncidentRow;
 }
 
