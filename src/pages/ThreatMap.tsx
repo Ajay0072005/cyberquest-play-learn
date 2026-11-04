@@ -264,6 +264,7 @@ const ThreatMap: React.FC = () => {
               <div className="space-y-1">
                 <Field label="Provider" value={selected.provider} />
                 <Field label="Source IP" value={notAvail(selected.source_ip)} />
+                <Field label="Malware family" value={notAvail(selected.malware_family)} />
                 <Field label="Destination IP" value={notAvail(selected.dest_ip)} />
                 <Field label="Country" value={notAvail(selected.country)} />
                 <Field label="City" value={notAvail(selected.city)} />
