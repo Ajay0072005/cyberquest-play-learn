@@ -623,6 +623,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      link_threat_incident: {
+        Args: { _incident_id: string; _threat_id: string }
+        Returns: undefined
+      }
       match_knowledge: {
         Args: {
           match_count?: number
