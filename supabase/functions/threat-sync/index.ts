@@ -5,10 +5,14 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
  * threat-sync — imports real threat intelligence into public.threat_indicators.
  *
  * Sources:
- *  - ThreatFox (abuse.ch): keyless, recent IOCs (IPs, domains, URLs, hashes)
- *  - URLhaus (abuse.ch): keyless, recent malicious URLs
- *  - AlienVault OTX: requires OTX_API_KEY secret; reported as "requires-configuration" otherwise
- *  - AbuseIPDB: requires ABUSEIPDB_API_KEY secret; reported as "requires-configuration" otherwise
+ *  - Feodo Tracker (abuse.ch): keyless JSON blocklist of actively observed botnet
+ *    C2 servers (IP, C2 port, malware family, country) — works without a key.
+ *  - ThreatFox (abuse.ch): community API now requires an Auth-Key
+ *    (secret: THREATFOX_AUTH_KEY); reported as "requires-configuration" otherwise.
+ *  - URLhaus (abuse.ch): API now requires an Auth-Key (secret: URLHAUS_AUTH_KEY);
+ *    reported as "requires-configuration" otherwise.
+ *  - AlienVault OTX: requires OTX_API_KEY; reported as "requires-configuration" otherwise.
+ *  - AbuseIPDB: requires ABUSEIPDB_API_KEY; reported as "requires-configuration" otherwise.
  *
  * This is threat INTELLIGENCE (reported/historical malicious indicators), not a
  * live attack stream. Severity is derived from the provider's confidence score;
@@ -32,6 +36,7 @@ interface NormalizedThreat {
   protocol: string | null;
   severity: Severity;
   confidence: number | null;
+  malware_family: string | null;
   country: string | null;
   city: string | null;
   latitude: number | null;
@@ -64,11 +69,41 @@ async function fetchJson(url: string, init?: RequestInit): Promise<any> {
   return res.json();
 }
 
-// ---------- ThreatFox (keyless) ----------
-async function fetchThreatFox(): Promise<NormalizedThreat[]> {
+// ---------- Feodo Tracker (keyless) ----------
+async function fetchFeodoTracker(): Promise<NormalizedThreat[]> {
+  const data = await fetchJson('https://feodotracker.abuse.ch/downloads/ipblocklist.json');
+  if (!Array.isArray(data)) throw new Error('Feodo Tracker returned no array');
+  return data.map((d: any) => {
+    // Feodo publishes no confidence score, so severity stays "Unknown" — honest.
+    const confidence: number | null = null;
+    return {
+      provider: 'Feodo Tracker',
+      provider_event_id: `${d.ip_address}:${d.port ?? 0}`,
+      threat_type: 'c2-server',
+      indicator_value: String(d.ip_address),
+      source_ip: String(d.ip_address),
+      dest_ip: null,
+      dest_port: typeof d.port === 'number' ? d.port : null,
+      protocol: null,
+      severity: severityFromConfidence(confidence),
+      confidence,
+      malware_family: typeof d.malware === 'string' && d.malware ? d.malware : null,
+      country: typeof d.country === 'string' && d.country ? d.country : null,
+      city: null,
+      latitude: null,
+      longitude: null,
+      first_seen: toIso(d.first_seen),
+      last_seen: toIso(d.last_online),
+      source_reference: `https://feodotracker.abuse.ch/browse/ip/${encodeURIComponent(String(d.ip_address))}/`,
+    };
+  }).filter((t: NormalizedThreat) => t.indicator_value);
+}
+
+// ---------- ThreatFox (requires THREATFOX_AUTH_KEY since 2025) ----------
+async function fetchThreatFox(authKey: string): Promise<NormalizedThreat[]> {
   const body = await fetchJson('https://threatfox.abuse.ch/api/v1/', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Auth-Key': authKey },
     body: JSON.stringify({ query: 'get_iocs', days: 1 }),
   });
   if (body.query_status !== 'ok' || !Array.isArray(body.data)) {
@@ -103,6 +138,7 @@ async function fetchThreatFox(): Promise<NormalizedThreat[]> {
       protocol: null,
       severity: severityFromConfidence(confidence),
       confidence,
+      malware_family: typeof d.malware === 'string' && d.malware ? d.malware : null,
       country: null,
       city: null,
       latitude: null,
@@ -114,10 +150,11 @@ async function fetchThreatFox(): Promise<NormalizedThreat[]> {
   }).filter((t: NormalizedThreat) => t.indicator_value);
 }
 
-// ---------- URLhaus (keyless) ----------
-async function fetchURLhaus(): Promise<NormalizedThreat[]> {
+// ---------- URLhaus (requires URLHAUS_AUTH_KEY since 2025) ----------
+async function fetchURLhaus(authKey: string): Promise<NormalizedThreat[]> {
   const data = await fetchJson('https://urlhaus-api.abuse.ch/v1/urls/recent/limit/100/', {
     method: 'POST',
+    headers: { 'Auth-Key': authKey },
   });
   if (!Array.isArray(data)) throw new Error('URLhaus returned no array');
   return data.map((d: any) => {
@@ -133,6 +170,7 @@ async function fetchURLhaus(): Promise<NormalizedThreat[]> {
       protocol: null,
       severity: severityFromConfidence(confidence),
       confidence,
+      malware_family: Array.isArray(d.tags) && d.tags.length ? String(d.tags[0]) : null,
       country: null,
       city: null,
       latitude: null,
@@ -154,9 +192,7 @@ async function fetchOTX(apiKey: string): Promise<NormalizedThreat[]> {
   const pulses: any[] = Array.isArray(body?.results) ? body.results : [];
   const out: NormalizedThreat[] = [];
   for (const p of pulses) {
-    const indicators: any[] = [
-      ...(p.indicators ?? []).filter((i: any) => i.type === 'IPv4').slice(0, 10),
-    ];
+    const indicators: any[] = (p.indicators ?? []).filter((i: any) => i.type === 'IPv4').slice(0, 10);
     for (const i of indicators) {
       out.push({
         provider: 'OTX',
@@ -169,6 +205,7 @@ async function fetchOTX(apiKey: string): Promise<NormalizedThreat[]> {
         protocol: null,
         severity: 'Unknown', // pulses publish no confidence-derived severity
         confidence: null,
+        malware_family: null,
         country: null,
         city: null,
         latitude: null,
@@ -202,6 +239,7 @@ async function fetchAbuseIPDB(apiKey: string): Promise<NormalizedThreat[]> {
       protocol: null,
       severity: severityFromConfidence(confidence),
       confidence,
+      malware_family: null,
       country: null,
       city: null,
       latitude: null,
@@ -214,10 +252,7 @@ async function fetchAbuseIPDB(apiKey: string): Promise<NormalizedThreat[]> {
 }
 
 // ---------- IP geolocation with cache ----------
-async function enrichGeo(
-  supabaseAdmin: any,
-  threats: NormalizedThreat[],
-): Promise<number> {
+async function enrichGeo(supabaseAdmin: any, threats: NormalizedThreat[]): Promise<number> {
   const ips = [...new Set(threats.map((t) => t.source_ip).filter((ip): ip is string => !!ip))];
   if (!ips.length) return 0;
   const lookup = ips.slice(0, GEO_MAX_LOOKUPS);
@@ -250,8 +285,8 @@ async function enrichGeo(
     if (!t.source_ip) continue;
     const g = cacheMap.get(t.source_ip);
     if (g && g.latitude != null) {
-      t.country = g.country ?? null;
-      t.city = g.city ?? null;
+      t.country = t.country ?? g.country ?? null;
+      t.city = t.city ?? g.city ?? null;
       t.latitude = g.latitude;
       t.longitude = g.longitude;
       enriched++;
@@ -283,10 +318,13 @@ Deno.serve(async (req) => {
     const supabaseAdmin = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
     const otxKey = Deno.env.get('OTX_API_KEY');
     const abuseKey = Deno.env.get('ABUSEIPDB_API_KEY');
+    const threatfoxKey = Deno.env.get('THREATFOX_AUTH_KEY');
+    const urlhausKey = Deno.env.get('URLHAUS_AUTH_KEY');
 
     const sources: Array<{ provider: string; run: () => Promise<NormalizedThreat[]>; requiresConfig: boolean }> = [
-      { provider: 'ThreatFox', run: fetchThreatFox, requiresConfig: false },
-      { provider: 'URLhaus', run: fetchURLhaus, requiresConfig: false },
+      { provider: 'Feodo Tracker', run: fetchFeodoTracker, requiresConfig: false },
+      { provider: 'ThreatFox', run: () => (threatfoxKey ? fetchThreatFox(threatfoxKey) : Promise.resolve([])), requiresConfig: !threatfoxKey },
+      { provider: 'URLhaus', run: () => (urlhausKey ? fetchURLhaus(urlhausKey) : Promise.resolve([])), requiresConfig: !urlhausKey },
       { provider: 'OTX', run: () => (otxKey ? fetchOTX(otxKey) : Promise.resolve([])), requiresConfig: !otxKey },
       { provider: 'AbuseIPDB', run: () => (abuseKey ? fetchAbuseIPDB(abuseKey) : Promise.resolve([])), requiresConfig: !abuseKey },
     ];
@@ -296,7 +334,7 @@ Deno.serve(async (req) => {
 
     for (const src of sources) {
       if (src.requiresConfig) {
-        const message = 'Requires configuration: add the API key as a project secret to enable this provider.';
+        const message = 'Requires configuration: add the provider Auth-Key as a project secret to enable this provider.';
         await supabaseAdmin.from('intelligence_sync_logs').insert({ provider: src.provider, status: 'requires-configuration', records_imported: 0, message });
         results.push({ provider: src.provider, status: 'requires-configuration', imported: 0, message });
         continue;

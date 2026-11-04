@@ -30,6 +30,7 @@ export const THREAT_TYPE_LABELS: Record<string, string> = {
   'malicious-url': 'Malicious URL',
   'malicious-domain': 'Malicious Domain',
   'malware-hash': 'Malware Indicator',
+  'c2-server': 'Command & Control Server',
 };
 
 export const NOT_AVAILABLE = 'Not Available';
