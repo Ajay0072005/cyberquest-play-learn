@@ -36,6 +36,13 @@
       "when": 1793753757481,
       "tag": "0004_incident_permissions",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793847327893,
+      "tag": "0005_profile_views_insert_scope",
+      "breakpoints": true
     }
   ]
 }
