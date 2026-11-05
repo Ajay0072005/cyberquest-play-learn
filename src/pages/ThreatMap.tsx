@@ -1,6 +1,7 @@
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Globe2, RotateCw, RefreshCw, X, ArrowRight, Flag, ShieldAlert, Database, Loader2 } from 'lucide-react';
+import { useAdminRole } from '@/hooks/useAdminRole';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -51,6 +52,7 @@ const ThreatMap: React.FC = () => {
   const [noteDraft, setNoteDraft] = useState('');
   const [savingNote, setSavingNote] = useState(false);
 
+  const { isAdmin } = useAdminRole();
   const { threats, incidents, teams, loading, syncing, lastSyncAt, providerStatus, user, sync, refetch } = useThreatIntel();
 
   const filtered = useMemo(() => threats.filter((t) => {
@@ -179,6 +181,11 @@ const ThreatMap: React.FC = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          {isAdmin && (
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/admin/incidents"><ShieldAlert className="h-4 w-4 mr-1" />Incident Control</Link>
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={() => sync()} disabled={syncing}>
             {syncing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-1" />}
             {syncing ? 'Syncing…' : 'Sync now'}
