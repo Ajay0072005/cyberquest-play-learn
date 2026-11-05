@@ -40,6 +40,7 @@ import AboutUs from "./pages/AboutUs";
 import CyberEvents from "./pages/CyberEvents";
 import CyberFeeds from "./pages/CyberFeeds";
 import ThreatMap from "./pages/ThreatMap";
+import WarRoomAdmin from "./pages/WarRoomAdmin";
 import SecurityLabs from "./pages/SecurityLabs";
 import { useThemeCustomization } from "./hooks/useThemeCustomization";
 
@@ -86,6 +87,7 @@ const App = () => (
                 <Route path="/career-roles" element={<ProtectedRoute><CareerRoles /></ProtectedRoute>} />
                 <Route path="/career-roles/:slug" element={<ProtectedRoute><CareerRoles /></ProtectedRoute>} />
                 <Route path="/admin/roles" element={<ProtectedRoute><AdminRoles /></ProtectedRoute>} />
+                <Route path="/admin/incidents" element={<ProtectedRoute><WarRoomAdmin /></ProtectedRoute>} />
                 <Route path="/moderator" element={<ProtectedRoute><ModeratorDashboard /></ProtectedRoute>} />
                 <Route path="/roadmap" element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />
                 <Route path="/cyber-game" element={<ProtectedRoute><CyberGame /></ProtectedRoute>} />
