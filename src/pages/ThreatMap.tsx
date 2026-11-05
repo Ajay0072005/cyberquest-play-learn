@@ -52,6 +52,7 @@ const ThreatMap: React.FC = () => {
   const [noteDraft, setNoteDraft] = useState('');
   const [savingNote, setSavingNote] = useState(false);
 
+  const { isAdmin } = useAdminRole();
   const { threats, incidents, teams, loading, syncing, lastSyncAt, providerStatus, user, sync, refetch } = useThreatIntel();
 
   const filtered = useMemo(() => threats.filter((t) => {
