@@ -155,6 +155,12 @@ export async function createIncident(input: {
   return data as IncidentRow;
 }
 
+/** Approve an incident — admins/moderators only, via SECURITY DEFINER RPC. */
+export async function approveIncident(incidentId: string): Promise<void> {
+  const { error } = await supabase.rpc('approve_incident', { _incident_id: incidentId });
+  if (error) throw error;
+}
+
 export async function updateIncident(
   incident: IncidentRow,
   patch: Partial<Pick<IncidentRow, 'status' | 'team_id' | 'assigned_analyst' | 'severity'>>,

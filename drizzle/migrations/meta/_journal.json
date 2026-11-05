@@ -43,6 +43,13 @@
       "when": 1793847327893,
       "tag": "0005_profile_views_insert_scope",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793847479518,
+      "tag": "0006_incident_approval",
+      "breakpoints": true
     }
   ]
 }

@@ -119,6 +119,9 @@ export type Database = {
       }
       incidents: {
         Row: {
+          approved: boolean
+          approved_at: string | null
+          approved_by: string | null
           assigned_analyst: string | null
           created_at: string
           created_by: string | null
@@ -132,6 +135,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          approved?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
           assigned_analyst?: string | null
           created_at?: string
           created_by?: string | null
@@ -145,6 +151,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          approved?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
           assigned_analyst?: string | null
           created_at?: string
           created_by?: string | null
@@ -615,6 +624,7 @@ export type Database = {
     }
     Functions: {
       add_user_points: { Args: { _points: number }; Returns: undefined }
+      approve_incident: { Args: { _incident_id: string }; Returns: undefined }
       award_achievement: { Args: { _achievement_id: string }; Returns: boolean }
       has_role: {
         Args: {
